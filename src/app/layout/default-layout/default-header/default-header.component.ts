@@ -1,6 +1,7 @@
 import { NgStyle, NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from 'src/app/services/auth.service';
 
 import {
   AvatarComponent,
@@ -27,6 +28,7 @@ import {
 } from '@coreui/angular';
 
 import { IconDirective } from '@coreui/icons-angular';
+import { OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-default-header',
@@ -34,8 +36,9 @@ import { IconDirective } from '@coreui/icons-angular';
   standalone: true,
   imports: [ContainerComponent, HeaderTogglerDirective, SidebarToggleDirective, IconDirective, HeaderNavComponent, NavItemComponent, NavLinkDirective, RouterLink, RouterLinkActive, NgTemplateOutlet, BreadcrumbRouterComponent, ThemeDirective, DropdownComponent, DropdownToggleDirective, TextColorDirective, AvatarComponent, DropdownMenuDirective, DropdownHeaderDirective, DropdownItemDirective, BadgeComponent, DropdownDividerDirective, ProgressBarDirective, ProgressComponent, NgStyle]
 })
-export class DefaultHeaderComponent extends HeaderComponent {
+export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
 
+  public userPayload: any;
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
 
@@ -50,8 +53,13 @@ export class DefaultHeaderComponent extends HeaderComponent {
     return this.colorModes.find(mode => mode.name === currentMode)?.icon ?? 'cilSun';
   });
 
-  constructor() {
+  constructor(private authService: AuthService) {
     super();
+  }
+
+  ngOnInit(): void {
+    this.userPayload = this.authService.getDecodedToken();
+    console.log(this.userPayload);
   }
 
   sidebarId = input('sidebar1');

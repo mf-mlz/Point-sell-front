@@ -11,7 +11,7 @@ export class ApiServiceEmployees {
 
   constructor(private http: HttpClient) {}
 
-  /* Post */
+  /* Post -- Login */
   login(credentials: { email: string, password: string }): Observable<any> {
     const url = `${this.apiUrl}/employees/login`;
     return this.http.post(url, credentials);
