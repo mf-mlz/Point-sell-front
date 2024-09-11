@@ -21,3 +21,12 @@
 // Examples
 // We use those styles to show code examples, you should remove them in your application.
 @import "examples";
+
+div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm) {
+    border: 0;
+    border-radius: .25em;
+    background: initial;
+    background-color: #ff0270 !important;
+    color: #fff;
+    font-size: 1em;
+}
