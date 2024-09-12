@@ -25,6 +25,7 @@
       class="btn btn-success fw-bold d-flex align-items-center justify-content-center"
       (click)="showModal({}, 'Ver Datos del Producto', 'add', '')"
       style="width: 100%; max-width: 200px; height: 40px; color: white"
+      *ngIf="userPayload.role_name === 'Administrador'"
     >
       <svg
         [cIcon]="icons.cilPlus"
