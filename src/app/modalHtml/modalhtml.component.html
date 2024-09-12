@@ -1,0 +1,20 @@
+<div class="modal" [ngClass]="{ show: visible }" (click)="handleBackdropClick($event)">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ title }}</h5>
+          <button type="button" class="btn-close" (click)="toggleModal()"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Html Dinamic -->
+          <ng-content></ng-content>
+        </div>
+        <div class="modal-footer" *ngIf="class !== 'eye'">
+          <button type="button" class="btn btn-secondary" (click)="toggleModal()">Cerrar</button>
+          <button type="button" class="btn btn-primary" (click)="execute()">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  

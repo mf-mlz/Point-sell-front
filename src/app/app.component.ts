@@ -7,6 +7,7 @@ import { ColorModeService } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
 import { ApiService } from './services/api.service';
+import { UserService } from './services/user.service'; 
 
 @Component({
   selector: 'app-root',
@@ -24,6 +25,7 @@ export class AppComponent implements OnInit {
   readonly #colorModeService = inject(ColorModeService);
   readonly #iconSetService = inject(IconSetService);
   readonly #apiService = inject(ApiService);
+  readonly #userService = inject(UserService); // Inyecta UserService
 
   constructor() {
     this.#titleService.setTitle(this.title);

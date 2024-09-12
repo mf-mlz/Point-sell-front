@@ -2,6 +2,8 @@ import { NgStyle, NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 import {
   AvatarComponent,
@@ -53,13 +55,26 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
     return this.colorModes.find(mode => mode.name === currentMode)?.icon ?? 'cilSun';
   });
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private router: Router ) {
     super();
   }
 
   ngOnInit(): void {
     this.userPayload = this.authService.getDecodedToken();
     console.log(this.userPayload);
+  }
+
+  onLogout() {
+    Swal.fire({
+      icon: 'success',
+      title: 'Sesión Finalizada',
+      showConfirmButton: false,
+      timer: 2000,
+    }).then(() => {
+      this.authService.removeToken();
+      this.router.navigate(['/login']);
+    });
+    
   }
 
   sidebarId = input('sidebar1');

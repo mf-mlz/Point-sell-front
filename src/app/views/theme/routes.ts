@@ -9,14 +9,14 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'colors',
+        redirectTo: 'products',
         pathMatch: 'full'
       },
       {
-        path: 'colors',
-        loadComponent: () => import('./colors.component').then(m => m.ColorsComponent),
+        path: 'products',
+        loadComponent: () => import('./products.component').then(m => m.ProductsComponent),
         data: {
-          title: 'Colors'
+          title: 'Productos'
         }
       },
       {
