@@ -26,7 +26,7 @@ import {
   ProgressComponent,
   SidebarToggleDirective,
   TextColorDirective,
-  ThemeDirective
+  ThemeDirective,
 } from '@coreui/angular';
 
 import { IconDirective } from '@coreui/icons-angular';
@@ -36,10 +36,34 @@ import { OnInit } from '@angular/core';
   selector: 'app-default-header',
   templateUrl: './default-header.component.html',
   standalone: true,
-  imports: [ContainerComponent, HeaderTogglerDirective, SidebarToggleDirective, IconDirective, HeaderNavComponent, NavItemComponent, NavLinkDirective, RouterLink, RouterLinkActive, NgTemplateOutlet, BreadcrumbRouterComponent, ThemeDirective, DropdownComponent, DropdownToggleDirective, TextColorDirective, AvatarComponent, DropdownMenuDirective, DropdownHeaderDirective, DropdownItemDirective, BadgeComponent, DropdownDividerDirective, ProgressBarDirective, ProgressComponent, NgStyle]
+  imports: [
+    ContainerComponent,
+    HeaderTogglerDirective,
+    SidebarToggleDirective,
+    IconDirective,
+    HeaderNavComponent,
+    NavItemComponent,
+    NavLinkDirective,
+    RouterLink,
+    RouterLinkActive,
+    NgTemplateOutlet,
+    BreadcrumbRouterComponent,
+    ThemeDirective,
+    DropdownComponent,
+    DropdownToggleDirective,
+    TextColorDirective,
+    AvatarComponent,
+    DropdownMenuDirective,
+    DropdownHeaderDirective,
+    DropdownItemDirective,
+    BadgeComponent,
+    DropdownDividerDirective,
+    ProgressBarDirective,
+    ProgressComponent,
+    NgStyle,
+  ],
 })
 export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
-
   public userPayload: any;
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
@@ -47,15 +71,18 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   readonly colorModes = [
     { name: 'light', text: 'Light', icon: 'cilSun' },
     { name: 'dark', text: 'Dark', icon: 'cilMoon' },
-    { name: 'auto', text: 'Auto', icon: 'cilContrast' }
+    { name: 'auto', text: 'Auto', icon: 'cilContrast' },
   ];
 
   readonly icons = computed(() => {
     const currentMode = this.colorMode();
-    return this.colorModes.find(mode => mode.name === currentMode)?.icon ?? 'cilSun';
+    return (
+      this.colorModes.find((mode) => mode.name === currentMode)?.icon ??
+      'cilSun'
+    );
   });
 
-  constructor(private authService: AuthService, private router: Router ) {
+  constructor(private authService: AuthService, private router: Router) {
     super();
   }
 
@@ -65,16 +92,24 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   }
 
   onLogout() {
-    Swal.fire({
-      icon: 'success',
-      title: 'Sesión Finalizada',
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
       showConfirmButton: false,
       timer: 2000,
-    }).then(() => {
-      this.authService.removeToken();
-      this.router.navigate(['/login']);
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      },
     });
-    
+    Toast.fire({
+      icon: 'success',
+      title: 'Sesión Finalizada',
+    });
+
+    this.authService.removeToken();
+    this.router.navigate(['/login']);
   }
 
   sidebarId = input('sidebar1');
@@ -88,7 +123,8 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
       title: 'Urgent: System Maintenance Tonight',
       time: 'Just now',
       link: 'apps/email/inbox/message',
-      message: 'Attention team, we\'ll be conducting critical system maintenance tonight from 10 PM to 2 AM. Plan accordingly...'
+      message:
+        "Attention team, we'll be conducting critical system maintenance tonight from 10 PM to 2 AM. Plan accordingly...",
     },
     {
       id: 1,
@@ -98,7 +134,8 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
       title: 'Project Update: Milestone Achieved',
       time: '5 minutes ago',
       link: 'apps/email/inbox/message',
-      message: 'Kudos on hitting sales targets last quarter! Let\'s keep the momentum. New goals, new victories ahead...'
+      message:
+        "Kudos on hitting sales targets last quarter! Let's keep the momentum. New goals, new victories ahead...",
     },
     {
       id: 2,
@@ -108,7 +145,8 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
       title: 'Social Media Campaign Launch',
       time: '1:52 PM',
       link: 'apps/email/inbox/message',
-      message: 'Exciting news! Our new social media campaign goes live tomorrow. Brace yourselves for engagement...'
+      message:
+        'Exciting news! Our new social media campaign goes live tomorrow. Brace yourselves for engagement...',
     },
     {
       id: 3,
@@ -118,7 +156,8 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
       title: 'Inventory Checkpoint',
       time: '4:03 AM',
       link: 'apps/email/inbox/message',
-      message: 'Team, it\'s time for our monthly inventory check. Accurate counts ensure smooth operations. Let\'s nail it...'
+      message:
+        "Team, it's time for our monthly inventory check. Accurate counts ensure smooth operations. Let's nail it...",
     },
     {
       id: 3,
@@ -128,22 +167,56 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
       title: 'Customer Feedback Results',
       time: '3 days ago',
       link: 'apps/email/inbox/message',
-      message: 'Our latest customer feedback is in. Let\'s analyze and discuss improvements for an even better service...'
-    }
+      message:
+        "Our latest customer feedback is in. Let's analyze and discuss improvements for an even better service...",
+    },
   ];
 
   public newNotifications = [
-    { id: 0, title: 'New user registered', icon: 'cilUserFollow', color: 'success' },
+    {
+      id: 0,
+      title: 'New user registered',
+      icon: 'cilUserFollow',
+      color: 'success',
+    },
     { id: 1, title: 'User deleted', icon: 'cilUserUnfollow', color: 'danger' },
-    { id: 2, title: 'Sales report is ready', icon: 'cilChartPie', color: 'info' },
+    {
+      id: 2,
+      title: 'Sales report is ready',
+      icon: 'cilChartPie',
+      color: 'info',
+    },
     { id: 3, title: 'New client', icon: 'cilBasket', color: 'primary' },
-    { id: 4, title: 'Server overloaded', icon: 'cilSpeedometer', color: 'warning' }
+    {
+      id: 4,
+      title: 'Server overloaded',
+      icon: 'cilSpeedometer',
+      color: 'warning',
+    },
   ];
 
   public newStatus = [
-    { id: 0, title: 'CPU Usage', value: 25, color: 'info', details: '348 Processes. 1/4 Cores.' },
-    { id: 1, title: 'Memory Usage', value: 70, color: 'warning', details: '11444GB/16384MB' },
-    { id: 2, title: 'SSD 1 Usage', value: 90, color: 'danger', details: '243GB/256GB' }
+    {
+      id: 0,
+      title: 'CPU Usage',
+      value: 25,
+      color: 'info',
+      details: '348 Processes. 1/4 Cores.',
+    },
+    {
+      id: 1,
+      title: 'Memory Usage',
+      value: 70,
+      color: 'warning',
+      details: '11444GB/16384MB',
+    },
+    {
+      id: 2,
+      title: 'SSD 1 Usage',
+      value: 90,
+      color: 'danger',
+      details: '243GB/256GB',
+    },
   ];
 
   public newTasks = [
@@ -151,7 +224,6 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
     { id: 1, title: 'ReactJS Version', value: 25, color: 'danger' },
     { id: 2, title: 'VueJS Version', value: 50, color: 'warning' },
     { id: 3, title: 'Add new layouts', value: 75, color: 'info' },
-    { id: 4, title: 'Angular Version', value: 100, color: 'success' }
+    { id: 4, title: 'Angular Version', value: 100, color: 'success' },
   ];
-
 }

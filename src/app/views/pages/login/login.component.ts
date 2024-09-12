@@ -71,16 +71,25 @@ export class LoginComponent {
 
       this.apiService.login(credentials).subscribe(
         (response) => {
-          Swal.fire({
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: true,
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            },
+          });
+          Toast.fire({
             icon: 'success',
             title: 'Bienvenido',
             text: response.message,
-            showConfirmButton: false,
-            timer: 2000,
-          }).then(() => {
-            localStorage.setItem('token', response.token);
-            this.router.navigate(['/dashboard']);
           });
+
+          localStorage.setItem('token', response.token);
+          this.router.navigate(['/dashboard']);
         },
         (error) => {
           Swal.fire({

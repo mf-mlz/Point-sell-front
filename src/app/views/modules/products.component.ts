@@ -149,7 +149,7 @@ export class ProductsComponent implements OnInit {
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 2000,
           timerProgressBar: true,
           didOpen: (toast) => {
@@ -205,7 +205,7 @@ export class ProductsComponent implements OnInit {
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 2000,
           timerProgressBar: true,
           didOpen: (toast) => {
@@ -225,7 +225,7 @@ export class ProductsComponent implements OnInit {
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
-          showConfirmButton: false,
+          showConfirmButton: true,
           timer: 2000,
           timerProgressBar: true,
           didOpen: (toast) => {
