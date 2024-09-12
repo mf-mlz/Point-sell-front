@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   HostBinding,
   Inject,
@@ -9,7 +8,6 @@ import {
   forwardRef,
 } from '@angular/core';
 import { DOCUMENT, NgClass, CommonModule } from '@angular/common';
-import { getStyle, rgbToHex } from '@coreui/utils';
 import {
   TextColorDirective,
   CardComponent,
@@ -38,9 +36,9 @@ import {
   FormsModule,
 } from '@angular/forms';
 import { environment } from '../../../environments/environment';
-import { UserService } from '../../services/user.service';
 import { cilPlus, cilShieldAlt } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
+import { AuthService } from '../../services/auth.service'; 
 
 /* Interfaces */
 interface DeleteProductRequest {
@@ -119,7 +117,7 @@ export class ProductsComponent implements OnInit {
     private renderer: Renderer2,
     private apiServiceProducts: ApiServiceProducts,
     private fb: FormBuilder,
-    private userService: UserService
+    private authService: AuthService
   ) {
     this.productForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -135,7 +133,7 @@ export class ProductsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userPayload = this.userService.userPayload;
+    this.userPayload = this.authService.getDecodedToken();
     this.getAllProducts();
     this.getAllCategories();
     this.getAllKeySat();
