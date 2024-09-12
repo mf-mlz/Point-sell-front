@@ -54,19 +54,31 @@
   color: white;
 }
 
-.btn-product {
-  font-size: 13px;
+.desconocida{
+  background-color: black;
+  color: white;
 }
 
-.eye input,
-select {
+.btn-product {
+  font-size: 15px;
+}
+
+.eye {
   z-index: 1 !important;
   pointer-events: none;
   opacity: 0.5;
 }
 
+.add input,
+select {
+ display: inline !important;
+}
+
 .btn-category{
-  font-size: 10px;
+  font-size: 15px;
   font-weight: bolder;
   border: 1px solid transparent;
+  border-radius: 10px !important;
+  height: 50px !important;
+  width: 100%;
 }

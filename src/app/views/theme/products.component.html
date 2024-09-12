@@ -1,17 +1,48 @@
 <!-- Filter Input-->
-<div class="col-12 col-sm-12 col-md-6 col-lg-6 mb-4">
-  <div class="form-group d-flex align-items-center">
-    <input id="search" class="form-control me-2 flex-grow-1" placeholder="Ingresa el Sku / Descripción" [(ngModel)]="searchInput"/>
-    <button class="btn btn-primary fw-bold btn-product" (click)="filterProducts('input')">Buscar</button>
-    <button class="btn btn-success fw-bold btn-product mx-2" style="width: 40%;color:white;" (click)="getAllProducts()">Ver Todos</button>
+<div class="row my-2">
+  <!-- Input de búsqueda y botones en una fila -->
+  <div class="col-12 col-md-6 mb-4">
+    <div class="form-group d-flex flex-column flex-md-row align-items-center">
+      <input
+        id="search"
+        class="form-control me-2 mb-2 mb-md-0 flex-grow-1"
+        placeholder="Ingresa el Sku / Descripción"
+        [(ngModel)]="searchInput"
+      />
+      <button
+        class="btn btn-primary fw-bold me-2"
+        (click)="filterProducts('input')"
+        style="flex: 1"
+      >
+        Buscar
+      </button>
+    </div>
+  </div>
+
+  <!-- Botón de "Añadir Producto" -->
+  <div class="col-12 col-md-6 mb-4 d-flex justify-content-end">
+    <button
+      class="btn btn-success fw-bold d-flex align-items-center justify-content-center"
+      (click)="showModal({}, 'Ver Datos del Producto', 'add', '')"
+      style="width: 100%; max-width: 200px; height: 40px; color: white"
+    >
+      <svg
+        [cIcon]="icons.cilPlus"
+        width="20"
+        height="20"
+        class="me-2"
+        title="Añadir"
+      ></svg>
+      Añadir Producto
+    </button>
   </div>
 </div>
 
 <!-- Filter Categories-->
-<div class="row">
+<div class="row d-flex justify-content-center">
   <div
     *ngFor="let category of categories"
-    class="col-lg-3 col-md-3 col-sm-6 mb-4 d-flex justify-content-center"
+    class="col-lg-2 col-md-2 col-sm-6 mb-4"
   >
     <button
       [ngClass]="'span-color ' + category.category"
@@ -21,9 +52,22 @@
       {{ category.category }}
     </button>
   </div>
+  <div
+    class="col-lg-2 col-md-2 col-sm-6 mb-4"
+    style="margin-top: 10px !important"
+  >
+    <button
+      class="text-center btn-category"
+      (click)="getAllProducts()"
+      style="flex: 1; background-color: white; color: black"
+    >
+      Ver Todos
+    </button>
+  </div>
 </div>
 
-<div class="row">
+<div class="row my-4">
+  <hr />
   <!-- Products -->
   <div
     class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4"
@@ -33,11 +77,11 @@
       <img
         class="theme-color w-100 rounded mb-3 bg-primary"
         style="height: 250px"
-        [src]="apiUpload + product.photo"
+        [src]="apiUpload + (product.photo || 'noImage.png')"
       />
       <h5>{{ product.name }}</h5>
-      <span>Sku: {{product.id}}</span>
-      <br>
+      <span>Sku: {{ product.id }}</span>
+      <br />
       <div [ngClass]="'span-color ' + product.category">
         <b>{{ product.category }}</b>
       </div>
@@ -72,13 +116,13 @@
         </button>
       </div>
     </div>
-    <!-- Modal Component (Edit Product) -->
+    <!-- Modal Component (Edit / View / Add  Product) -->
     <app-modal
       [visible]="isModalVisible"
       (visibleChange)="handleModalVisibilityChange($event)"
       [title]="titleModal"
       [class]="classModal"
-      (executeFunction)="editProduct()"
+      (executeFunction)="handleClick()"
     >
       <!-- Img Product => View -->
       <div
@@ -200,7 +244,6 @@
             class="form-control"
             (change)="onFileSelected($event)"
             accept="image/*"
-            required
           />
           <div
             *ngIf="isFieldInvalid(productForm, 'photoUpload')"

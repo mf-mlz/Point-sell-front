@@ -39,6 +39,8 @@ import {
 } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { UserService } from '../../services/user.service';
+import { cilPlus, cilShieldAlt } from '@coreui/icons';
+import { IconDirective } from '@coreui/icons-angular';
 
 /* Interfaces */
 interface DeleteProductRequest {
@@ -87,6 +89,7 @@ interface KeySat {
     ModalComponentHtml,
     ReactiveFormsModule,
     FormsModule,
+    IconDirective,
     forwardRef(() => ThemeColorComponent),
   ],
 })
@@ -108,6 +111,7 @@ export class ProductsComponent implements OnInit {
   classModal: string = '';
   nameFile: string = '';
   searchInput: string = '';
+  icons = { cilPlus, cilShieldAlt };
   public apiUpload = environment.apiUpload;
 
   constructor(
@@ -123,9 +127,9 @@ export class ProductsComponent implements OnInit {
       price: [0, [Validators.required, Validators.min(0)]],
       category: ['', Validators.required],
       stock: [0, [Validators.required, Validators.min(1)]],
-      photo: ['', [Validators.required, Validators.minLength(3)]],
-      photoUpload: [null, [Validators.required]],
-      id: ['', [Validators.required, Validators.minLength(1)]],
+      photo: [''],
+      photoUpload: [null],
+      id: [''],
       key_sat: [0, [Validators.required, Validators.minLength(1)]],
     });
   }
@@ -155,7 +159,7 @@ export class ProductsComponent implements OnInit {
         });
         Toast.fire({
           icon: 'success',
-          title: 'Se encontraron '+ response.length +' registros',
+          title: 'Se encontraron ' + response.length + ' registros',
         });
       },
       (error) => {
@@ -328,48 +332,122 @@ export class ProductsComponent implements OnInit {
     );
   }
 
-  /* Modal -- Edit Product */
+  /* Modal -- Edit/View Product */
   showModal(
-    product: any,
-    titleModal: string,
-    classModal: string,
-    nameFile: string
+    product?: any,
+    titleModal: string = '',
+    classModal: string = '',
+    nameFile: string = ''
   ): void {
-    this.selectedProduct = product;
+    const defaultProduct = {
+      name: '',
+      description: '',
+      price: 0,
+      category: '',
+      stock: 0,
+      photo: '',
+      id: 0,
+      key_sat: '',
+    };
+
+    this.selectedProduct = product || defaultProduct;
+
     this.productForm.patchValue({
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      category: product.category,
-      stock: product.stock,
-      photo: product.photo,
-      id: product.id,
-      key_sat: product.key_sat,
+      name: this.selectedProduct?.name ?? '',
+      description: this.selectedProduct?.description ?? '',
+      price: this.selectedProduct?.price ?? 0,
+      category: this.selectedProduct?.category ?? '',
+      stock: this.selectedProduct?.stock ?? 0,
+      photo: this.selectedProduct?.photo ?? '',
+      id: this.selectedProduct?.id ?? 0,
+      key_sat: this.selectedProduct?.key_sat ?? '',
     });
+
     this.isModalVisible = true;
     this.titleModal = titleModal;
     this.classModal = classModal;
-    this.nameFile = nameFile;
+    this.nameFile = nameFile || 'noImage.png';
   }
 
   handleModalVisibilityChange(visible: boolean) {
     this.isModalVisible = visible;
   }
 
+  /* Handle Click */
+  handleClick(): void {
+    if (this.classModal === 'add') {
+      this.addProduct();
+    } else if (this.classModal === 'edit') {
+      this.editProduct();
+    }
+  }
+
+  /* Add Product  */
+  addProduct(): void {
+    if (this.productForm.valid) {
+      const formValue = this.productForm.value;
+      this.apiServiceProducts.registerProducts(formValue).subscribe(
+        (response) => {
+          /* Upload File  */
+          if (this.selectedFile) {
+            const formData = new FormData();
+            formData.append('id_product', response.id);
+            formData.append('photo', this.selectedFile);
+            this.uploadProduct(formData);
+          } else {
+            Swal.fire({
+              icon: 'success',
+              title: response.message || 'Producto Añadido con Éxito',
+            }).then((result) => {
+              if (result.isConfirmed) {
+                this.resetFileInput();
+                this.getAllProducts();
+              }
+            });
+          }
+        },
+        (error) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text:
+              error.error?.message || 'Ocurrió un error al Añadir el Producto.',
+          });
+        }
+      );
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Error',
+        text: 'Por favor, ingresa correctamente la información.',
+      });
+    }
+  }
   /* Edit Product */
   editProduct(): void {
-    if (this.productForm.valid && this.selectedFile) {
+    if (this.productForm.valid) {
       const formValue = this.productForm.value;
-
-      const formData = new FormData();
-      formData.append('id_product', formValue.id);
-      formData.append('photo', this.selectedFile);
-
+      
       /* Send Data Put (Edit Product) */
       this.apiServiceProducts.editProduct(formValue).subscribe(
         (response) => {
           /* Upload File  */
-          this.uploadProduct(formData);
+          if (this.selectedFile) {
+            const formData = new FormData();
+            formData.append('id_product', formValue.id);
+            formData.append('photo', this.selectedFile);
+            this.uploadProduct(formData);
+          } else {
+            Swal.fire({
+              icon: 'success',
+              title: response.message || 'Producto Modificado con Éxito',
+            }).then((result) => {
+              if (result.isConfirmed) {
+                this.resetFileInput();
+                this.getAllProducts();
+              }
+            });
+          }
         },
         (error) => {
           Swal.fire({
@@ -403,12 +481,15 @@ export class ProductsComponent implements OnInit {
   uploadProduct(formData: FormData): void {
     this.apiServiceProducts.uploadFile(formData).subscribe(
       (response) => {
-        this.resetFileInput();
         Swal.fire({
           icon: 'success',
           title: response.message || 'Producto Modificado con Éxito',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.resetFileInput();
+            this.getAllProducts();
+          }
         });
-        this.getAllProducts();
       },
       (error) => {
         Swal.fire({

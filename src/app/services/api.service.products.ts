@@ -76,6 +76,18 @@ export class ApiServiceProducts {
     return this.http.post(url, filters, { headers });
   }
   
+    /* Post -- Register Products */
+    registerProducts(credentials: { id: number, name: string, description: string, price: number, category: string, stock: number, photo: string}): Observable<any> {
+      const url = `${this.apiUrl}/products/register`;
+      const token = this.authService.getToken();
+    
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+        employeeId: this.userPayload.id,
+      });
+  
+      return this.http.post(url, credentials, { headers });
+    }
 
   /* Put -- Edit Product */
   editProduct(credentials: { id: number, name: string, description: string, price: number, category: string, stock: number, photo: string }): Observable<any> {
