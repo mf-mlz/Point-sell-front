@@ -39,31 +39,7 @@ import { environment } from '../../../environments/environment';
 import { cilPlus, cilShieldAlt } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { AuthService } from '../../services/auth.service'; 
-
-/* Interfaces */
-interface DeleteProductRequest {
-  id: number;
-}
-
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  stock: number;
-  photo: string;
-  key_sat: string;
-}
-
-interface Category {
-  category: string;
-}
-
-interface KeySat {
-  clave: string;
-  descripcion: string;
-}
+import { DeleteProductRequest, Product, Category, KeySat } from '../../models/interfaces';
 
 @Component({
   templateUrl: 'products.component.html',
