@@ -23,3 +23,24 @@ export interface KeySat {
   clave: string;
   descripcion: string;
 }
+
+// Sale
+
+export interface SaleDate {
+  dateBefore: string;
+  dateAfter: string;
+}
+
+
+export interface Sale {
+  id: number;
+  date: string; 
+  totalAmount: number;
+  payment: number;
+  dataPayment: string;
+  customerId: number;
+  employeesId: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}

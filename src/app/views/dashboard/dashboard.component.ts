@@ -1,7 +1,6 @@
-import { DOCUMENT, NgStyle } from '@angular/common';
-import { Component, DestroyRef, effect, inject, OnInit, Renderer2, signal, WritableSignal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { ChartOptions } from 'chart.js';
+import { RouterLink } from '@angular/router';
+import { NgStyle } from '@angular/common';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import {
   AvatarComponent,
   ButtonDirective,
@@ -17,174 +16,201 @@ import {
   ProgressComponent,
   RowComponent,
   TableDirective,
-  TextColorDirective
+  TextColorDirective,
+
+  DropdownComponent,
+  DropdownItemDirective,
+  DropdownMenuDirective,
+  DropdownToggleDirective,
+  TemplateIdDirective,
+  ThemeDirective,
+  WidgetStatAComponent
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
+import { cilArrowTop, cilOptions } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-
+import { getStyle } from '@coreui/utils';
 import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.component';
 import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
-import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
+import { ApiServiceSales } from '../../services/api.service.sales';
+import { SaleDate, Sale } from '../../models/interfaces';
+import Swal from 'sweetalert2';
+import { GridModule } from '@coreui/angular';
 
-interface IUser {
-  name: string;
-  state: string;
-  registered: string;
-  country: string;
-  usage: number;
-  period: string;
-  payment: string;
-  activity: string;
-  avatar: string;
-  status: string;
-  color: string;
-}
+
 
 @Component({
   templateUrl: 'dashboard.component.html',
   styleUrls: ['dashboard.component.scss'],
   standalone: true,
-  imports: [WidgetsDropdownComponent, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent]
+  imports: [WidgetsDropdownComponent, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent, GridModule,
+    WidgetStatAComponent,
+    TemplateIdDirective,
+    IconDirective,
+    ThemeDirective,
+    DropdownComponent,
+    DropdownToggleDirective,
+    DropdownMenuDirective,
+    DropdownItemDirective,
+    RouterLink,
+
+  ],
 })
+
 export class DashboardComponent implements OnInit {
 
-  readonly #destroyRef: DestroyRef = inject(DestroyRef);
-  readonly #document: Document = inject(DOCUMENT);
-  readonly #renderer: Renderer2 = inject(Renderer2);
-  readonly #chartsData: DashboardChartsData = inject(DashboardChartsData);
+  sales: Sale[] = [];
+  public data: any = null;
+  public total: number = 0;
 
-  public users: IUser[] = [
-    {
-      name: 'Yiorgos Avraamu',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'Us',
-      usage: 50,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Mastercard',
-      activity: '10 sec ago',
-      avatar: './assets/images/avatars/1.jpg',
-      status: 'success',
-      color: 'success'
-    },
-    {
-      name: 'Avram Tarasios',
-      state: 'Recurring ',
-      registered: 'Jan 1, 2021',
-      country: 'Br',
-      usage: 10,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Visa',
-      activity: '5 minutes ago',
-      avatar: './assets/images/avatars/2.jpg',
-      status: 'danger',
-      color: 'info'
-    },
-    {
-      name: 'Quintin Ed',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'In',
-      usage: 74,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Stripe',
-      activity: '1 hour ago',
-      avatar: './assets/images/avatars/3.jpg',
-      status: 'warning',
-      color: 'warning'
-    },
-    {
-      name: 'Enéas Kwadwo',
-      state: 'Sleep',
-      registered: 'Jan 1, 2021',
-      country: 'Fr',
-      usage: 98,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Paypal',
-      activity: 'Last month',
-      avatar: './assets/images/avatars/4.jpg',
-      status: 'secondary',
-      color: 'danger'
-    },
-    {
-      name: 'Agapetus Tadeáš',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'Es',
-      usage: 22,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'ApplePay',
-      activity: 'Last week',
-      avatar: './assets/images/avatars/5.jpg',
-      status: 'success',
-      color: 'primary'
-    },
-    {
-      name: 'Friderik Dávid',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'Pl',
-      usage: 43,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Amex',
-      activity: 'Yesterday',
-      avatar: './assets/images/avatars/6.jpg',
-      status: 'info',
-      color: 'dark'
-    }
-  ];
+  public options: any = {};
 
-  public mainChart: IChartProps = { type: 'line' };
-  public mainChartRef: WritableSignal<any> = signal(undefined);
-  #mainChartRefEffect = effect(() => {
-    if (this.mainChartRef()) {
-      this.setChartStyles();
-    }
-  });
-  public chart: Array<IChartProps> = [];
-  public trafficRadioGroup = new FormGroup({
-    trafficRadio: new FormControl('Month')
-  });
+  constructor(private apiServiceSales: ApiServiceSales) { }
 
   ngOnInit(): void {
-    this.initCharts();
-    this.updateChartOnColorModeChange();
+    this.getSaleDate();
+    // this.options = this.optionsDefault;
   }
 
-  initCharts(): void {
-    this.mainChart = this.#chartsData.mainChart;
+  getSaleDate(): void {
+    // armar date para fechas diarias xD
+
+
+    const today = new Date();
+    const formattedDate = this.getFormattedDate(today, 0);
+    const afterFormattedDate = this.getFormattedDate(today, 1);
+
+    const obj: SaleDate = {
+      dateBefore: formattedDate,
+      dateAfter: afterFormattedDate
+    };
+
+    this.apiServiceSales.getSaleDate(obj).subscribe(
+      (response) => {
+        this.sales = response.sales;
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: true,
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          },
+        });
+        Toast.fire({
+          icon: 'success',
+          title: 'Se encontraron ' + response.sales.length + ' registros',
+        });
+        this.createChart();
+
+      },
+      (error) => {
+        this.sales = [];
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text:
+            error.error?.message || 'Ocurrió un Error al Obtener las Ventas Diarias',
+        });
+
+      }
+    );
+
   }
 
-  setTrafficPeriod(value: string): void {
-    this.trafficRadioGroup.setValue({ trafficRadio: value });
-    this.#chartsData.initMainChart(value);
-    this.initCharts();
-  }
+  createChart(): void {
+    let arrayLabels: string[] = [];
+    let arrayTotalAmounts: number[] = [];
+    let last10Sales: Sale[] = [];
 
-  handleChartRef($chartRef: any) {
-    if ($chartRef) {
-      this.mainChartRef.set($chartRef);
+    if (this.sales.length >= 10) {
+      last10Sales = this.sales.slice(-10);
     }
-  }
 
-  updateChartOnColorModeChange() {
-    const unListen = this.#renderer.listen(this.#document.documentElement, 'ColorSchemeChange', () => {
-      this.setChartStyles();
+    this.sales.forEach(e => {
+      this.total += e.totalAmount;
     });
 
-    this.#destroyRef.onDestroy(() => {
-      unListen();
+    last10Sales.forEach(e => {
+      let totalAmount = e.totalAmount;
+
+      let arrayDate = e.date.split("T");
+      let date = arrayDate[0];
+
+      const d = new Date(e.date);
+      const day = d.getDate();
+      const month = d.getMonth() + 1; // Los meses van de 0 a 11
+      const year = d.getFullYear();
+      const hours = d.getHours();
+      const minutes = d.getMinutes();
+      const dateForm = `${day}-${month}-${year} ${hours}:${minutes}`;
+
+      arrayLabels.push(dateForm);
+      arrayTotalAmounts.push(totalAmount);
     });
+
+    this.data = {
+      labels: arrayLabels,
+      datasets: [
+        {
+          label: '',
+          data: arrayTotalAmounts,
+          borderColor: '#36A2EB',
+          backgroundColor: '#9BD0F5'
+        }
+      ]
+    };
   }
 
-  setChartStyles() {
-    if (this.mainChartRef()) {
-      setTimeout(() => {
-        const options: ChartOptions = { ...this.mainChart.options };
-        const scales = this.#chartsData.getScales();
-        this.mainChartRef().options.scales = { ...options.scales, ...scales };
-        this.mainChartRef().update();
-      });
-    }
+  getFormattedDate(date: Date, d: number): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate() + d).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
+
+  // opciines del Widgets
+  // optionsDefault = {
+  //   plugins: {
+  //     legend: {
+  //       display: false
+  //     }
+  //   },
+  //   maintainAspectRatio: true,
+  //   scales: {
+  //     x: {
+  //       grid: {
+  //         display: false,
+  //         drawBorder: false
+  //       },
+  //       ticks: {
+  //         display: false
+  //       }
+  //     },
+  //     y: {
+  //       min: 30,
+  //       max: 89,
+  //       display: false,
+  //       grid: {
+  //         display: false
+  //       },
+  //       ticks: {
+  //         display: false
+  //       }
+  //     }
+  //   },
+  //   elements: {
+  //     line: {
+  //       borderWidth: 1,
+  //       tension: 0.4
+  //     },
+  //     point: {
+  //       radius: 4,
+  //       hitRadius: 10,
+  //       hoverRadius: 4
+  //     }
+  //   }
+  // };
 }
