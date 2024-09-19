@@ -22,7 +22,6 @@ export const navItems: INavData[] = [
   {
     name: 'Ventas',
     url: '/modules/sales',
-    linkProps: { fragment: 'headings' },
     iconComponent: { name: 'cil-calculator' }
   },
   {
