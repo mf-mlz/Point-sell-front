@@ -38,8 +38,20 @@ import {
 import { environment } from '../../../environments/environment';
 import { cilPlus, cilShieldAlt } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-import { AuthService } from '../../services/auth.service'; 
-import { DeleteProductRequest, Product, Category, KeySat } from '../../models/interfaces';
+import { AuthService } from '../../services/auth.service';
+import {
+  DeleteProductRequest,
+  Product,
+  Category,
+  KeySat,
+  userPayload,
+} from '../../models/interfaces';
+
+/* Type data Filter Obj */
+type ProductFilterData =
+  | { id: string }
+  | { name: string }
+  | { category: string | undefined };
 
 @Component({
   templateUrl: 'products.component.html',
@@ -68,7 +80,16 @@ import { DeleteProductRequest, Product, Category, KeySat } from '../../models/in
   ],
 })
 export class ProductsComponent implements OnInit {
-  public userPayload: any;
+  userPayload: userPayload = {
+    id: 0,
+    name: '',
+    email: '',
+    phone: '',
+    role_id: 0,
+    role_name: '',
+    iat: 0,
+    exp: 0,
+  };
   products: Product[] = [];
   categories: Category[] = [];
   keySat: KeySat[] = [];
@@ -154,7 +175,7 @@ export class ProductsComponent implements OnInit {
     if (type === 'input') {
       if (this.searchInput) {
         const isInteger = /^-?\d+$/.test(this.searchInput);
-        const data = isInteger
+        const data: ProductFilterData = isInteger
           ? { id: this.searchInput }
           : { name: this.searchInput };
         this.getProductsFilter(data);
@@ -165,7 +186,7 @@ export class ProductsComponent implements OnInit {
         });
       }
     } else if (type === 'category') {
-      const data = {
+      const data: ProductFilterData = {
         category: category,
       };
       this.getProductsFilter(data);
@@ -173,7 +194,7 @@ export class ProductsComponent implements OnInit {
   }
 
   /* Filter -- Post */
-  getProductsFilter(data: any): void {
+  getProductsFilter(data: ProductFilterData): void {
     this.apiServiceProducts.filterProducts(data).subscribe(
       (response) => {
         const Toast = Swal.mixin({
@@ -253,6 +274,7 @@ export class ProductsComponent implements OnInit {
     );
   }
 
+  /* Filter Key Say Datalist */
   filterKeySat(event: Event) {
     const inputValue = (event.target as HTMLInputElement).value;
     this.filteredKeySat = this.keySat
@@ -343,6 +365,7 @@ export class ProductsComponent implements OnInit {
     this.nameFile = nameFile || 'noImage.png';
   }
 
+  /* Open / Close Modal */
   handleModalVisibilityChange(visible: boolean) {
     this.isModalVisible = visible;
   }
@@ -356,7 +379,7 @@ export class ProductsComponent implements OnInit {
     }
   }
 
-  /* Add Product  */
+  /* Add Product -- Function  */
   addProduct(): void {
     if (this.productForm.valid) {
       const formValue = this.productForm.value;
@@ -397,11 +420,12 @@ export class ProductsComponent implements OnInit {
       });
     }
   }
-  /* Edit Product */
+
+  /* Edit Product -- Function */
   editProduct(): void {
     if (this.productForm.valid) {
       const formValue = this.productForm.value;
-      
+
       /* Send Data Put (Edit Product) */
       this.apiServiceProducts.editProduct(formValue).subscribe(
         (response) => {
@@ -441,17 +465,7 @@ export class ProductsComponent implements OnInit {
     }
   }
 
-  /* Modal Upload File */
-  showModalUpload(id: number): void {
-    this.idProductSelect = id;
-    this.uploadForm.get('photoUpload')?.reset();
-    this.uploadForm.patchValue({
-      id: id,
-    });
-    this.isModalVisibleUpload = true;
-  }
-
-  /* Upload Photo */
+  /* Upload Photo -- Function */
   uploadProduct(formData: FormData): void {
     this.apiServiceProducts.uploadFile(formData).subscribe(
       (response) => {
