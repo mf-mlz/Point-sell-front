@@ -1,0 +1,33 @@
+.filter-container {
+  mat-form-field {
+    width: 100%; // Para que ocupe el ancho completo
+    background-color: white; // Fondo blanco
+
+    input {
+      color: black; // Texto negro
+    }
+
+    .mat-form-field-wrapper {
+      .mat-form-field-label {
+        color: black; // Color de la etiqueta
+      }
+
+      .mat-form-field-flex {
+        border: 1px solid black; // Borde negro
+        background-color: white; // Fondo blanco
+      }
+
+      .mat-form-field-underline {
+        background-color: black; // Línea negra debajo del input
+      }
+    }
+
+    .mat-input-element {
+      background-color: white; // Fondo blanco dentro del input
+      color: black; // Texto negro
+    }
+  }
+}
+
+
+  
