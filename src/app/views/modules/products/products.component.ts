@@ -25,9 +25,9 @@ import {
   ThemeDirective,
 } from '@coreui/angular';
 
-import { ApiServiceProducts } from '../../services/api.service.products';
+import { ApiServiceProducts } from '../../../services/api.service.products';
 import Swal from 'sweetalert2';
-import { ModalComponentHtml } from '../../modalHtml/modalhtml.component';
+import { ModalComponentHtml } from '../../../modalHtml/modalhtml.component';
 import {
   FormBuilder,
   FormGroup,
@@ -35,17 +35,17 @@ import {
   Validators,
   FormsModule,
 } from '@angular/forms';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { cilPlus, cilShieldAlt } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../../services/auth.service';
 import {
   DeleteProductRequest,
   Product,
   Category,
   KeySat,
   userPayload,
-} from '../../models/interfaces';
+} from '../../../models/interfaces';
 
 /* Type data Filter Obj */
 type ProductFilterData =
