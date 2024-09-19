@@ -1,0 +1,52 @@
+/* Buttons */
+.btn-view {
+  background-color: #17a2b8;
+  color: white;
+  border: 1px solid #17a2b8;
+  border-radius: 4px;
+  padding: 8px 16px;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #138496;
+    color: white;
+    transition: 0.3s;
+  }
+}
+
+.btn-edit {
+  background-color: #ffc107;
+  color: black;
+  border: 1px solid white;
+  border-radius: 4px;
+  padding: 8px 16px;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-left: 10px;
+  margin-right: 5px;
+
+  &:hover {
+    background-color: #e0a800;
+    color: black;
+    transition: 0.3s;
+  }
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+  border: 1px solid white;
+  border-radius: 4px;
+  padding: 8px 16px;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-left: 10px;
+  margin-right: 10px;
+
+  &:hover {
+    background-color: #c82333;
+    color: white;
+    transition: 0.3s;
+  }
+}
