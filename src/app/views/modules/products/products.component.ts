@@ -46,6 +46,7 @@ import {
   KeySat,
   userPayload,
 } from '../../../models/interfaces';
+import { IconsModule } from '../../../icons/icons.module';
 
 /* Type data Filter Obj */
 type ProductFilterData =
@@ -56,7 +57,7 @@ type ProductFilterData =
 
 @Component({
   templateUrl: 'products.component.html',
-  styleUrls: ['./products.component.scss'],
+  styleUrls: ['./products.component.scss', '../../../../scss/buttons.scss'],
   standalone: true,
   imports: [
     TextColorDirective,
@@ -77,6 +78,7 @@ type ProductFilterData =
     ReactiveFormsModule,
     FormsModule,
     IconDirective,
+    IconsModule,
     forwardRef(() => ThemeColorComponent),
   ],
 })

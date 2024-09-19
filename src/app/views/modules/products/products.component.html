@@ -108,26 +108,29 @@
       <span class="text-success fw-bold">${{ product.price }}</span>
       <div class="d-flex justify-content-center my-2">
         <button
-          class="btn btn-primary me-2 fw-bold btn-product"
+          title="Ver"
+          class="btn btn-view me-2 fw-bold btn-product"
           (click)="
             showModal(product, 'Ver Datos del Producto', 'eye', product.photo)
           "
         >
-          Ver
+          <app-icons icon="view"></app-icons>
         </button>
         <button
-          class="btn btn-warning me-2 fw-bold btn-product"
+          title="Editar"
+          class="btn btn-edit me-2 fw-bold btn-product"
           (click)="showModal(product, 'Editar Producto', 'edit', product.photo)"
           *ngIf="userPayload.role_name === 'Administrador'"
         >
-          Editar
+          <app-icons icon="pencil"></app-icons>
         </button>
         <button
-          class="btn btn-danger fw-bold btn-product"
+          title="Eliminar"
+          class="btn btn-delete fw-bold btn-product"
           (click)="showModaldeleteProduct(product.id)"
           *ngIf="userPayload.role_name === 'Administrador'"
         >
-          Eliminar
+          <app-icons icon="trash"></app-icons>
         </button>
       </div>
     </div>
