@@ -1,3 +1,16 @@
+/* User Payload */
+
+export interface userPayload {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  role_id: number;
+  role_name: string;
+  iat: number;
+  exp: number;
+}
+
 /* Products Interfaces */
 
 export interface DeleteProductRequest {
@@ -24,17 +37,15 @@ export interface KeySat {
   descripcion: string;
 }
 
-// Sale
-
+/* Sales */
 export interface SaleDate {
   dateBefore: string;
   dateAfter: string;
 }
 
-
 export interface Sale {
   id: number;
-  date: string; 
+  date: string;
   totalAmount: number;
   payment: number;
   dataPayment: string;
