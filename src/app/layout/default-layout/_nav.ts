@@ -20,10 +20,10 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-list' }
   },
   {
-    name: 'Typography',
-    url: '/modules/typography',
+    name: 'Ventas',
+    url: '/modules/sales',
     linkProps: { fragment: 'headings' },
-    iconComponent: { name: 'cil-pencil' }
+    iconComponent: { name: 'cil-calculator' }
   },
   {
     name: 'Components',
