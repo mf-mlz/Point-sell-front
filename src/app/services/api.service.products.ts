@@ -7,7 +7,8 @@ import { AuthService } from '../services/auth.service';
 type ProductFilterData =
   | { id: string }
   | { name: string }
-  | { category: string | undefined };
+  | { category: string | undefined }
+  | { stock: string | undefined };
 
 @Injectable({
   providedIn: 'root',

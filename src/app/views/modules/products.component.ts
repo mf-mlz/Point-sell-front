@@ -51,7 +51,8 @@ import {
 type ProductFilterData =
   | { id: string }
   | { name: string }
-  | { category: string | undefined };
+  | { category: string | undefined }
+  | { stock: string | undefined };
 
 @Component({
   templateUrl: 'products.component.html',
@@ -188,6 +189,11 @@ export class ProductsComponent implements OnInit {
     } else if (type === 'category') {
       const data: ProductFilterData = {
         category: category,
+      };
+      this.getProductsFilter(data);
+    }else if(type === 'stock'){
+      const data: ProductFilterData = {
+        stock: '10',
       };
       this.getProductsFilter(data);
     }

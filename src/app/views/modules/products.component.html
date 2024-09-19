@@ -53,6 +53,7 @@
       {{ category.category }}
     </button>
   </div>
+  <!-- View All Products -->
   <div
     class="col-lg-2 col-md-2 col-sm-6 mb-4"
     style="margin-top: 10px !important"
@@ -63,6 +64,19 @@
       style="flex: 1; background-color: white; color: black"
     >
       Ver Todos
+    </button>
+  </div>
+  <!-- View Stock Min -->
+  <div
+    class="col-lg-2 col-md-2 col-sm-6 mb-4"
+    style="margin-top: 10px !important"
+  >
+    <button
+      class="text-center btn-category"
+      (click)="filterProducts('stock')"
+      style="flex: 1; background-color: red; color: white"
+    >
+      Stock Minimo
     </button>
   </div>
 </div>
