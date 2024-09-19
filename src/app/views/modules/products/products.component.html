@@ -27,14 +27,8 @@
       style="width: 100%; max-width: 200px; height: 40px; color: white"
       *ngIf="userPayload.role_name === 'Administrador'"
     >
-      <svg
-        [cIcon]="icons.cilPlus"
-        width="20"
-        height="20"
-        class="me-2"
-        title="Añadir"
-      ></svg>
-      Añadir Producto
+      <app-icons icon="plus"></app-icons>
+      <span>Añadir Producto</span>
     </button>
   </div>
 </div>

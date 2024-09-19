@@ -36,7 +36,6 @@ import {
   FormsModule,
 } from '@angular/forms';
 import { environment } from '../../../../environments/environment';
-import { cilPlus, cilShieldAlt } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { AuthService } from '../../../services/auth.service';
 import {
@@ -109,7 +108,6 @@ export class ProductsComponent implements OnInit {
   classModal: string = '';
   nameFile: string = '';
   searchInput: string = '';
-  icons = { cilPlus, cilShieldAlt };
   public apiUpload = environment.apiUpload;
 
   constructor(

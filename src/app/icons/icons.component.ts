@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { cilPencil, cilTrash, cilTouchApp } from '@coreui/icons';
+import { cilPencil, cilTrash, cilTouchApp, cilPlus} from '@coreui/icons';
 
-type IconName = 'pencil' | 'trash' | 'view'; 
+type IconName = 'pencil' | 'trash' | 'view' | 'plus'; 
 
 @Component({
   selector: 'app-icons',
@@ -15,6 +15,7 @@ export class IconsComponent {
     pencil: cilPencil,
     trash: cilTrash,
     view: cilTouchApp,
+    plus: cilPlus,
   };
 
   get iconContent() {
