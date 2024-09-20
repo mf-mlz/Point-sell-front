@@ -1,0 +1,141 @@
+<!-- Filter Input-->
+<div class="row my-2">
+  <!-- Input de búsqueda y botones en una fila -->
+  <div class="col-12 col-md-6 mb-4">
+    <div class="form-group d-flex flex-column flex-md-row align-items-center">
+      <input id="search" class="form-control me-2 mb-2 mb-md-0 flex-grow-1" placeholder="Ingresa el Sku / Descripción"
+        [(ngModel)]="searchInput" />
+      <button class="btn btn-primary fw-bold me-2" (click)="filterEmployees('input')" style="flex: 1">
+        Buscar
+      </button>
+    </div>
+  </div>
+
+  <!-- Botón de "Añadir Empleado" -->
+  <div class="col-12 col-md-6 mb-4 d-flex justify-content-end">
+    <button class="btn btn-success fw-bold d-flex align-items-center justify-content-center"
+      (click)="showModal({}, 'Agregar Nuevo Empleado', 'add', '')"
+      style="width: 100%; max-width: 200px; height: 40px; color: white"
+      *ngIf="userPayload.role_name === 'Administrador'">
+      <svg [cIcon]="icons.cilPlus" width="20" height="20" class="me-2" title="Añadir"></svg>
+      Añadir Empleado
+    </button>
+  </div>
+</div>
+
+<div class="row my-4">
+  <!-- <hr /> -->
+  <!-- Employees -->
+  <table cTable>
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">name</th>
+        <th scope="col">email</th>
+        <th scope="col">address</th>
+        <th scope="col">phone</th>
+        <th scope="col">role_id</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+
+
+    <tbody>
+      <tr *ngFor="let emp of employees" class="p-3 b-2 border">
+        <th scope="row">{{emp.id}}</th>
+        <td>{{emp.name}}</td>
+        <td>{{censorEmail(emp.email)}}</td>
+        <td>{{emp.address}}</td>
+        <td>{{emp.phone}}</td>
+        <td>{{emp.role_id}}</td>
+        <td>
+          <button class="btn btn-primary me-2 fw-bold btn-product"
+            (click)="showModal(emp, 'Ver Datos del Empleado', 'eye', '')">
+            Ver
+          </button>
+          <button class="btn btn-warning me-2 fw-bold btn-product"
+            (click)="showModal(emp, 'Editar Empleado', 'edit', '')" *ngIf="userPayload.role_name === 'Administrador'">
+            Editar
+          </button>
+          <button class="btn btn-danger fw-bold btn-product" (click)="showModaldeleteProduct(emp.id)"
+            *ngIf="userPayload.role_name === 'Administrador'">
+            Eliminar
+          </button>
+
+        </td>
+
+      </tr>
+
+    </tbody>
+
+
+
+  </table>
+
+
+
+
+  <app-modal [visible]="isModalVisible" (visibleChange)="handleModalVisibilityChange($event)" [title]="titleModal"
+    [class]="classModal" (executeFunction)="handleClick()">
+
+    <form [formGroup]="employeeForm" class="employee-form" [ngClass]="classModal">
+
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input id="name" formControlName="name" class="form-control" />
+        <div *ngIf="isFieldInvalid(employeeForm, 'name')" class="error-message">
+          {{ getErrorMessage(employeeForm, "name") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input id="email" formControlName="email" class="form-control" />
+        <div *ngIf="isFieldInvalid(employeeForm, 'email')" class="error-message">
+          {{ getErrorMessage(employeeForm, "email") }}
+        </div>
+      </div>
+      <div class="form-group" *ngIf="classModal === 'add'">
+        <label for="password">password:</label>
+        <input id="password" formControlName="password" class="form-control" />
+        <div *ngIf="isFieldInvalid(employeeForm, 'password')" class="error-message">
+          {{ getErrorMessage(employeeForm, "password") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">phone:</label>
+        <input id="phone" type="text" formControlName="phone" class="form-control" />
+        <div *ngIf="isFieldInvalid(employeeForm, 'phone')" class="error-message">
+          {{ getErrorMessage(employeeForm, "phone") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="address">address:</label>
+        <input id="address" formControlName="address" class="form-control" />
+        <div *ngIf="isFieldInvalid(employeeForm, 'address')" class="error-message">
+          {{ getErrorMessage(employeeForm, "address") }}
+        </div>
+      </div>
+
+      <!-- 
+        <div class="form-group">
+          <label for="category">Category:</label>
+          <select id="category" formControlName="category" class="form-control">
+            <option value="">Selecciona una Categoría</option>
+            <option *ngFor="let cat of categories" [value]="cat.category">
+              {{ cat.category }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid(employeeForm, 'category')" class="error-message">
+            {{ getErrorMessage(employeeForm, "category") }}
+          </div>
+        </div> -->
+
+      <div class="form-group hidden">
+        <input id="id" type="number" formControlName="id" class="form-control" />
+      </div>
+    </form>
+  </app-modal>
+</div>

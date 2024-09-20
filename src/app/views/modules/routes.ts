@@ -25,6 +25,13 @@ export const routes: Routes = [
         data: {
           title: 'Ventas'
         }
+      },
+      {
+        path: 'employees',
+        loadComponent: () => import('./employees/employees.component').then(m => m.EmployeesComponent),
+        data: {
+          title: 'Empleados'
+        }
       }
     ]
   }

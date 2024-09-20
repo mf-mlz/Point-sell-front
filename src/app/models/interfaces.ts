@@ -1,5 +1,4 @@
 /* User Payload */
-
 export interface userPayload {
   id: number;
   name: string;
@@ -12,7 +11,6 @@ export interface userPayload {
 }
 
 /* Products Interfaces */
-
 export interface DeleteProductRequest {
   id: number;
 }
@@ -42,7 +40,6 @@ export interface SaleDate {
   dateBefore: string;
   dateAfter: string;
 }
-
 export interface Sale {
   id: number;
   date: string;
@@ -56,6 +53,7 @@ export interface Sale {
   updated_at: string;
 }
 
+/* Sale Info */
 export interface SaleInfoComplete {
   id: number;
   date: string;
@@ -76,4 +74,18 @@ export interface ButtonConfig {
   icon: string;
   title: string;
   action: (element: any) => void;
+}
+
+// Employees
+export interface Employee {
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  phone: number;
+  address: string;
+  status: string;
+  role_id: number;
+  created_at: string;
+  updated_at: string;
 }
