@@ -27,5 +27,18 @@ export class ApiServiceSales {
 
   }
 
+  public getAllSales(): Observable<any> {
+    const url = `${this.apiUrl}/sales`;
+    const token = this.authService.getToken();
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      employeeId: this.userPayload.id,
+    });
+
+    return this.http.get(url, { headers });
+
+  }
+
 
 }
