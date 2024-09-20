@@ -55,17 +55,29 @@ export interface Sale {
 
 /* Sale Info */
 export interface SaleInfoComplete {
-  id: number;
-  date: string;
-  totalAmount: number;
-  typePayment: string;
-  dataPayment: string;
-  nameClient: string;
-  emailClient: string;
-  taxIdClient: string;
-  taxSystemClient: number;
-  nameEmployee: string;
+  id: number;              
+  payment: number;         
+  customerId: number;      
+  employeesId: number;     
+  status: string;          
+  date: string;            
+  totalAmount: number;     
+  typePayment: string;     
+  dataPayment: string;     
+  nameClient: string;      
+  emailClient: string;     
+  taxIdClient: string;     
+  taxSystemClient: number; 
+  nameEmployee: string;    
   emailEmployee: string;
+}
+
+/* Forms Payment */
+export interface PaymentForm {
+  id: number;
+  descripcion: string;
+  created_at: Date;  
+  updated_at: Date;  
 }
 
 /* Datatable */
@@ -76,7 +88,7 @@ export interface ButtonConfig {
   action: (element: any) => void;
 }
 
-// Employees
+/* Employees */
 export interface Employee {
   id: number;
   name: string;
