@@ -9,6 +9,199 @@
   [class]="classModal"
   (executeFunction)="handleClick()"
 >
-  <p> Content </p>
-  
+  <!-- Form View || Form Edit -->
+  <form [formGroup]="saleForm" class="product-form" [ngClass]="classModal">
+    <div class="form-group">
+      <label for="date">Fecha Venta:</label>
+      <input
+        id="date"
+        formControlName="date"
+        class="form-control"
+        type="date"
+      />
+      <div *ngIf="isFieldInvalid(saleForm, 'date')" class="error-message">
+        {{ getErrorMessage(saleForm, "date") }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="totalAmount">Monto Total:</label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input
+          id="totalAmount"
+          formControlName="totalAmount"
+          class="form-control"
+          type="number"
+        />
+      </div>
+      <div
+        *ngIf="isFieldInvalid(saleForm, 'totalAmount')"
+        class="error-message"
+      >
+        {{ getErrorMessage(saleForm, "totalAmount") }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="typePayment">Tipo de Pago:</label>
+      <input
+        id="typePayment"
+        type="text"
+        formControlName="typePayment"
+        class="form-control"
+        list="type_payment_options"
+        (input)="filterPaymentForms($event)"
+        (change)="paymentSelected($event)"
+      />
+      <datalist id="type_payment_options">
+        <option *ngFor="let key of filteredPaymentForms" [value]="key.descripcion">
+          {{ key.id }} - {{ key.descripcion }}
+        </option>
+      </datalist>
+      <div
+        *ngIf="isFieldInvalid(saleForm, 'typePayment')"
+        class="error-message"
+      >
+        {{ getErrorMessage(saleForm, "typePayment") }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="dataPayment">Detalles del Pago:</label>
+      <input
+        id="dataPayment"
+        formControlName="dataPayment"
+        class="form-control"
+        type="number"
+        placeholder="Número de Tarjeta Sin Guiones, si fue en efectivo poner 0"
+      />
+      <div
+        *ngIf="isFieldInvalid(saleForm, 'dataPayment')"
+        class="error-message"
+      >
+        {{ getErrorMessage(saleForm, "dataPayment") }}
+      </div>
+    </div>
+
+    <!-- Client -->
+    <div class="form-group">
+      <label for="nameClient">Nombre Cliente: </label>
+      <input
+        id="nameClient"
+        type="text"
+        formControlName="nameClient"
+        class="form-control"
+        list="clients_list"
+        (input)="filterClients($event)"
+        (change)="clientSelected($event)"
+      />
+      <datalist id="clients_list">
+        <option *ngFor="let client of filteredClients" [value]="client.name">
+          {{ client.id }} - {{ client.name }}
+        </option>
+      </datalist>
+
+      <div *ngIf="isFieldInvalid(saleForm, 'nameClient')" class="error-message">
+        {{ getErrorMessage(saleForm, "nameClient") }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="emailClient">E-mail Cliente: </label>
+      <input
+        id="emailClient"
+        formControlName="emailClient"
+        class="form-control"
+        readonly
+      />
+      <div
+        *ngIf="isFieldInvalid(saleForm, 'emailClient')"
+        class="error-message"
+      >
+        {{ getErrorMessage(saleForm, "emailClient") }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="taxIdClient">RFC Cliente: </label>
+      <input
+        id="taxIdClient"
+        formControlName="taxIdClient"
+        class="form-control"
+        readonly
+      />
+      <div
+        *ngIf="isFieldInvalid(saleForm, 'taxIdClient')"
+        class="error-message"
+      >
+        {{ getErrorMessage(saleForm, "taxIdClient") }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="taxSystemClient">Régimen Fiscal Cliente: </label>
+      <input
+        id="taxSystemClient"
+        formControlName="taxSystemClient"
+        class="form-control"
+        type="text"
+        readonly
+      />
+      <div
+        *ngIf="isFieldInvalid(saleForm, 'taxSystemClient')"
+        class="error-message"
+      >
+        {{ getErrorMessage(saleForm, "taxSystemClient") }}
+      </div>
+    </div>
+
+    <!-- Employee -->
+    <div class="form-group">
+      <label for="nameEmployee">Empleado: </label>
+      <input
+        id="nameEmployee"
+        type="text"
+        formControlName="nameEmployee"
+        class="form-control"
+        list="employee_list"
+        (input)="filterEmployees($event)"
+        (change)="employeeSelected($event)"
+      />
+      <datalist id="employee_list">
+        <option *ngFor="let employee of filteredEmployees" [value]="employee.name">
+          {{ employee.id }} - {{ employee.name }}
+        </option>
+      </datalist>
+      <div
+        *ngIf="isFieldInvalid(saleForm, 'nameEmployee')"
+        class="error-message"
+      >
+        {{ getErrorMessage(saleForm, "nameEmployee") }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="emailEmployee">E-mail Empleado: </label>
+      <input
+        id="emailEmployee"
+        formControlName="emailEmployee"
+        class="form-control"
+        readonly
+      />
+      <div
+        *ngIf="isFieldInvalid(saleForm, 'emailEmployee')"
+        class="error-message"
+      >
+        {{ getErrorMessage(saleForm, "emailEmployee") }}
+      </div>
+    </div>
+
+    <div class="form-group hidden">
+      <input id="id" type="number" formControlName="id" class="form-control" />
+      <input id="customerId" type="number" formControlName="customerId" class="form-control" />
+      <input id="employeesId" type="number" formControlName="employeesId" class="form-control" />
+      <input id="payment" type="number" formControlName="payment" class="form-control" />
+    </div>
+  </form>
 </app-modal>
