@@ -55,3 +55,25 @@ export interface Sale {
   created_at: string;
   updated_at: string;
 }
+
+export interface SaleInfoComplete {
+  id: number;
+  date: string;
+  totalAmount: number;
+  typePayment: string;
+  dataPayment: string;
+  nameClient: string;
+  emailClient: string;
+  taxIdClient: string;
+  taxSystemClient: number;
+  nameEmployee: string;
+  emailEmployee: string;
+}
+
+/* Datatable */
+export interface ButtonConfig {
+  class: string;
+  icon: string;
+  title: string;
+  action: (element: any) => void;
+}
