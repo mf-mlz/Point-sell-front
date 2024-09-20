@@ -9,9 +9,11 @@ export function getErrorMessage(form: FormGroup, field: string): string {
   } else if (control?.hasError('minlength')) {
     const minLength = control.errors?.['minlength'].requiredLength;
     return `Ingresa Mínimo ${minLength} Caracteres`;
-  } else if (control?.hasError('maxlength')) {
-    const maxLength = control.errors?.['maxlength'].requiredLength;
-    return `Ingresa Máximo ${maxLength} Caracteres`;
+  } else if (control?.hasError('minlength')) {
+    const minLength = control.errors?.['minlength'].requiredLength;
+    return `Ingresa Mínimo ${minLength} Caracteres`;
+  }else if (control?.hasError('invalid')) {
+    return `El Campo es Inválido`;
   } else if (control?.hasError('email')) {
     return 'Ingresa un correo válido';
   } else if (control?.hasError('pattern')) {
