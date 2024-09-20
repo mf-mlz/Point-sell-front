@@ -19,8 +19,8 @@
 
 .btn-edit {
   background-color: #ffc107;
-  color: black;
-  border: 1px solid white;
+  color: white;
+  border: 1px solid #ffc107;
   border-radius: 4px;
   padding: 8px 16px;
   text-transform: uppercase;
@@ -30,7 +30,7 @@
 
   &:hover {
     background-color: #e0a800;
-    color: black;
+    color: white;
     transition: 0.3s;
   }
 }
@@ -38,7 +38,7 @@
 .btn-delete {
   background-color: #dc3545;
   color: white;
-  border: 1px solid white;
+  border: 1px solid #dc3545;
   border-radius: 4px;
   padding: 8px 16px;
   text-transform: uppercase;
@@ -48,6 +48,24 @@
 
   &:hover {
     background-color: #c82333;
+    color: white;
+    transition: 0.3s;
+  }
+}
+
+.btn-success {
+  background-color: #28a745;
+  color: white;
+  border: 1px solid #28a745;
+  border-radius: 4px;
+  padding: 8px 16px;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-left: 10px;
+  margin-right: 10px;
+
+  &:hover {
+    background-color: #218a3a;
     color: white;
     transition: 0.3s;
   }
