@@ -5,16 +5,29 @@ import { environment } from '../../environments/environment';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiServiceSales {
   private apiUrl = environment.apiUrl;
   public userPayload = this.authService.getDecodedToken();
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
+  /* Get Headers */
+  private getHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    const userPayload = this.authService.getDecodedToken();
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      employeeId: userPayload.id,
+    });
+  }
 
-  public getSaleDate(filters: { dateBefore: string, dateAfter: string }): Observable<any> {
+  /* Get */
+  getSaleDate(filters: {
+    dateBefore: string;
+    dateAfter: string;
+  }): Observable<any> {
     const url = `${this.apiUrl}/sales/getSaleDate`;
     const token = this.authService.getToken();
 
@@ -24,10 +37,9 @@ export class ApiServiceSales {
     });
 
     return this.http.post(url, filters, { headers });
-
   }
 
-  public getAllSales(): Observable<any> {
+  getAllSales(): Observable<any> {
     const url = `${this.apiUrl}/sales`;
     const token = this.authService.getToken();
 
@@ -37,8 +49,22 @@ export class ApiServiceSales {
     });
 
     return this.http.get(url, { headers });
-
   }
 
+  /* Put */
+  editProduct(credentials: {
+    id: Number;
+    date: string;
+    payment: Number;
+    dataPayment: Number;
+    totalAmount: Number;
+    customerId: Number;
+    employeesId: Number;
+    status: Number;
+  }): Observable<any> {
+    const url = `${this.apiUrl}/sales/edit`;
 
+    const headers = this.getHeaders();
+    return this.http.put(url, credentials, { headers });
+  }
 }
