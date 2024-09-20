@@ -46,6 +46,10 @@ import {
   userPayload,
 } from '../../../models/interfaces';
 import { IconsModule } from '../../../icons/icons.module';
+import {
+  getErrorMessage,
+  isFieldInvalid,
+} from '../../../utils/form-validations';
 
 /* Type data Filter Obj */
 type ProductFilterData =
@@ -56,7 +60,7 @@ type ProductFilterData =
 
 @Component({
   templateUrl: 'products.component.html',
-  styleUrls: ['./products.component.scss', '../../../../scss/buttons.scss'],
+  styleUrls: ['../../../../scss/forms.scss', '../../../../scss/buttons.scss'],
   standalone: true,
   imports: [
     TextColorDirective,
@@ -191,7 +195,7 @@ export class ProductsComponent implements OnInit {
         category: category,
       };
       this.getProductsFilter(data);
-    }else if(type === 'stock'){
+    } else if (type === 'stock') {
       const data: ProductFilterData = {
         stock: '10',
       };
@@ -541,24 +545,13 @@ export class ProductsComponent implements OnInit {
     this.productForm.reset();
   }
 
-  /* Validate Fields Form */
-  isFieldInvalid(form: FormGroup, field: string): boolean {
-    const control = form.get(field);
-    return !!control && control.invalid && (control.dirty || control.touched);
+  /* Validation Form */
+  getErrorMessage(form: FormGroup, field: string): string {
+    return getErrorMessage(form, field);
   }
 
-  /* Validate Errors Fields Form */
-  getErrorMessage(form: FormGroup, field: string): string {
-    const control = form.get(field);
-    if (control?.hasError('required')) {
-      return 'El Campo es Requerido';
-    } else if (control?.hasError('minlength')) {
-      const minLength = control.errors?.['minlength'].requiredLength;
-      return `Ingresa Minímo ${minLength} Caracteres`;
-    } else if (control?.hasError('invalidFileType')) {
-      return 'Solo se permiten imágenes (JPG, PNG, GIF, JPEG)';
-    }
-    return '';
+  isFieldInvalid(form: FormGroup, field: string): boolean {
+    return isFieldInvalid(form, field);
   }
 }
 
