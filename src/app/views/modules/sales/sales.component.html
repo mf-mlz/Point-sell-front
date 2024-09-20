@@ -1,5 +1,14 @@
-<app-datatable 
-  [columns]="columns" 
-  [data]="sales"
-  [buttons]="buttons">
+<app-datatable [columns]="columns" [data]="sales" [buttons]="buttons">
 </app-datatable>
+
+<!-- Modal Component -->
+<app-modal
+  [visible]="isModalVisible"
+  (visibleChange)="handleModalVisibilityChange($event)"
+  [title]="titleModal"
+  [class]="classModal"
+  (executeFunction)="handleClick()"
+>
+  <p> Content </p>
+  
+</app-modal>

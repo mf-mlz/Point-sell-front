@@ -2,17 +2,21 @@ import { Component } from '@angular/core';
 import { DatatableComponent } from '../../../datatable/datatable.component';
 import { ApiServiceSales } from 'src/app/services/api.service.sales';
 import { SaleInfoComplete } from 'src/app/models/interfaces';
+import { ModalComponentHtml } from '../../../modalHtml/modalhtml.component';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-sales',
   standalone: true,
-  imports: [DatatableComponent],
+  imports: [DatatableComponent, ModalComponentHtml],
   templateUrl: './sales.component.html',
   styleUrl: './sales.component.scss',
 })
 export class SalesComponent {
   sales: SaleInfoComplete[] = [];
+  isModalVisible = false;
+  titleModal = '';
+  classModal = 'eye';
   constructor(private apiServiceSales: ApiServiceSales) {}
 
   ngOnInit(): void {
@@ -81,7 +85,7 @@ export class SalesComponent {
   buttons = [
     {
       class: 'btn-view',
-      icon: 'view', 
+      icon: 'view',
       title: 'Ver',
       action: (element: any) => this.onView(element),
     },
@@ -107,7 +111,7 @@ export class SalesComponent {
 
   /* Functions Datatable */
   onView(element: any) {
-    console.log('View:', element);
+    this.showModal();
   }
 
   onEdit(element: any) {
@@ -120,5 +124,21 @@ export class SalesComponent {
 
   onInvoice(element: any) {
     console.log('Invoice:', element);
+  }
+
+  /* Modal */
+  showModal() {
+    this.isModalVisible = true;
+    this.titleModal = 'Hola';
+    this.classModal = 'add';
+  }
+
+  /* Open / Close Modal */
+  handleModalVisibilityChange(visible: boolean) {
+    this.isModalVisible = visible;
+  }
+
+  handleClick(): void {
+    console.log('Aqui');
   }
 }
