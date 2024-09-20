@@ -36,10 +36,12 @@ export interface KeySat {
 }
 
 /* Sales */
+
 export interface SaleDate {
   dateBefore: string;
   dateAfter: string;
 }
+
 export interface Sale {
   id: number;
   date: string;
@@ -100,4 +102,18 @@ export interface Employee {
   role_id: number;
   created_at: string;
   updated_at: string;
+}
+
+/* Clients */
+export interface Clients {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  zip: number;
+  tax_id: string;
+  tax_system: number;
+  created_at: Date; 
+  updated_at: Date; 
 }
