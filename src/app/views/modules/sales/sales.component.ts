@@ -97,6 +97,12 @@ export class SalesComponent {
       title: 'Eliminar',
       action: (element: any) => this.onDelete(element),
     },
+    {
+      class: 'btn-success',
+      icon: 'book',
+      title: 'Facturar',
+      action: (element: any) => this.onInvoice(element),
+    },
   ];
 
   /* Functions Datatable */
@@ -110,5 +116,9 @@ export class SalesComponent {
 
   onDelete(element: any) {
     console.log('Delete:', element);
+  }
+
+  onInvoice(element: any) {
+    console.log('Invoice:', element);
   }
 }
