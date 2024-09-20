@@ -1,7 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { cilPencil, cilTrash, cilTouchApp, cilPlus} from '@coreui/icons';
-
-type IconName = 'pencil' | 'trash' | 'view' | 'plus'; 
+import { cilPencil, cilTrash, cilTouchApp, cilPlus } from '@coreui/icons';
 
 @Component({
   selector: 'app-icons',
@@ -9,9 +7,9 @@ type IconName = 'pencil' | 'trash' | 'view' | 'plus';
   styleUrls: ['./icons.component.scss'],
 })
 export class IconsComponent {
-  @Input() icon: IconName = 'view';
+  @Input() icon: string = 'view'; 
 
-  icons: Record<IconName, string[]> = {
+  icons: Record<string, any> = {
     pencil: cilPencil,
     trash: cilTrash,
     view: cilTouchApp,
