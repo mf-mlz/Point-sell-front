@@ -102,13 +102,13 @@ export class EmployeesComponent implements OnInit {
       name: [''/* , [Validators.required, Validators.minLength(3)] */],
       email: [''/* , [Validators.required, Validators.minLength(10)] */],
       password: [''/* , [Validators.required, Validators.min(1)] */],
-      phone: [0/* , Validators.required, Validators.min(1) */],
+      phone: [''/* , Validators.required, Validators.min(1) */],
       address: [''/* , [Validators.required, Validators.min(1)] */],
       status: [''],
       created_at: [''],
       updated_at: [''],
       role_id: [0/* , [Validators.required, Validators.minLength(1)] */],
-      id: [''/* , [Validators.required, Validators.minLength(3)] */],
+      id: [0/* , [Validators.required, Validators.minLength(3)] */],
     });
   }
   ngOnInit(): void {
@@ -146,7 +146,7 @@ export class EmployeesComponent implements OnInit {
           icon: 'error',
           title: 'Error',
           text:
-            error.error?.message || 'Ocurrió un Error al Obtener los Productos',
+            error.error?.message || 'Ocurrió un Error al Obtener los Empleados',
         });
       }
     );
@@ -207,7 +207,7 @@ export class EmployeesComponent implements OnInit {
         });
         Toast.fire({
           icon: 'error',
-          title: 'Ocurrio un Error al Obtener los Productos',
+          title: 'Ocurrio un Error al Obtener los Empleados',
         });
       }
     );
@@ -241,7 +241,7 @@ export class EmployeesComponent implements OnInit {
       (response) => {
         Swal.fire({
           icon: 'success',
-          title: response.message || 'Producto Eliminado Correctamente',
+          title: response.message || 'Empleado Eliminado Correctamente',
         });
         this.getAllEmployees();
       },
@@ -250,7 +250,7 @@ export class EmployeesComponent implements OnInit {
           icon: 'error',
           title: 'Error',
           text:
-            error.error?.message || 'Ocurrió un Error al Eliminar el Producto',
+            error.error?.message || 'Ocurrió un Error al Eliminar el Empleado',
         });
       }
     );
@@ -269,7 +269,7 @@ export class EmployeesComponent implements OnInit {
       name: '',
       email: '',
       password: '',
-      phone: 0,
+      phone: '',
       address: '',
       status: '',
       created_at: '',
@@ -291,7 +291,6 @@ export class EmployeesComponent implements OnInit {
       updated_at: this.selectedEmployee?.updated_at ?? '',
       role_id: this.selectedEmployee?.role_id ?? '',
     });
-
     this.isModalVisible = true;
     this.titleModal = titleModal;
     this.classModal = classModal;
@@ -305,71 +304,60 @@ export class EmployeesComponent implements OnInit {
   //   /* Handle Click */
   handleClick(): void {
     if (this.classModal === 'add') {
-      // this.addProduct();
+      this.addEmployee();
     } else if (this.classModal === 'edit') {
-      this.editProduct();
+      this.editEmployee();
     }
   }
 
 
   //   /* Add Product  */
-    // addProduct(): void {
-    //   if (this.employeeForm.valid) {
-    //     const formValue = this.employeeForm.value;
-    //     this.ApiServiceEmployees.registerProducts(formValue).subscribe(
-    //       (response) => {
-    //         /* Upload File  */
-    //         if (this.selectedFile) {
-    //           const formData = new FormData();
-    //           formData.append('id_product', response.id);
-    //           formData.append('photo', this.selectedFile);
-    //           this.uploadForm(formData);
-    //         } else {
-    //           Swal.fire({
-    //             icon: 'success',
-    //             title: response.message || 'Producto Añadido con Éxito',
-    //           }).then((result) => {
-    //             if (result.isConfirmed) {
-    //               this.resetFileInput();
-    //               this.getAllEmployees();
-    //             }
-    //           });
-    //         }
-    //       },
-    //       (error) => {
-    //         Swal.fire({
-    //           icon: 'error',
-    //           title: 'Error',
-    //           text:
-    //             error.error?.message || 'Ocurrió un error al Añadir el Producto.',
-    //         });
-    //       }
-    //     );
-    //   } else {
-    //     Swal.fire({
-    //       icon: 'warning',
-    //       title: 'Error',
-    //       text: 'Por favor, ingresa correctamente la información.',
-    //     });
-    //   }
-    // }
+  addEmployee(): void {
+    if (this.employeeForm.valid) {
+      const formValue = this.employeeForm.value;
+      this.ApiServiceEmployees.registerEmployee(formValue).subscribe(
+        (response) => {
+          Swal.fire({
+            icon: 'success',
+            title: response.message || 'Empleado Añadido con Éxito',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.resetFileInput();
+              this.getAllEmployees();
+            }
+          });
+        },
+        (error) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text:
+              error.error?.message || 'Ocurrió un error al Añadir el Empleado.',
+          });
+        }
+      );
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Error',
+        text: 'Por favor, ingresa correctamente la información.',
+      });
+    }
+  }
 
 
 
   //   /* Edit Product */
-  editProduct(): void {
+  editEmployee(): void {
     if (this.employeeForm.valid) {
       const formValue = this.employeeForm.value;
 
       /* Send Data Put (Edit Product) */
       this.ApiServiceEmployees.editEmployee(formValue).subscribe(
         (response) => {
-
-          console.log(response);
-
           Swal.fire({
             icon: 'success',
-            title: response.message || 'Producto Modificado con Éxito',
+            title: response.message || 'Empleado Modificado con Éxito',
           }).then((result) => {
             if (result.isConfirmed) {
               this.resetFileInput();
@@ -379,13 +367,11 @@ export class EmployeesComponent implements OnInit {
         },
         (error) => {
 
-          console.log(error);
-
           Swal.fire({
             icon: 'error',
             title: 'Error',
             text:
-              error.error?.message || 'Ocurrió un error al Editar el Producto.',
+              error.error?.message || 'Ocurrió un error al Editar el Empleado.',
           });
         }
       );
