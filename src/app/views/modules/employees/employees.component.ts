@@ -39,7 +39,7 @@ import { environment } from '../../../../environments/environment';
 import { cilPlus, cilShieldAlt } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { AuthService } from '../../../services/auth.service';
-import { DeleteProductRequest, Employee, Category, KeySat } from '../../../models/interfaces';
+import { DeleteProductRequest, Employee, Rol, KeySat } from '../../../models/interfaces';
 
 @Component({
   templateUrl: 'employees.component.html',
@@ -72,7 +72,7 @@ export class EmployeesComponent implements OnInit {
 
   public userPayload: any;
   employees: Employee[] = [];
-  categories: Category[] = [];
+  roles: Rol[] = [];
   keySat: KeySat[] = [];
   filteredKeySat: KeySat[] = [];
   selectedEmployee: Employee | null = null;
@@ -114,6 +114,7 @@ export class EmployeesComponent implements OnInit {
   ngOnInit(): void {
     this.userPayload = this.authService.getDecodedToken();
     this.getAllEmployees();
+    this.getRolesAll();
   }
 
 
@@ -490,6 +491,26 @@ export class EmployeesComponent implements OnInit {
     const censoredUser = user.slice(0, visibleLength) + '*'.repeat(user.length - visibleLength);
     return `${censoredUser}@${domain}`;
   }
+
+  /* Get roles */
+  getRolesAll(): void {
+    this.ApiServiceEmployees.getRoles().subscribe(
+      (response) => {
+        this.roles = response;
+      },
+      (error) => {
+        this.roles = [];
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text:
+            error.error?.message ||
+            'Ocurrió un Error al Obtener las Categorias',
+        });
+      }
+    );
+  }
+
 }
 
 

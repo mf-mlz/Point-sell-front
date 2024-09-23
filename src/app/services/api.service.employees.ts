@@ -80,4 +80,11 @@ export class ApiServiceEmployees {
     const headers = this.getHeaders();
     return this.http.delete(url, { headers, body: credentials });
   }
+
+  /* get -- roles */
+  getRoles(): Observable<any> {
+    const url = `${this.apiUrl}/roles/get`;
+    const headers = this.getHeaders();
+    return this.http.get(url, { headers});
+  }
 }

@@ -67,9 +67,6 @@
       </tr>
 
     </tbody>
-
-
-
   </table>
 
 
@@ -119,19 +116,18 @@
         </div>
       </div>
 
-      <!-- 
         <div class="form-group">
-          <label for="category">Category:</label>
-          <select id="category" formControlName="category" class="form-control">
-            <option value="">Selecciona una Categoría</option>
-            <option *ngFor="let cat of categories" [value]="cat.category">
-              {{ cat.category }}
+        <label for="rol">Rol:</label>
+        <select id="rol" formControlName="role_id" class="form-control">
+          <option value="">Selecciona una Rol</option>
+          <option *ngFor="let rol of roles" [value]="rol.id">
+            {{ rol.name }}
             </option>
           </select>
-          <div *ngIf="isFieldInvalid(employeeForm, 'category')" class="error-message">
-            {{ getErrorMessage(employeeForm, "category") }}
+        <div *ngIf="isFieldInvalid(employeeForm, 'role_id')" class="error-message">
+          {{ getErrorMessage(employeeForm, "role_id") }}
+        </div>
           </div>
-        </div> -->
 
       <div class="form-group hidden">
         <input id="id" type="number" formControlName="id" class="form-control" />
