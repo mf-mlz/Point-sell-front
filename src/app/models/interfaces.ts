@@ -117,3 +117,9 @@ export interface Clients {
   created_at: Date; 
   updated_at: Date; 
 }
+
+/* Rol */
+export interface Rol {
+  id:  number;
+  name: string;
+}
