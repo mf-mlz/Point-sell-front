@@ -7,11 +7,29 @@
   padding: 8px 16px;
   text-transform: uppercase;
   cursor: pointer;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 3px;
+  margin-right: 3px;
   
   &:hover {
     background-color: #138496;
+    color: white;
+    transition: 0.3s;
+  }
+}
+
+.btn-view-products{
+  background-color: #6f42c1;
+  color: white;
+  border: 1px solid #6f42c1;
+  border-radius: 4px;
+  padding: 8px 16px;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-left: 3px;
+  margin-right: 3px;
+  
+  &:hover {
+    background-color: #5a359f;
     color: white;
     transition: 0.3s;
   }
@@ -25,8 +43,8 @@
   padding: 8px 16px;
   text-transform: uppercase;
   cursor: pointer;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 3px;
+  margin-right: 3px;
 
   &:hover {
     background-color: #e0a800;
@@ -43,8 +61,8 @@
   padding: 8px 16px;
   text-transform: uppercase;
   cursor: pointer;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 3px;
+  margin-right: 3px;
 
   &:hover {
     background-color: #c82333;
@@ -61,12 +79,40 @@
   padding: 8px 16px;
   text-transform: uppercase;
   cursor: pointer;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 3px;
+  margin-right: 3px;
 
   &:hover {
     background-color: #218a3a;
     color: white;
     transition: 0.3s;
   }
+}
+
+.btn-download {
+  background-color: #6c757d;
+  color: white;
+  border: 1px solid #6c757d;
+  border-radius: 4px;
+  padding: 8px 16px;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-left: 3px;
+  margin-right: 3px;
+
+  &:hover {
+    background-color: #50575d;
+    color: white;
+    transition: 0.3s;
+  }
+}
+
+.btn-group, .btn-group-vertical {
+  position: static !important;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.action-link{
+  cursor: pointer;
 }
