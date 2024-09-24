@@ -39,7 +39,7 @@ import { environment } from '../../../../environments/environment';
 import { IconDirective } from '@coreui/icons-angular';
 import { AuthService } from '../../../services/auth.service';
 import {
-  DeleteProductRequest,
+  DeleteRequest,
   Product,
   Category,
   KeySat,
@@ -309,7 +309,7 @@ export class ProductsComponent implements OnInit {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        const obj: DeleteProductRequest = {
+        const obj: DeleteRequest = {
           id: idProduct,
         };
         this.deleteProduct(obj);
@@ -318,7 +318,7 @@ export class ProductsComponent implements OnInit {
   }
 
   /* Delete Product -- Function */
-  deleteProduct(credentials: DeleteProductRequest): void {
+  deleteProduct(credentials: DeleteRequest): void {
     this.apiServiceProducts.deleteProduct(credentials).subscribe(
       (response) => {
         Swal.fire({
