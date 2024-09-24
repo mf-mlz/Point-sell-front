@@ -156,3 +156,9 @@ export interface InvoiceList {
 export interface DeleteRequest {
   id: number;
 }
+
+/* Rol */
+export interface Rol {
+  id:  number;
+  name: string;
+}

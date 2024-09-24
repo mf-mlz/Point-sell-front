@@ -59,25 +59,30 @@ export class ApiServiceEmployees {
   }
 
   /* Post -- Register Products */
-  registerProducts(credentials: {
+  registerEmployee(credentials: {
     name: string,
     email: string,
     password: string,
     phone: number,
     address: string,
-    idid: number
+    role_id: number
   }): Observable<any> {
     const url = `${this.apiUrl}/employees/register`;
     const headers = this.getHeaders();
     return this.http.post(url, credentials, { headers });
   }
 
-
-
   /* Delete -- Delete Product:Id */
   deleteEmployee(credentials: { id: number }): Observable<any> {
     const url = `${this.apiUrl}/employees/delete`;
     const headers = this.getHeaders();
     return this.http.delete(url, { headers, body: credentials });
+  }
+
+  /* get -- roles */
+  getRoles(): Observable<any> {
+    const url = `${this.apiUrl}/roles/get`;
+    const headers = this.getHeaders();
+    return this.http.get(url, { headers});
   }
 }
