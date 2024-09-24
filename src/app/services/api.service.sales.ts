@@ -67,4 +67,12 @@ export class ApiServiceSales {
     const headers = this.getHeaders();
     return this.http.put(url, credentials, { headers });
   }
+
+  /* Delete */
+  deleteSale(credentials: { id: number }): Observable<any> {
+    const url = `${this.apiUrl}/sales/delete`;
+
+    const headers = this.getHeaders();
+    return this.http.delete(url, { headers, body: credentials });
+  }
 }
