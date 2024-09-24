@@ -39,7 +39,7 @@ import { environment } from '../../../../environments/environment';
 import { cilPlus, cilShieldAlt } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { AuthService } from '../../../services/auth.service';
-import { DeleteProductRequest, Employee, Category, KeySat } from '../../../models/interfaces';
+import { DeleteRequest, Employee, Category, KeySat } from '../../../models/interfaces';
 
 @Component({
   templateUrl: 'employees.component.html',
@@ -225,7 +225,7 @@ export class EmployeesComponent implements OnInit {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        const obj: DeleteProductRequest = {
+        const obj: DeleteRequest = {
           id: idProduct,
         };
         this.deleteEmployee(obj);
@@ -235,7 +235,7 @@ export class EmployeesComponent implements OnInit {
 
 
   //   /* Delete Product -- Function */
-  deleteEmployee(credentials: DeleteProductRequest): void {
+  deleteEmployee(credentials: DeleteRequest): void {
     this.ApiServiceEmployees.deleteEmployee(credentials).subscribe(
       (response) => {
         Swal.fire({
