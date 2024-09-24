@@ -6,6 +6,14 @@ import {
   PaymentForm,
   Employee,
   Clients,
+  SaleProductDescription,
+  DeleteRequest,
+  ButtonConfig,
+  userPayload,
+  Invoice,
+  InvoiceDownload,
+  CancelInvoice,
+  InvoiceList,
 } from 'src/app/models/interfaces';
 import { ModalComponentHtml } from '../../../modalHtml/modalhtml.component';
 import Swal from 'sweetalert2';
@@ -23,6 +31,9 @@ import {
 import { ApiServicePaymentForms } from '../../../services/api.service.paymentForms';
 import { ApiServiceEmployees } from '../../../services/api.service.employees';
 import { ApiServiceClients } from '../../../services/api.service.clients';
+import { ApiServiceSalesProducts } from '../../../services/api.service.salesProducts';
+import { AuthService } from '../../../services/auth.service';
+import { ApiServiceInvoice } from '../../../services/api.service.invoice';
 
 @Component({
   selector: 'app-sales',
@@ -37,6 +48,17 @@ import { ApiServiceClients } from '../../../services/api.service.clients';
   styleUrls: ['../../../../scss/forms.scss', '../../../../scss/buttons.scss'],
 })
 export class SalesComponent {
+  userPayload: userPayload = {
+    id: 0,
+    name: '',
+    email: '',
+    phone: '',
+    role_id: 0,
+    role_name: '',
+    iat: 0,
+    exp: 0,
+  };
+  buttonsDatatable: ButtonConfig[] = [];
   sales: SaleInfoComplete[] = [];
   paymentsForm: PaymentForm[] = [];
   employees: Employee[] = [];
@@ -44,17 +66,26 @@ export class SalesComponent {
   filteredPaymentForms: PaymentForm[] = [];
   clients: Clients[] = [];
   filteredClients: Clients[] = [];
+  saleProducts: SaleProductDescription[] = [];
+  invoicesList: InvoiceList[] = [];
   selectedSale: SaleInfoComplete | null = null;
   saleForm!: FormGroup;
   isModalVisible = false;
   titleModal: string = '';
   classModal: string = '';
   error: string | null = null;
+  viewProducts: string | null = null;
+  iconGroup: string = 'book';
+  titleGroup: string = 'Menú Facturas';
+  classGroup: string = 'btn-success';
   constructor(
     private apiServiceSales: ApiServiceSales,
     private apiServicePaymentForms: ApiServicePaymentForms,
     private apiServiceEmployees: ApiServiceEmployees,
     private apiServiceClients: ApiServiceClients,
+    private apiServiceSalesProducts: ApiServiceSalesProducts,
+    private apiServiceInvoice: ApiServiceInvoice,
+    private authService: AuthService,
     private fb: FormBuilder
   ) {
     /* Init Form and Add Validations */
@@ -105,7 +136,13 @@ export class SalesComponent {
     });
   }
 
+  /* Buttons Datatable */
+  buttons: ButtonConfig[] = [];
+  buttonsGroup: ButtonConfig[] = [];
+
   ngOnInit(): void {
+    this.userPayload = this.authService.getDecodedToken();
+    this.generateButtons();
     this.getAllSales();
     this.getAllPaymentsForm();
     this.getAllEmployees();
@@ -181,6 +218,36 @@ export class SalesComponent {
     );
   }
 
+  /* Sales Products By ID Sale */
+  salesProductsByIdSale(salesId: number): void {
+    const data = {
+      salesId: salesId,
+    };
+    this.apiServiceSalesProducts.postFilterDescription(data).subscribe(
+      (response) => {
+        this.saleProducts = response.sales;
+      },
+      (error) => {
+        this.saleProducts = [];
+      }
+    );
+  }
+
+  /* Invoice By Id Sale */
+  invoicesByIdSale(salesId: number): void {
+    const data = {
+      id_sale: salesId,
+    };
+    this.apiServiceInvoice.invoicesByIdSale(data).subscribe(
+      (response) => {
+        this.invoicesList = response.invoices;
+      },
+      (error) => {
+        this.invoicesList = [];
+      }
+    );
+  }
+
   /* Columns => Datatable */
   columns = [
     { columnDef: 'id', header: 'ID', cell: (element: any) => element.id },
@@ -206,37 +273,139 @@ export class SalesComponent {
     },
   ];
 
-  /* Buttons Datatable */
-  buttons = [
+  columnsProductsSale = [
     {
-      class: 'btn-view',
-      icon: 'view',
-      title: 'Ver',
-      action: (element: any) => this.onView(element),
+      columnDef: 'quantity',
+      header: 'Cantidad',
+      cell: (element: any) => element.quantity,
     },
     {
-      class: 'btn-edit',
-      icon: 'pencil',
-      title: 'Editar',
-      action: (element: any) => this.onEdit(element),
+      columnDef: 'descripcion',
+      header: 'Descripción',
+      cell: (element: any) => element.descripcion,
     },
     {
-      class: 'btn-delete',
-      icon: 'trash',
-      title: 'Eliminar',
-      action: (element: any) => this.onDelete(element),
+      columnDef: 'key_sat',
+      header: 'Clave Sat',
+      cell: (element: any) => element.key_sat,
     },
     {
-      class: 'btn-success',
-      icon: 'book',
-      title: 'Facturar',
-      action: (element: any) => this.onInvoice(element),
+      columnDef: 'descriptionSat',
+      header: 'Descripción Sat',
+      cell: (element: any) => element.descriptionSat,
+    },
+    {
+      columnDef: 'price',
+      header: 'Precio Unitario',
+      cell: (element: any) => '$' + element.price,
     },
   ];
+
+  columnsInvoices = [
+    {
+      columnDef: 'id',
+      header: '#',
+      cell: (element: any) => element.id,
+    },
+    {
+      columnDef: 'id_invoice',
+      header: 'N° Factura',
+      cell: (element: any) => element.id_invoice,
+    },
+    {
+      columnDef: 'status',
+      header: 'Estatus',
+      cell: (element: any) => element.status,
+    },
+    {
+      columnDef: 'employee_name',
+      header: 'Empleado Generó',
+      cell: (element: any) => element.employee_name,
+    },
+    {
+      columnDef: 'employee_cancel_name',
+      header: 'Empleado Canceló',
+      cell: (element: any) => element.employee_cancel_name,
+    },
+    {
+      columnDef: 'motive',
+      header: 'Motivo Cancelación',
+      cell: (element: any) => element.motive,
+    },
+  ];
+
+  /* Generate Btns Datatable */
+  generateButtons() {
+    const btnsGroup: ButtonConfig[] = [];
+    const btns: ButtonConfig[] = [
+      {
+        class: 'btn-view',
+        icon: 'view',
+        title: 'Ver',
+        action: (element: any) => this.onView(element),
+      },
+      {
+        class: 'btn-view-products',
+        icon: 'sharedBox',
+        title: 'Ver Productos',
+        action: (element: any) => this.onViewProducts(element),
+      },
+    ];
+
+    if (this.userPayload.role_name === 'Administrador') {
+      btns.push(
+        {
+          class: 'btn-edit',
+          icon: 'pencil',
+          title: 'Editar',
+          action: (element: any) => this.onEdit(element),
+        },
+        {
+          class: 'btn-delete',
+          icon: 'trash',
+          title: 'Eliminar',
+          action: (element: any) => this.onDelete(element),
+        }
+      );
+      btnsGroup.push(
+        {
+          class: 'btn-success',
+          icon: 'book',
+          title: 'Facturar',
+          action: (element: any) => this.onInvoice(element),
+        },
+        {
+          class: 'btn-download',
+          icon: 'download',
+          title: 'Descargar Factura',
+          action: (element: any) => this.onDownloadInvoice(element),
+        },
+        {
+          class: 'btn-delete',
+          icon: 'trash',
+          title: 'Cancelar Factura',
+          action: (element: any) => this.onCancelInvoice(element),
+        },
+        {
+          class: 'btn-delete',
+          icon: 'trash',
+          title: 'Ver Lista de Facturas',
+          action: (element: any) => this.onViewInvoice(element),
+        }
+      );
+    }
+
+    this.buttons = btns;
+    this.buttonsGroup = btnsGroup;
+  }
 
   /* Functions Datatable Buttons -- Open Modals */
   onView(sale: SaleInfoComplete) {
     this.showModal('eye', 'Ver Información de la Venta', sale);
+  }
+
+  onViewProducts(sale: SaleInfoComplete) {
+    this.showModal('eye', 'Ver Productos de la Venta', sale, 'viewProducts');
   }
 
   onEdit(sale: SaleInfoComplete) {
@@ -244,15 +413,134 @@ export class SalesComponent {
   }
 
   onDelete(sale: SaleInfoComplete) {
-    console.log('Delete:', sale);
+    Swal.fire({
+      title: '¿Estás seguro que deseas eliminar?',
+      text: '¡Esta acción no se puede deshacer!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const obj: DeleteRequest = {
+          id: sale.id,
+        };
+        this.deleteSale(obj);
+      }
+    });
   }
 
   onInvoice(sale: SaleInfoComplete) {
-    console.log('Invoice:', sale);
+    if (sale.id_invoice && sale.status_invoice == 'Active') {
+      Swal.fire({
+        icon: 'info',
+        title: 'Factura Existente',
+        text: 'La venta ya cuenta con una Factura Activa',
+      });
+    } else {
+      Swal.fire({
+        title: '¿Estás seguro que deseas generar la Factura?',
+        text: '¡Sólo puedes generar 1 Factura por Venta, verifica que los datos sean correctos!',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, generar',
+        cancelButtonText: 'Cancelar',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const obj: Invoice = {
+            customer: sale.customerId,
+            id_sale: sale.id,
+            id_employee: this.userPayload.id,
+          };
+          this.createInvoice(obj);
+        }
+      });
+    }
+  }
+
+  onDownloadInvoice(sale: SaleInfoComplete) {
+    if (sale.id_invoice && sale.status_invoice == 'Active') {
+      Swal.fire({
+        title: 'Descargar Factura',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Descargar',
+        cancelButtonText: 'Cancelar',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const obj: InvoiceDownload = {
+            id_invoice: sale.id_invoice,
+          };
+          this.downloadIncoice(obj);
+        }
+      });
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'Sin Factura Registrada',
+        text: 'La venta no cuenta con una Factura Activa',
+      });
+    }
+  }
+
+  onCancelInvoice(sale: SaleInfoComplete) {
+    if (sale.id_invoice && sale.status_invoice == 'Active') {
+      Swal.fire({
+        title: 'Selecciona el Motivo para Cancelar la Factura',
+        input: 'select',
+        inputOptions: {
+          '01': 'Comprobante emitido con errores con relación. Cuando la factura contiene algún error en las cantidades, claves o cualquier otro dato y ya se ha emitido el comprobante que la sustituye, el cual deberá indicarse por medio del atributo substitution.',
+          '02': 'Comprobante emitido con errores sin relación. Cuando la factura contiene algún error en las cantidades, claves o cualquier otro dato y no se requiere relacionar con otra factura.',
+          '03': 'No se llevó a cabo la operación. Cuando la venta o transacción no se concretó.',
+          '04': 'Operación nominativa relacionada en la factura global. Cuando se trata de un comprobante global que incluye a otros comprobantes.',
+        },
+        inputPlaceholder: 'Selecciona una opción',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: (value) => {
+          if (!value) {
+            Swal.showValidationMessage('Por favor selecciona una opción');
+          }
+          return value;
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const motivo = result.value;
+          const obj: CancelInvoice = {
+            id_employee: this.userPayload.id,
+            id_invoice: sale.id_invoice,
+            motive: motivo,
+          };
+          this.cancelInvoice(obj);
+        }
+      });
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'Factura Inexistente',
+        text: 'La venta no cuenta con una Factura Activa',
+      });
+    }
+  }
+
+  onViewInvoice(sale: SaleInfoComplete) {
+    this.showModal('eye', 'Ver Facturas de la Venta', sale, 'viewInvoices');
   }
 
   /* Show Modal */
-  showModal(classModal: string, title: string, sale: SaleInfoComplete) {
+  showModal(
+    classModal: string,
+    title: string,
+    sale: SaleInfoComplete,
+    viewProducts?: string
+  ) {
     /* Select Element or Default */
     const defaultSale = {
       date: '',
@@ -273,6 +561,17 @@ export class SalesComponent {
     };
 
     this.selectedSale = sale || defaultSale;
+    this.viewProducts = viewProducts || null;
+
+    /* View Products => Filter Sales Products */
+    if (viewProducts == 'viewProducts') {
+      this.salesProductsByIdSale(this.selectedSale.id);
+    }
+
+    /* View Products => Filter Sales Products */
+    if (viewProducts == 'viewInvoices') {
+      this.invoicesByIdSale(this.selectedSale.id);
+    }
 
     /* Inti Form => Show Modal */
     this.saleForm.patchValue({
@@ -470,9 +769,101 @@ export class SalesComponent {
     }
   }
 
-    /* Reset Input File */
-    resetFileInput() {
-      this.saleForm.reset();
-    }
+  deleteSale(credentials: DeleteRequest): void {
+    this.apiServiceSales.deleteSale(credentials).subscribe(
+      (response) => {
+        Swal.fire({
+          icon: 'success',
+          title: response.message || 'Venta Eliminada Correctamente',
+        });
+        this.getAllSales();
+      },
+      (error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.error?.message || 'Ocurrió un Error al Eliminar la Venta',
+        });
+      }
+    );
+  }
 
+  createInvoice(credentials: Invoice): void {
+    this.apiServiceInvoice.createInvoice(credentials).subscribe(
+      (response) => {
+        console.log(response);
+        Swal.fire({
+          title: response.message || 'Factura Generada con Éxito',
+          icon: 'success',
+          showCancelButton: false,
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Ok',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.getAllSales();
+          }
+        });
+      },
+      (error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.error?.error || 'Ocurrió un Error al Generar la Factura',
+        });
+      }
+    );
+  }
+
+  downloadIncoice(credentials: InvoiceDownload): void {
+    this.apiServiceInvoice.downloadInvoice(credentials).subscribe(
+      (response: Blob) => {
+        const url = window.URL.createObjectURL(response);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Factura ID ${credentials.id_invoice}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      (error) => {
+        console.error('Error al descargar la factura:', error);
+      }
+    );
+  }
+
+  cancelInvoice(credentials: CancelInvoice): void {
+    this.apiServiceInvoice.cancelInvoice(credentials).subscribe(
+      (response) => {
+        Swal.fire({
+          title: response.message || 'Factura Cancelada con Éxito',
+          icon: 'success',
+          showCancelButton: false,
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Ok',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.getAllSales();
+          }
+        });
+      },
+      (error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.error?.error || 'Ocurrió un Error al Cancelar la Factura',
+        });
+      }
+    );
+  }
+
+  /* Reset Input File */
+  resetFileInput() {
+    this.saleForm.reset();
+  }
+
+  /* Not KeyPress in Inputs */
+  preventInput(event: KeyboardEvent | Event) {
+    event.preventDefault();
+  }
 }

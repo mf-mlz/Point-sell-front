@@ -1,5 +1,12 @@
-<app-datatable [columns]="columns" [data]="sales" [buttons]="buttons">
-</app-datatable>
+<app-datatable
+  [columns]="columns"
+  [data]="sales"
+  [buttons]="buttons"
+  [buttonsGroup]="buttonsGroup"
+  [iconbuttonsGroup]="iconGroup"
+  [titleGroup]="titleGroup"
+  [classGroup]="classGroup"
+></app-datatable>
 
 <!-- Modal Component -->
 <app-modal
@@ -10,7 +17,12 @@
   (executeFunction)="handleClick()"
 >
   <!-- Form View || Form Edit -->
-  <form [formGroup]="saleForm" class="product-form" [ngClass]="classModal">
+  <form
+    [formGroup]="saleForm"
+    class="product-form"
+    [ngClass]="classModal"
+    *ngIf="!viewProducts"
+  >
     <div class="form-group">
       <label for="date">Fecha Venta:</label>
       <input
@@ -31,8 +43,11 @@
         <input
           id="totalAmount"
           formControlName="totalAmount"
-          class="form-control"
+          class="form-control readonly-input"
           type="number"
+          readonly
+          (keydown)="preventInput($event)"
+          (input)="preventInput($event)"
         />
       </div>
       <div
@@ -55,7 +70,10 @@
         (change)="paymentSelected($event)"
       />
       <datalist id="type_payment_options">
-        <option *ngFor="let key of filteredPaymentForms" [value]="key.descripcion">
+        <option
+          *ngFor="let key of filteredPaymentForms"
+          [value]="key.descripcion"
+        >
           {{ key.id }} - {{ key.descripcion }}
         </option>
       </datalist>
@@ -112,8 +130,10 @@
       <input
         id="emailClient"
         formControlName="emailClient"
-        class="form-control"
+        class="form-control readonly-input"
         readonly
+        (keydown)="preventInput($event)"
+        (input)="preventInput($event)"
       />
       <div
         *ngIf="isFieldInvalid(saleForm, 'emailClient')"
@@ -128,8 +148,10 @@
       <input
         id="taxIdClient"
         formControlName="taxIdClient"
-        class="form-control"
+        class="form-control readonly-input"
         readonly
+        (keydown)="preventInput($event)"
+        (input)="preventInput($event)"
       />
       <div
         *ngIf="isFieldInvalid(saleForm, 'taxIdClient')"
@@ -144,9 +166,11 @@
       <input
         id="taxSystemClient"
         formControlName="taxSystemClient"
-        class="form-control"
+        class="form-control readonly-input"
         type="text"
         readonly
+        (keydown)="preventInput($event)"
+        (input)="preventInput($event)"
       />
       <div
         *ngIf="isFieldInvalid(saleForm, 'taxSystemClient')"
@@ -169,7 +193,10 @@
         (change)="employeeSelected($event)"
       />
       <datalist id="employee_list">
-        <option *ngFor="let employee of filteredEmployees" [value]="employee.name">
+        <option
+          *ngFor="let employee of filteredEmployees"
+          [value]="employee.name"
+        >
           {{ employee.id }} - {{ employee.name }}
         </option>
       </datalist>
@@ -186,8 +213,10 @@
       <input
         id="emailEmployee"
         formControlName="emailEmployee"
-        class="form-control"
+        class="form-control readonly-input"
         readonly
+        (keydown)="preventInput($event)"
+        (input)="preventInput($event)"
       />
       <div
         *ngIf="isFieldInvalid(saleForm, 'emailEmployee')"
@@ -199,9 +228,38 @@
 
     <div class="form-group hidden">
       <input id="id" type="number" formControlName="id" class="form-control" />
-      <input id="customerId" type="number" formControlName="customerId" class="form-control" />
-      <input id="employeesId" type="number" formControlName="employeesId" class="form-control" />
-      <input id="payment" type="number" formControlName="payment" class="form-control" />
+      <input
+        id="customerId"
+        type="number"
+        formControlName="customerId"
+        class="form-control"
+      />
+      <input
+        id="employeesId"
+        type="number"
+        formControlName="employeesId"
+        class="form-control"
+      />
+      <input
+        id="payment"
+        type="number"
+        formControlName="payment"
+        class="form-control"
+      />
     </div>
   </form>
+
+  <!-- Datatable => Product Sales -->
+  <app-datatable
+    [columns]="columnsProductsSale"
+    [data]="saleProducts"
+    *ngIf="viewProducts === 'viewProducts'"
+  ></app-datatable>
+
+  <!-- Datatable => Invoices -->
+  <app-datatable
+    [columns]="columnsInvoices"
+    [data]="invoicesList"
+    *ngIf="viewProducts === 'viewInvoices'"
+  ></app-datatable>
 </app-modal>
