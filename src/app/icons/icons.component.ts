@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { cilPencil, cilTrash, cilTouchApp, cilPlus, cilBook} from '@coreui/icons';
+import { cilPencil, cilTrash, cilTouchApp, cilPlus, cilBook, cilInbox, cilCloudDownload, cilList} from '@coreui/icons';
 
 @Component({
   selector: 'app-icons',
@@ -14,7 +14,10 @@ export class IconsComponent {
     trash: cilTrash,
     view: cilTouchApp,
     plus: cilPlus,
-    book: cilBook
+    book: cilBook,
+    sharedBox: cilInbox,
+    download: cilCloudDownload,
+    list: cilList
   };
 
   get iconContent() {
