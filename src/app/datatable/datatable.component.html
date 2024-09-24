@@ -20,14 +20,29 @@
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef>Acción</th>
     <td mat-cell *matCellDef="let element">
-      <ng-container *ngFor="let button of buttons">
-        <button
-          class="{{button.class}}"
-          (click)="button.action(element)"
-          title="{{ button.title }}"
-        >
-        <app-icons icon="{{button.icon}}"></app-icons>
-        </button>
+      <ng-container>
+        <ng-container *ngFor="let button of buttons">
+          <button
+            class="{{ button.class }}"
+            (click)="button.action(element)"
+            title="{{ button.title }}"
+          >
+            <app-icons icon="{{ button.icon }}"></app-icons>
+          </button>
+        </ng-container>
+        <c-dropdown variant="btn-group">
+          <button [class]="classGroup" [title]="titleGroup" cButton cDropdownToggle><app-icons [icon]="iconbuttonsGroup"></app-icons></button>
+          <ul cDropdownMenu>
+            <ng-container *ngFor="let button of buttonsGroup">
+              <li class="action-link">
+                <a cDropdownItem (click)="button.action(element)">
+                  {{ button.title }}
+                </a>
+              </li>
+            </ng-container>
+            <li cDropdownDivider></li>
+          </ul>
+        </c-dropdown>
       </ng-container>
     </td>
   </ng-container>
