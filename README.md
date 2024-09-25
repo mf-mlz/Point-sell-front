@@ -27,7 +27,7 @@ Para instalar y ejecutar este sistema de punto de venta, sigue estos pasos:
 
 - Ejecutar los siguientes comandos:
 
-##Clonar Repositorio:
+## Clonar Repositorio:
 
 ```sh
 git clone git@github.com:mf-mlz/Point-sell-front.git
