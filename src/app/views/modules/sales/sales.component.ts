@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { DatatableComponent } from '../../../datatable/datatable.component';
 import { ApiServiceSales } from 'src/app/services/api.service.sales';
+import { Router, RouterModule } from '@angular/router';
 import {
   SaleInfoComplete,
+  SaleInvoice,
   PaymentForm,
   Employee,
   Clients,
@@ -23,17 +25,15 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { DOCUMENT, NgClass, CommonModule } from '@angular/common';
-import {
-  getErrorMessage,
-  isFieldInvalid,
-} from '../../../utils/form-validations';
+import { CommonModule } from '@angular/common';
+import { ValidationsFormService } from 'src/app/utils/form-validations';
 import { ApiServicePaymentForms } from '../../../services/api.service.paymentForms';
 import { ApiServiceEmployees } from '../../../services/api.service.employees';
 import { ApiServiceClients } from '../../../services/api.service.clients';
 import { ApiServiceSalesProducts } from '../../../services/api.service.salesProducts';
 import { AuthService } from '../../../services/auth.service';
 import { ApiServiceInvoice } from '../../../services/api.service.invoice';
+import { IconsModule } from '../../../icons/icons.module';
 
 @Component({
   selector: 'app-sales',
@@ -43,11 +43,16 @@ import { ApiServiceInvoice } from '../../../services/api.service.invoice';
     ModalComponentHtml,
     CommonModule,
     ReactiveFormsModule,
+    IconsModule,
+    RouterModule,
   ],
   templateUrl: './sales.component.html',
   styleUrls: ['../../../../scss/forms.scss', '../../../../scss/buttons.scss'],
 })
 export class SalesComponent {
+  showButtonGroupSale: boolean = true;
+  showButtonGroupInvoice: boolean = true;
+  isAddRoute: boolean = false;
   userPayload: userPayload = {
     id: 0,
     name: '',
@@ -58,8 +63,8 @@ export class SalesComponent {
     iat: 0,
     exp: 0,
   };
-  buttonsDatatable: ButtonConfig[] = [];
   sales: SaleInfoComplete[] = [];
+  saleInvoice: SaleInvoice[] = [];
   paymentsForm: PaymentForm[] = [];
   employees: Employee[] = [];
   filteredEmployees: Employee[] = [];
@@ -86,7 +91,9 @@ export class SalesComponent {
     private apiServiceSalesProducts: ApiServiceSalesProducts,
     private apiServiceInvoice: ApiServiceInvoice,
     private authService: AuthService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private router: Router,
+    public validationsFormService: ValidationsFormService
   ) {
     /* Init Form and Add Validations */
     this.saleForm = this.fb.group({
@@ -94,15 +101,10 @@ export class SalesComponent {
       totalAmount: ['', [Validators.required, Validators.minLength(3)]],
       payment: [0, [Validators.required, Validators.min(1)]],
       dataPayment: ['', Validators.required],
+      payment_status: ['', Validators.required],
+      rejection_reason: ['', Validators.required],
       typePayment: ['', Validators.required],
-      customerId: [
-        '',
-        [
-          Validators.required,
-          Validators.min(1),
-          Validators.pattern('^[0-9]+$'),
-        ],
-      ],
+      customerId: [''],
       employeesId: [
         '',
         [
@@ -113,21 +115,10 @@ export class SalesComponent {
       ],
       id: [''],
       status: [0, [Validators.required, Validators.minLength(1)]],
-      nameClient: ['', [Validators.required, Validators.minLength(3)]],
-      emailClient: [
-        '',
-        [Validators.required, Validators.minLength(3), Validators.email],
-      ],
-      taxIdClient: ['', [Validators.required, Validators.minLength(3)]],
-      taxSystemClient: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(3),
-          Validators.minLength(1),
-          Validators.pattern('^[0-9]+$'),
-        ],
-      ],
+      nameClient: [''],
+      emailClient: [''],
+      taxIdClient: [''],
+      taxSystemClient: [''],
       nameEmployee: ['', [Validators.required, Validators.minLength(3)]],
       emailEmployee: [
         '',
@@ -139,6 +130,7 @@ export class SalesComponent {
   /* Buttons Datatable */
   buttons: ButtonConfig[] = [];
   buttonsGroup: ButtonConfig[] = [];
+  buttonsInvoice: ButtonConfig[] = [];
 
   ngOnInit(): void {
     this.userPayload = this.authService.getDecodedToken();
@@ -167,7 +159,7 @@ export class SalesComponent {
         });
         Toast.fire({
           icon: 'success',
-          title: 'Se encontraron ' + response.length + ' registros',
+          title: 'Se encontraron ' + response.length + ' ventas',
         });
       },
       (error) => {
@@ -271,6 +263,11 @@ export class SalesComponent {
       header: 'Atendido Por',
       cell: (element: any) => element.nameEmployee,
     },
+    {
+      columnDef: 'payment_status',
+      header: 'Estatus',
+      cell: (element: any) => element.payment_status,
+    },
   ];
 
   columnsProductsSale = [
@@ -308,9 +305,9 @@ export class SalesComponent {
       cell: (element: any) => element.id,
     },
     {
-      columnDef: 'id_invoice',
-      header: 'N° Factura',
-      cell: (element: any) => element.id_invoice,
+      columnDef: 'folio',
+      header: 'Folio',
+      cell: (element: any) => element.folio,
     },
     {
       columnDef: 'status',
@@ -335,8 +332,16 @@ export class SalesComponent {
   ];
 
   /* Generate Btns Datatable */
-  generateButtons() {
-    const btnsGroup: ButtonConfig[] = [];
+  generateButtons(): void {
+    const buttonsInvoice: ButtonConfig[] = [];
+    const btnsGroup: ButtonConfig[] = [
+      {
+        class: 'btn-delete',
+        icon: 'trash',
+        title: 'Ver Facturas',
+        action: (element: any) => this.onViewInvoice(element),
+      },
+    ];
     const btns: ButtonConfig[] = [
       {
         class: 'btn-view',
@@ -367,13 +372,13 @@ export class SalesComponent {
           action: (element: any) => this.onDelete(element),
         }
       );
-      btnsGroup.push(
-        {
-          class: 'btn-success',
-          icon: 'book',
-          title: 'Facturar',
-          action: (element: any) => this.onInvoice(element),
-        },
+      btnsGroup.push({
+        class: 'btn-success',
+        icon: 'book',
+        title: 'Facturar',
+        action: (element: any) => this.onInvoice(element),
+      });
+      buttonsInvoice.push(
         {
           class: 'btn-download',
           icon: 'download',
@@ -385,34 +390,29 @@ export class SalesComponent {
           icon: 'trash',
           title: 'Cancelar Factura',
           action: (element: any) => this.onCancelInvoice(element),
-        },
-        {
-          class: 'btn-delete',
-          icon: 'trash',
-          title: 'Ver Lista de Facturas',
-          action: (element: any) => this.onViewInvoice(element),
         }
       );
     }
 
     this.buttons = btns;
     this.buttonsGroup = btnsGroup;
+    this.buttonsInvoice = buttonsInvoice;
   }
 
   /* Functions Datatable Buttons -- Open Modals */
-  onView(sale: SaleInfoComplete) {
+  onView(sale: SaleInfoComplete): void {
     this.showModal('eye', 'Ver Información de la Venta', sale);
   }
 
-  onViewProducts(sale: SaleInfoComplete) {
+  onViewProducts(sale: SaleInfoComplete): void {
     this.showModal('eye', 'Ver Productos de la Venta', sale, 'viewProducts');
   }
 
-  onEdit(sale: SaleInfoComplete) {
+  onEdit(sale: SaleInfoComplete): void {
     this.showModal('edit', 'Editar Venta', sale);
   }
 
-  onDelete(sale: SaleInfoComplete) {
+  onDelete(sale: SaleInfoComplete): void {
     Swal.fire({
       title: '¿Estás seguro que deseas eliminar?',
       text: '¡Esta acción no se puede deshacer!',
@@ -432,12 +432,12 @@ export class SalesComponent {
     });
   }
 
-  onInvoice(sale: SaleInfoComplete) {
+  onInvoice(sale: SaleInfoComplete): void {
     if (sale.id_invoice && sale.status_invoice == 'Active') {
       Swal.fire({
         icon: 'info',
         title: 'Factura Existente',
-        text: 'La venta ya cuenta con una Factura Activa',
+        text: 'La venta ya cuenta con una Factura Activa: ' + sale.folio,
       });
     } else {
       Swal.fire({
@@ -462,8 +462,8 @@ export class SalesComponent {
     }
   }
 
-  onDownloadInvoice(sale: SaleInfoComplete) {
-    if (sale.id_invoice && sale.status_invoice == 'Active') {
+  onDownloadInvoice(invoice: SaleInvoice): void {
+    if (invoice.id_invoice) {
       Swal.fire({
         title: 'Descargar Factura',
         icon: 'info',
@@ -475,7 +475,7 @@ export class SalesComponent {
       }).then((result) => {
         if (result.isConfirmed) {
           const obj: InvoiceDownload = {
-            id_invoice: sale.id_invoice,
+            id_invoice: invoice.id_invoice,
           };
           this.downloadIncoice(obj);
         }
@@ -484,53 +484,24 @@ export class SalesComponent {
       Swal.fire({
         icon: 'info',
         title: 'Sin Factura Registrada',
-        text: 'La venta no cuenta con una Factura Activa',
+        text: 'La venta no cuenta con una Factura Registrada',
       });
     }
   }
 
-  onCancelInvoice(sale: SaleInfoComplete) {
-    if (sale.id_invoice && sale.status_invoice == 'Active') {
-      Swal.fire({
-        title: 'Selecciona el Motivo para Cancelar la Factura',
-        input: 'select',
-        inputOptions: {
-          '01': 'Comprobante emitido con errores con relación. Cuando la factura contiene algún error en las cantidades, claves o cualquier otro dato y ya se ha emitido el comprobante que la sustituye, el cual deberá indicarse por medio del atributo substitution.',
-          '02': 'Comprobante emitido con errores sin relación. Cuando la factura contiene algún error en las cantidades, claves o cualquier otro dato y no se requiere relacionar con otra factura.',
-          '03': 'No se llevó a cabo la operación. Cuando la venta o transacción no se concretó.',
-          '04': 'Operación nominativa relacionada en la factura global. Cuando se trata de un comprobante global que incluye a otros comprobantes.',
-        },
-        inputPlaceholder: 'Selecciona una opción',
-        showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar',
-        preConfirm: (value) => {
-          if (!value) {
-            Swal.showValidationMessage('Por favor selecciona una opción');
-          }
-          return value;
-        },
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const motivo = result.value;
-          const obj: CancelInvoice = {
-            id_employee: this.userPayload.id,
-            id_invoice: sale.id_invoice,
-            motive: motivo,
-          };
-          this.cancelInvoice(obj);
-        }
-      });
+  onCancelInvoice(invoice: SaleInvoice): void {
+    if (invoice.id_invoice && invoice.status === 'Active') {
+      this.swalCancel(invoice);
     } else {
       Swal.fire({
         icon: 'info',
-        title: 'Factura Inexistente',
-        text: 'La venta no cuenta con una Factura Activa',
+        title: 'Factura Inexistente o Cancelada',
+        text: 'La Factura Seleccionada no sé puede Cancelar',
       });
     }
   }
 
-  onViewInvoice(sale: SaleInfoComplete) {
+  onViewInvoice(sale: SaleInfoComplete): void {
     this.showModal('eye', 'Ver Facturas de la Venta', sale, 'viewInvoices');
   }
 
@@ -540,7 +511,7 @@ export class SalesComponent {
     title: string,
     sale: SaleInfoComplete,
     viewProducts?: string
-  ) {
+  ): void {
     /* Select Element or Default */
     const defaultSale = {
       date: '',
@@ -552,6 +523,8 @@ export class SalesComponent {
       id: '',
       status: 0,
       typePayment: '',
+      payment_status: '',
+      rejection_reason: '',
       nameClient: '',
       emailClient: '',
       taxIdClient: '',
@@ -575,6 +548,8 @@ export class SalesComponent {
 
     /* Inti Form => Show Modal */
     this.saleForm.patchValue({
+      payment_status: this.selectedSale.payment_status,
+      rejection_reason: this.selectedSale.rejection_reason,
       date: this.selectedSale.date,
       totalAmount: this.selectedSale.totalAmount,
       payment: this.selectedSale.payment,
@@ -599,12 +574,12 @@ export class SalesComponent {
   }
 
   /* Open / Close Modal */
-  handleModalVisibilityChange(visible: boolean) {
+  handleModalVisibilityChange(visible: boolean): void {
     this.isModalVisible = visible;
   }
 
   /* Filter Payment Forms Datalist */
-  filterPaymentForms(event: Event) {
+  filterPaymentForms(event: Event): void {
     const inputValue = (event.target as HTMLInputElement).value;
     this.filteredPaymentForms = this.paymentsForm
       .filter(
@@ -616,7 +591,7 @@ export class SalesComponent {
   }
 
   /* Get Payment Selected */
-  paymentSelected(event: Event) {
+  paymentSelected(event: Event): void {
     const descriptionPayment = (event.target as HTMLSelectElement).value;
     const selectedPayment = this.filteredPaymentForms.find(
       (payment) => payment.descripcion === descriptionPayment
@@ -634,7 +609,7 @@ export class SalesComponent {
   }
 
   /* Filter Employees  */
-  filterEmployees(event: Event) {
+  filterEmployees(event: Event): void {
     const inputValue = (event.target as HTMLInputElement).value;
     this.filteredEmployees = this.employees
       .filter(
@@ -646,7 +621,7 @@ export class SalesComponent {
   }
 
   /* Get Employee Selected */
-  employeeSelected(event: Event) {
+  employeeSelected(event: Event): void {
     const nameEmployee = (event.target as HTMLSelectElement).value;
     const selectedEmployee = this.filteredEmployees.find(
       (employee) => employee.name === nameEmployee
@@ -665,7 +640,7 @@ export class SalesComponent {
   }
 
   /* Filter Clients  */
-  filterClients(event: Event) {
+  filterClients(event: Event): void {
     const inputValue = (event.target as HTMLInputElement).value;
     this.filteredClients = this.clients
       .filter(
@@ -677,7 +652,7 @@ export class SalesComponent {
   }
 
   /* Get Client Selected */
-  clientSelected(event: Event) {
+  clientSelected(event: Event): void {
     const nameClient = (event.target as HTMLSelectElement).value;
     const selectedClient = this.filteredClients.find(
       (client) => client.name === nameClient
@@ -695,20 +670,11 @@ export class SalesComponent {
       this.saleForm.get('taxSystemClient')?.setValue('');
       this.saleForm.get('customerId')?.setValue('');
       /* Invalidate Inputs */
-      this.saleForm.get('nameClient')?.setErrors({ invalid: true });
+      /* this.saleForm.get('nameClient')?.setErrors({ invalid: true });
       this.saleForm.get('emailClient')?.setErrors({ invalid: true });
       this.saleForm.get('taxIdClient')?.setErrors({ invalid: true });
-      this.saleForm.get('taxSystemClient')?.setErrors({ invalid: true });
+      this.saleForm.get('taxSystemClient')?.setErrors({ invalid: true }); */
     }
-  }
-
-  /* Validation Form */
-  getErrorMessage(form: FormGroup, field: string): string {
-    return getErrorMessage(form, field);
-  }
-
-  isFieldInvalid(form: FormGroup, field: string): boolean {
-    return isFieldInvalid(form, field);
   }
 
   /* Execute Function Add-Edit-Delete-Create Invoice */
@@ -725,6 +691,7 @@ export class SalesComponent {
 
   /* Functions */
   editSale(): void {
+    
     if (this.saleForm.valid) {
       const formValue = this.saleForm.value;
       const data = {
@@ -733,13 +700,13 @@ export class SalesComponent {
         payment: Number(formValue.payment),
         dataPayment: Number(formValue.dataPayment),
         totalAmount: Number(formValue.totalAmount),
-        customerId: Number(formValue.customerId),
+        customerId: formValue.customerId ? Number(formValue.customerId) : null,
         employeesId: Number(formValue.employeesId),
         status: Number(formValue.status),
       };
 
       /* Send put Api */
-      this.apiServiceSales.editProduct(data).subscribe(
+      this.apiServiceSales.editSale(data).subscribe(
         (response) => {
           Swal.fire({
             icon: 'success',
@@ -791,7 +758,6 @@ export class SalesComponent {
   createInvoice(credentials: Invoice): void {
     this.apiServiceInvoice.createInvoice(credentials).subscribe(
       (response) => {
-        console.log(response);
         Swal.fire({
           title: response.message || 'Factura Generada con Éxito',
           icon: 'success',
@@ -857,13 +823,47 @@ export class SalesComponent {
     );
   }
 
+  /* SwalFunctions */
+  swalCancel(invoice: SaleInvoice): void {
+    Swal.fire({
+      title: 'Selecciona el Motivo para Cancelar la Factura',
+      input: 'select',
+      inputOptions: {
+        '01': 'Comprobante emitido con errores con relación. Cuando la factura contiene algún error en las cantidades, claves o cualquier otro dato y ya se ha emitido el comprobante que la sustituye, el cual deberá indicarse por medio del atributo substitution.',
+        '02': 'Comprobante emitido con errores sin relación. Cuando la factura contiene algún error en las cantidades, claves o cualquier otro dato y no se requiere relacionar con otra factura.',
+        '03': 'No se llevó a cabo la operación. Cuando la venta o transacción no se concretó.',
+        '04': 'Operación nominativa relacionada en la factura global. Cuando se trata de un comprobante global que incluye a otros comprobantes.',
+      },
+      inputPlaceholder: 'Selecciona una opción',
+      showCancelButton: true,
+      confirmButtonText: 'Aceptar',
+      cancelButtonText: 'Cancelar',
+      preConfirm: (value) => {
+        if (!value) {
+          Swal.showValidationMessage('Por favor selecciona una opción');
+        }
+        return value;
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const motivo = result.value;
+        const obj: CancelInvoice = {
+          id_employee: this.userPayload.id,
+          id_invoice: invoice.id_invoice,
+          motive: motivo,
+        };
+        this.cancelInvoice(obj);
+      }
+    });
+  }
+
   /* Reset Input File */
-  resetFileInput() {
+  resetFileInput(): void {
     this.saleForm.reset();
   }
 
-  /* Not KeyPress in Inputs */
-  preventInput(event: KeyboardEvent | Event) {
-    event.preventDefault();
+  /* Change Route => Add Sale */
+  addSale(): void {
+    this.router.navigate(['modules/addSale']);
   }
 }

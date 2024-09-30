@@ -1,7 +1,21 @@
+<!-- Botón "Añadir Producto" -->
+<div class="col-12 mb-4 d-flex justify-content-end">
+  <button
+    class="btn btn-success fw-bold d-flex align-items-center justify-content-center"
+    style="width: 100%; max-width: 200px; height: 35px; color: white"
+    (click)="addSale()"
+  >
+    <app-icons icon="plus"></app-icons>
+    <span>Añadir Venta</span>
+  </button>
+</div>
+
+<!-- Datatable General Sale -->
 <app-datatable
   [columns]="columns"
   [data]="sales"
   [buttons]="buttons"
+  [showButtonGroup]="showButtonGroupSale"
   [buttonsGroup]="buttonsGroup"
   [iconbuttonsGroup]="iconGroup"
   [titleGroup]="titleGroup"
@@ -31,8 +45,8 @@
         class="form-control"
         type="date"
       />
-      <div *ngIf="isFieldInvalid(saleForm, 'date')" class="error-message">
-        {{ getErrorMessage(saleForm, "date") }}
+      <div *ngIf="validationsFormService.isFieldInvalid(saleForm, 'date')" class="error-message">
+        {{ validationsFormService.getErrorMessage(saleForm, "date") }}
       </div>
     </div>
 
@@ -46,15 +60,15 @@
           class="form-control readonly-input"
           type="number"
           readonly
-          (keydown)="preventInput($event)"
-          (input)="preventInput($event)"
+          (keydown)="validationsFormService.preventInput($event)"
+          (input)="validationsFormService.preventInput($event)"
         />
       </div>
       <div
-        *ngIf="isFieldInvalid(saleForm, 'totalAmount')"
+        *ngIf="validationsFormService.isFieldInvalid(saleForm, 'totalAmount')"
         class="error-message"
       >
-        {{ getErrorMessage(saleForm, "totalAmount") }}
+        {{ validationsFormService.getErrorMessage(saleForm, "totalAmount") }}
       </div>
     </div>
 
@@ -78,10 +92,10 @@
         </option>
       </datalist>
       <div
-        *ngIf="isFieldInvalid(saleForm, 'typePayment')"
+        *ngIf="validationsFormService.isFieldInvalid(saleForm, 'typePayment')"
         class="error-message"
       >
-        {{ getErrorMessage(saleForm, "typePayment") }}
+        {{ validationsFormService.getErrorMessage(saleForm, "typePayment") }}
       </div>
     </div>
 
@@ -95,10 +109,10 @@
         placeholder="Número de Tarjeta Sin Guiones, si fue en efectivo poner 0"
       />
       <div
-        *ngIf="isFieldInvalid(saleForm, 'dataPayment')"
+        *ngIf="validationsFormService.isFieldInvalid(saleForm, 'dataPayment')"
         class="error-message"
       >
-        {{ getErrorMessage(saleForm, "dataPayment") }}
+        {{ validationsFormService.getErrorMessage(saleForm, "dataPayment") }}
       </div>
     </div>
 
@@ -119,10 +133,6 @@
           {{ client.id }} - {{ client.name }}
         </option>
       </datalist>
-
-      <div *ngIf="isFieldInvalid(saleForm, 'nameClient')" class="error-message">
-        {{ getErrorMessage(saleForm, "nameClient") }}
-      </div>
     </div>
 
     <div class="form-group">
@@ -132,15 +142,9 @@
         formControlName="emailClient"
         class="form-control readonly-input"
         readonly
-        (keydown)="preventInput($event)"
-        (input)="preventInput($event)"
+        (keydown)="validationsFormService.preventInput($event)"
+        (input)="validationsFormService.preventInput($event)"
       />
-      <div
-        *ngIf="isFieldInvalid(saleForm, 'emailClient')"
-        class="error-message"
-      >
-        {{ getErrorMessage(saleForm, "emailClient") }}
-      </div>
     </div>
 
     <div class="form-group">
@@ -150,15 +154,9 @@
         formControlName="taxIdClient"
         class="form-control readonly-input"
         readonly
-        (keydown)="preventInput($event)"
-        (input)="preventInput($event)"
+        (keydown)="validationsFormService.preventInput($event)"
+        (input)="validationsFormService.preventInput($event)"
       />
-      <div
-        *ngIf="isFieldInvalid(saleForm, 'taxIdClient')"
-        class="error-message"
-      >
-        {{ getErrorMessage(saleForm, "taxIdClient") }}
-      </div>
     </div>
 
     <div class="form-group">
@@ -169,15 +167,9 @@
         class="form-control readonly-input"
         type="text"
         readonly
-        (keydown)="preventInput($event)"
-        (input)="preventInput($event)"
+        (keydown)="validationsFormService.preventInput($event)"
+        (input)="validationsFormService.preventInput($event)"
       />
-      <div
-        *ngIf="isFieldInvalid(saleForm, 'taxSystemClient')"
-        class="error-message"
-      >
-        {{ getErrorMessage(saleForm, "taxSystemClient") }}
-      </div>
     </div>
 
     <!-- Employee -->
@@ -201,10 +193,10 @@
         </option>
       </datalist>
       <div
-        *ngIf="isFieldInvalid(saleForm, 'nameEmployee')"
+        *ngIf="validationsFormService.isFieldInvalid(saleForm, 'nameEmployee')"
         class="error-message"
       >
-        {{ getErrorMessage(saleForm, "nameEmployee") }}
+        {{ validationsFormService.getErrorMessage(saleForm, "nameEmployee") }}
       </div>
     </div>
 
@@ -215,15 +207,42 @@
         formControlName="emailEmployee"
         class="form-control readonly-input"
         readonly
-        (keydown)="preventInput($event)"
-        (input)="preventInput($event)"
+        (keydown)="validationsFormService.preventInput($event)"
+        (input)="validationsFormService.preventInput($event)"
       />
       <div
-        *ngIf="isFieldInvalid(saleForm, 'emailEmployee')"
+        *ngIf="validationsFormService.isFieldInvalid(saleForm, 'emailEmployee')"
         class="error-message"
       >
-        {{ getErrorMessage(saleForm, "emailEmployee") }}
+        {{ validationsFormService.getErrorMessage(saleForm, "emailEmployee") }}
       </div>
+    </div>
+
+    <!-- Status Sale -->
+    <div class="form-group" *ngIf="classModal == 'eye' && !viewProducts">
+      <label for="payment_status">Estatus:</label>
+      <input
+        type="text"
+        class="form-control readonly-input"
+        formControlName="payment_status"
+        readonly
+      />
+    </div>
+    <div
+      class="form-group"
+      *ngIf="
+        classModal == 'eye' &&
+        !viewProducts &&
+        saleForm.get('payment_status')?.value === 'Rechazada'
+      "
+    >
+      <label for="rejection_reason">Motivo Rechazo:</label>
+      <input
+        type="text"
+        class="form-control readonly-input"
+        formControlName="rejection_reason"
+        readonly
+      />
     </div>
 
     <div class="form-group hidden">
@@ -260,6 +279,11 @@
   <app-datatable
     [columns]="columnsInvoices"
     [data]="invoicesList"
+    [showButtonGroup]="showButtonGroupInvoice"
+    [buttonsGroup]="buttonsInvoice"
+    [iconbuttonsGroup]="iconGroup"
+    [titleGroup]="titleGroup"
+    [classGroup]="classGroup"
     *ngIf="viewProducts === 'viewInvoices'"
   ></app-datatable>
 </app-modal>
