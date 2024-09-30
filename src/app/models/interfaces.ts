@@ -16,6 +16,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  code: string;
   category: string;
   stock: number;
   photo: string;
@@ -51,7 +52,6 @@ export interface Sale {
   updated_at: string;
 }
 
-/* Sale Info */
 export interface SaleInfoComplete {
   id: number;
   payment: number;
@@ -59,7 +59,10 @@ export interface SaleInfoComplete {
   employeesId: number;
   status: string;
   date: string;
+  folio: string;
   totalAmount: number;
+  payment_status: string;
+  rejection_reason: string;
   typePayment: string;
   dataPayment: string;
   nameClient: string;
@@ -72,12 +75,60 @@ export interface SaleInfoComplete {
   status_invoice: string;
 }
 
+export interface TransactionSale {
+  date: string;
+  customerId?: number;
+  payment: number;
+  employeesId: number;
+  status?: number;
+  typePayment: string;
+  dataPayment?: string;
+  total: string;
+  products: ProductObjSale[];
+}
+
+export interface DataCard {
+  card_number: number;
+  holder_name: string;
+  expiration_year: number;
+  expiration_month: number;
+  cvv2: string;
+}
+
+export interface PaymentObj {
+  token: string;
+  deviceSessionId: string;
+  amount: number;
+  description: string;
+}
+
+/* Open Pay */
+export interface OpenPayPayment {
+  id_order: number;
+  token: string;
+  amount: number;
+  description: string;
+  deviceSessionId: string;
+  customer: {
+    name: string;
+    lastName: string;
+    email: string;
+  };
+}
+
+export interface customerOpenPay{
+  name: string,
+  lastName: string,
+  email: string,
+}
+
 /* Forms Payment */
 export interface PaymentForm {
   id: number;
   descripcion: string;
   created_at: Date;
   updated_at: Date;
+  required_data: Boolean;
 }
 
 /* Datatable */
@@ -152,6 +203,21 @@ export interface InvoiceList {
   updated_at: string;
 }
 
+export interface SaleInvoice {
+  id: number;
+  id_sale: number;
+  id_invoice: string;
+  id_employee: number;
+  id_employee_cancel: number;
+  status: string;
+  status_invoice: string;
+  motive: string;
+  created_at: Date;
+  updated_at: Date;
+  employee_name: string;
+  employee_cancel_name: string;
+}
+
 /* Delete Interface */
 export interface DeleteRequest {
   id: number;
@@ -159,6 +225,60 @@ export interface DeleteRequest {
 
 /* Rol */
 export interface Rol {
-  id:  number;
+  id: number;
   name: string;
+}
+
+/* Products */
+export interface AddProductSale {
+  id: number;
+  quantity: number;
+  name: string;
+  price: number;
+  code: string;
+}
+
+export interface ProductFilterData {
+  id?: string;
+  name?: string;
+  category?: string;
+  stock?: string;
+  code?: string;
+}
+
+export interface ProductFilter {
+  id: number;
+  name: string;
+  quantity: number;
+  description: string;
+  key_sat: string;
+  price: number;
+  category: string;
+  stock: number;
+  photo: string;
+  status: string;
+  created_at: Date;
+  updated_at: Date;
+  code: string;
+}
+
+export interface SimpleProductSwal {
+  id: number;
+  name: string;
+}
+
+export interface ProductObjSale {
+  id: number;
+  quantity: number;
+  name: string;
+  price: number;
+  code: string;
+}
+
+/* Errors */
+export interface OpenPayError {
+  data?: {
+    message?: string;
+    description?: string;
+  };
 }
