@@ -26,6 +26,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -57,7 +58,8 @@ export class LoginComponent {
   constructor(
     private apiService: ApiServiceEmployees,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -65,6 +67,10 @@ export class LoginComponent {
     });
   }
 
+  onInit(): void{
+    this.authService.removeToken();
+  }
+  
   onSubmit(): void {
     if (this.loginForm.valid) {
       const credentials = this.loginForm.value;
