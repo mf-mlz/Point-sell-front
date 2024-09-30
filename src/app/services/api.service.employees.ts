@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../services/auth.service';
+import { HttpHeadersService } from './http-headers.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { AuthService } from '../services/auth.service';
 export class ApiServiceEmployees {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(private http: HttpClient, private authService: AuthService, private httpHeadersService: HttpHeadersService) { }
 
   /* Post -- Login */
   login(credentials: { email: string, password: string }): Observable<any> {
@@ -18,28 +19,17 @@ export class ApiServiceEmployees {
     return this.http.post(url, credentials);
   }
 
-
-  /* Get Headers */
-  private getHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
-    const userPayload = this.authService.getDecodedToken();
-    return new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-      employeeId: userPayload.id,
-    });
-  }
-
   /* Get -- All Employees */
   allEmployees(): Observable<any> {
     const url = `${this.apiUrl}/employees`;
-    const headers = this.getHeaders();
+    const headers = this.httpHeadersService.getHeaders();
     return this.http.get(url, { headers });
   }
 
   /* Post -- Filter Employees */
   filterEmployeesAll(filters: { search?: string }): Observable<any> {
     const url = `${this.apiUrl}/employees/filterAll`;
-    const headers = this.getHeaders();
+    const headers = this.httpHeadersService.getHeaders();
     return this.http.post(url, filters, { headers });
   }
 
@@ -54,7 +44,7 @@ export class ApiServiceEmployees {
     role_id: number
   }): Observable<any> {
     const url = `${this.apiUrl}/employees/edit`;
-    const headers = this.getHeaders();
+    const headers = this.httpHeadersService.getHeaders();
     return this.http.put(url, credentials, { headers });
   }
 
@@ -68,21 +58,21 @@ export class ApiServiceEmployees {
     role_id: number
   }): Observable<any> {
     const url = `${this.apiUrl}/employees/register`;
-    const headers = this.getHeaders();
+    const headers = this.httpHeadersService.getHeaders();
     return this.http.post(url, credentials, { headers });
   }
 
   /* Delete -- Delete Product:Id */
   deleteEmployee(credentials: { id: number }): Observable<any> {
     const url = `${this.apiUrl}/employees/delete`;
-    const headers = this.getHeaders();
+    const headers = this.httpHeadersService.getHeaders();
     return this.http.delete(url, { headers, body: credentials });
   }
 
   /* get -- roles */
   getRoles(): Observable<any> {
     const url = `${this.apiUrl}/roles/get`;
-    const headers = this.getHeaders();
+    const headers = this.httpHeadersService.getHeaders();
     return this.http.get(url, { headers});
   }
 }
