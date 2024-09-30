@@ -1,0 +1,161 @@
+<div class="row p-2 mb-4">
+  <!-- Section #1: Products Sale-->
+  <div class="col-12 d-flex justify-content-end mb-2">
+    <button
+      class="btn btn-success fw-bold d-flex align-items-center justify-content-center"
+      (click)="listSale()"
+    >
+      <app-icons icon="list"></app-icons>
+      <span>Ver Ventas</span>
+    </button>
+  </div>
+
+  <div class="col-12 col-md-8">
+    <div class="d-flex flex-column">
+      <h3 class="flex-grow-1 mx-3">Generar Venta</h3>
+      <div class="d-flex flex-column flex-md-row p-4">
+        <div class="col-12 mb-3 mb-md-0">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ingresa la Clave del Producto"
+            [(ngModel)]="productKey"
+            (keyup.enter)="addProduct()"
+            (keydown)="onKeydownScanner($event, 'search')"
+            (keypress)="allowOnlyNumbers($event)"
+          />
+          <!-- Btn Add Product and Empty Sale -->
+          <div class="col-12 my-2 d-flex justify-content-end">
+            <button
+              class="btn btn-success fw-bold d-flex align-items-center justify-content-center mx-1"
+              (click)="addProduct()"
+            >
+              <app-icons icon="search"></app-icons>
+              <span>Buscar</span>
+            </button>
+            <button
+              class="btn btn-delete fw-bold d-flex align-items-center justify-content-center mx-1"
+              (click)="emptyProducts()"
+            >
+              <app-icons icon="trash"></app-icons>
+              <span>Vacíar Lista</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <hr />
+      <!-- Datatable Products -->
+      <app-datatable
+        [columns]="columns"
+        [data]="products"
+        [buttons]="buttons"
+      ></app-datatable>
+    </div>
+  </div>
+
+  <!-- Section #2: Total Sale-->
+  <div class="col-12 col-md-4 my-4">
+    <div class="d-flex flex-column" style="border: 1px solid #43434382">
+      <div class="header d-flex">
+        <h3 class="flex-grow-1 mx-3">
+          Total: <span class="text-danger">{{ totalSale }}</span>
+        </h3>
+      </div>
+      <div class="container" style="padding: 10px">
+        <form [formGroup]="saleForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="date">Fecha:</label>
+            <input
+              type="text"
+              class="form-control readonly-input"
+              id="date"
+              formControlName="date"
+              readonly
+              (keydown)="validationsFormService.preventInput($event)"
+              (input)="validationsFormService.preventInput($event)"
+            />
+          </div>
+          <!-- Total, SubTotal / Taxes -->
+          <div class="form-group">
+            <label for="subtotal">Subtotal:</label>
+            <input
+              type="text"
+              class="form-control readonly-input"
+              id="subtotal"
+              formControlName="subtotal"
+              readonly
+              (keydown)="validationsFormService.preventInput($event)"
+              (input)="validationsFormService.preventInput($event)"
+            />
+          </div>
+          <div class="form-group">
+            <label for="iva">Iva 16%:</label>
+            <input
+              type="text"
+              class="form-control readonly-input"
+              id="iva"
+              formControlName="iva"
+              readonly
+              (keydown)="validationsFormService.preventInput($event)"
+              (input)="validationsFormService.preventInput($event)"
+            />
+          </div>
+          <div class="form-group">
+            <label for="total">Total:</label>
+            <input
+              type="text"
+              class="form-control readonly-input"
+              id="total"
+              formControlName="total"
+              readonly
+              (keydown)="validationsFormService.preventInput($event)"
+              (input)="validationsFormService.preventInput($event)"
+            />
+            <div
+              *ngIf="validationsFormService.isFieldInvalid(saleForm, 'total')"
+              class="error-message"
+            >
+              {{ validationsFormService.getErrorMessage(saleForm, "total") }}
+            </div>
+          </div>
+
+          <!-- Data Payment -->
+          <div class="form-group">
+            <label for="typePayment">Tipo de Pago:</label>
+            <input
+              id="typePayment"
+              formControlName="typePayment"
+              type="text"
+              class="form-control"
+              list="type_payment_options"
+              (input)="filterPaymentForms($event)"
+              (change)="paymentSelected($event)"
+            />
+            <datalist id="type_payment_options">
+              <option
+                *ngFor="let key of filteredPaymentForms"
+                [value]="key.descripcion"
+              >
+                {{ key.id }} - {{ key.descripcion }}
+              </option>
+            </datalist>
+            <div
+              *ngIf="validationsFormService.isFieldInvalid(saleForm, 'typePayment')"
+              class="error-message"
+            >
+              {{ validationsFormService.getErrorMessage(saleForm, "typePayment") }}
+            </div>
+            <!-- # Form Payment -->
+            <input id="payment" formControlName="payment" type="hidden" />
+          </div>
+          <!-- Btn Send Sale -->
+          <div class="d-flex justify-content-end">
+            <button type="submit" class="btn-view btn btn-primary">
+              Generar Venta
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
