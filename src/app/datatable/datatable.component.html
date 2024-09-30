@@ -1,61 +1,74 @@
-<!-- Filter -->
-<div class="filter-container">
-  <mat-form-field appearance="outline">
-    <mat-label>Filter</mat-label>
-    <input matInput (keyup)="applyFilter($event)" placeholder="Filter" />
-  </mat-form-field>
-</div>
+<div class="col col-12">
+  <!-- Filter -->
+  <div class="filter-container">
+    <mat-form-field appearance="outline">
+      <mat-label>Filter</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Filter" />
+    </mat-form-field>
+  </div>
 
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-  <!-- Definición de columnas dinámicas -->
-  <ng-container
-    *ngFor="let column of columns"
-    [matColumnDef]="column.columnDef"
-  >
-    <th mat-header-cell *matHeaderCellDef>{{ column.header }}</th>
-    <td mat-cell *matCellDef="let element">{{ column.cell(element) }}</td>
-  </ng-container>
-
-  <!-- Acciones -->
-  <ng-container matColumnDef="actions">
-    <th mat-header-cell *matHeaderCellDef>Acción</th>
-    <td mat-cell *matCellDef="let element">
-      <ng-container>
-        <ng-container *ngFor="let button of buttons">
-          <button
-            class="{{ button.class }}"
-            (click)="button.action(element)"
-            title="{{ button.title }}"
-          >
-            <app-icons icon="{{ button.icon }}"></app-icons>
-          </button>
-        </ng-container>
-        <c-dropdown variant="btn-group">
-          <button [class]="classGroup" [title]="titleGroup" cButton cDropdownToggle><app-icons [icon]="iconbuttonsGroup"></app-icons></button>
-          <ul cDropdownMenu>
-            <ng-container *ngFor="let button of buttonsGroup">
-              <li class="action-link">
-                <a cDropdownItem (click)="button.action(element)">
-                  {{ button.title }}
-                </a>
-              </li>
-            </ng-container>
-            <li cDropdownDivider></li>
-          </ul>
-        </c-dropdown>
+  <!-- Table -->
+  <div class="table-wrapper">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+      <!-- Columnas dinámicas -->
+      <ng-container
+        *ngFor="let column of columns"
+        [matColumnDef]="column.columnDef"
+      >
+        <th mat-header-cell *matHeaderCellDef>{{ column.header }}</th>
+        <td mat-cell *matCellDef="let element">{{ column.cell(element) }}</td>
       </ng-container>
-    </td>
-  </ng-container>
 
-  <!-- Header y Filas -->
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-</table>
+      <!-- Acciones -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Acción</th>
+        <td mat-cell *matCellDef="let element" style="display: revert-layer; padding: 10px;">
+          <ng-container>
+            <ng-container *ngFor="let button of buttons">
+              <button
+                class="{{ button.class }}"
+                (click)="button.action(element)"
+                title="{{ button.title }}"
+              >
+                <app-icons icon="{{ button.icon }}"></app-icons>
+              </button>
+            </ng-container>
+            <c-dropdown variant="btn-group" *ngIf="showButtonGroup">
+              <button
+                [class]="classGroup"
+                [title]="titleGroup"
+                cButton
+                cDropdownToggle
+                style="height: 32px;margin-bottom: 6px;"
+              >
+                <app-icons [icon]="iconbuttonsGroup"></app-icons>
+              </button>
+              <ul cDropdownMenu>
+                <ng-container *ngFor="let button of buttonsGroup">
+                  <li class="action-link">
+                    <a cDropdownItem (click)="button.action(element)">
+                      {{ button.title }}
+                    </a>
+                  </li>
+                </ng-container>
+                <li cDropdownDivider></li>
+              </ul>
+            </c-dropdown>
+          </ng-container>
+        </td>
+      </ng-container>
 
-<!-- Pagination -->
-<mat-paginator
-  class="pagination"
-  [pageSize]="pageSize"
-  [pageSizeOptions]="[10, 15, 20, 30, 50, 100]"
-  showFirstLastButtons
-></mat-paginator>
+      <!-- Header y Filas -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <mat-paginator
+    class="pagination"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[10, 15, 20, 30, 50, 100]"
+    showFirstLastButtons
+  ></mat-paginator>
+</div>

@@ -1,8 +1,6 @@
 import {
   Component,
   Input,
-  Output,
-  EventEmitter,
   AfterViewInit,
   ViewChild,
 } from '@angular/core';
@@ -77,7 +75,7 @@ export interface ColumnDef {
     DropdownDividerDirective,
   ],
   templateUrl: './datatable.component.html',
-  styleUrls: ['./datatable.component.scss', '../../scss/buttons.scss'],
+  styleUrls: ['./datatable.component.scss', '../../scss/buttons.scss', '../../scss/datatable.scss'],
 })
 export class DatatableComponent implements AfterViewInit {
   @Input() data: any[] = [];
@@ -87,6 +85,8 @@ export class DatatableComponent implements AfterViewInit {
   @Input() iconbuttonsGroup: string = 'list';
   @Input() classGroup: string = 'btn-success';
   @Input() titleGroup: string = 'Menú';
+  @Input() showButtonGroup: boolean = false;
+  
 
   displayedColumns: string[] = [];
   dataSource = new MatTableDataSource<any>(this.data);
