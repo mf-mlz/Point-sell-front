@@ -44,20 +44,11 @@ import {
   Category,
   KeySat,
   userPayload,
+  ProductFilterData,
 } from '../../../models/interfaces';
 import { IconsModule } from '../../../icons/icons.module';
-import {
-  getErrorMessage,
-  isFieldInvalid,
-} from '../../../utils/form-validations';
-
-/* Type data Filter Obj */
-type ProductFilterData =
-  | { id: string }
-  | { name: string }
-  | { category: string | undefined }
-  | { stock: string | undefined };
-
+import { ValidationsFormService } from '../../../utils/form-validations';
+import { onKeydownScanner } from '../../../utils/scanner';
 @Component({
   templateUrl: 'products.component.html',
   styleUrls: ['../../../../scss/forms.scss', '../../../../scss/buttons.scss'],
@@ -96,6 +87,7 @@ export class ProductsComponent implements OnInit {
     iat: 0,
     exp: 0,
   };
+  ProductFilterData: ProductFilterData[] = [];
   products: Product[] = [];
   categories: Category[] = [];
   keySat: KeySat[] = [];
@@ -119,9 +111,12 @@ export class ProductsComponent implements OnInit {
     private renderer: Renderer2,
     private apiServiceProducts: ApiServiceProducts,
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    public validationsFormService: ValidationsFormService
   ) {
+    /* Init Form and Validations */
     this.productForm = this.fb.group({
+      code: ['', [Validators.required, Validators.minLength(1)]],
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
       price: [0, [Validators.required, Validators.min(0)]],
@@ -179,9 +174,9 @@ export class ProductsComponent implements OnInit {
     /* Search by input */
     if (type === 'input') {
       if (this.searchInput) {
-        const isInteger = /^-?\d+$/.test(this.searchInput);
-        const data: ProductFilterData = isInteger
-          ? { id: this.searchInput }
+        const isCode = /^\d+$/.test(this.searchInput);
+        const data: ProductFilterData = isCode
+          ? { code: this.searchInput }
           : { name: this.searchInput };
         this.getProductsFilter(data);
       } else {
@@ -359,6 +354,7 @@ export class ProductsComponent implements OnInit {
     this.selectedProduct = product || defaultProduct;
 
     this.productForm.patchValue({
+      code: this.selectedProduct?.code ?? '',
       name: this.selectedProduct?.name ?? '',
       description: this.selectedProduct?.description ?? '',
       price: this.selectedProduct?.price ?? 0,
@@ -545,13 +541,16 @@ export class ProductsComponent implements OnInit {
     this.productForm.reset();
   }
 
-  /* Validation Form */
-  getErrorMessage(form: FormGroup, field: string): string {
-    return getErrorMessage(form, field);
-  }
-
-  isFieldInvalid(form: FormGroup, field: string): boolean {
-    return isFieldInvalid(form, field);
+  /* Scann Product */
+  async onKeydownScanner(event: KeyboardEvent, input: string) {
+    const result = await onKeydownScanner(event);
+    if (result) {
+      if (input == 'search') {
+        this.searchInput = result;
+      }else if(input == 'modal'){
+        this.productForm.get('code')?.setValue(result);
+      }
+    }
   }
 }
 

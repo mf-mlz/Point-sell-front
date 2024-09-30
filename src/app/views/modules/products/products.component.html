@@ -6,8 +6,10 @@
       <input
         id="search"
         class="form-control me-2 mb-2 mb-md-0 flex-grow-1"
-        placeholder="Ingresa el Sku / Descripción"
+        placeholder="Ingresa el Código | Descripción"
+        (keydown)="onKeydownScanner($event, 'search')"
         [(ngModel)]="searchInput"
+        (keyup.enter)="filterProducts('input')"
       />
       <button
         class="btn btn-primary fw-bold me-2"
@@ -153,33 +155,48 @@
         [ngClass]="classModal"
       >
         <div class="form-group">
-          <label for="name">Name:</label>
-          <input id="name" formControlName="name" class="form-control" />
+          <label for="code">Código:</label>
+          <input id="code" formControlName="code" class="form-control" (keydown)="onKeydownScanner($event, 'modal')"/>
           <div
-            *ngIf="isFieldInvalid(productForm, 'name')"
+            *ngIf="validationsFormService.isFieldInvalid(productForm, 'code')"
             class="error-message"
           >
-            {{ getErrorMessage(productForm, "name") }}
+            {{ validationsFormService.getErrorMessage(productForm, "code") }}
           </div>
         </div>
 
         <div class="form-group">
-          <label for="description">Description:</label>
+          <label for="name">Nombre:</label>
+          <input id="name" formControlName="name" class="form-control" />
+          <div
+            *ngIf="validationsFormService.isFieldInvalid(productForm, 'name')"
+            class="error-message"
+          >
+            {{ validationsFormService.getErrorMessage(productForm, "name") }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Descripción:</label>
           <input
             id="description"
             formControlName="description"
             class="form-control"
           />
           <div
-            *ngIf="isFieldInvalid(productForm, 'description')"
+            *ngIf="
+              validationsFormService.isFieldInvalid(productForm, 'description')
+            "
             class="error-message"
           >
-            {{ getErrorMessage(productForm, "description") }}
+            {{
+              validationsFormService.getErrorMessage(productForm, "description")
+            }}
           </div>
         </div>
 
         <div class="form-group">
-          <label for="price">Price:</label>
+          <label for="price">Precio:</label>
           <input
             id="price"
             type="number"
@@ -187,15 +204,15 @@
             class="form-control"
           />
           <div
-            *ngIf="isFieldInvalid(productForm, 'price')"
+            *ngIf="validationsFormService.isFieldInvalid(productForm, 'price')"
             class="error-message"
           >
-            {{ getErrorMessage(productForm, "price") }}
+            {{ validationsFormService.getErrorMessage(productForm, "price") }}
           </div>
         </div>
 
         <div class="form-group">
-          <label for="category">Category:</label>
+          <label for="category">Categoría:</label>
           <select id="category" formControlName="category" class="form-control">
             <option value="">Selecciona una Categoría</option>
             <option *ngFor="let cat of categories" [value]="cat.category">
@@ -203,10 +220,14 @@
             </option>
           </select>
           <div
-            *ngIf="isFieldInvalid(productForm, 'category')"
+            *ngIf="
+              validationsFormService.isFieldInvalid(productForm, 'category')
+            "
             class="error-message"
           >
-            {{ getErrorMessage(productForm, "category") }}
+            {{
+              validationsFormService.getErrorMessage(productForm, "category")
+            }}
           </div>
         </div>
 
@@ -219,10 +240,10 @@
             class="form-control"
           />
           <div
-            *ngIf="isFieldInvalid(productForm, 'stock')"
+            *ngIf="validationsFormService.isFieldInvalid(productForm, 'stock')"
             class="error-message"
           >
-            {{ getErrorMessage(productForm, "stock") }}
+            {{ validationsFormService.getErrorMessage(productForm, "stock") }}
           </div>
         </div>
         <div class="form-group">
@@ -241,10 +262,12 @@
             </option>
           </datalist>
           <div
-            *ngIf="isFieldInvalid(productForm, 'key_sat')"
+            *ngIf="
+              validationsFormService.isFieldInvalid(productForm, 'key_sat')
+            "
             class="error-message"
           >
-            {{ getErrorMessage(productForm, "key_sat") }}
+            {{ validationsFormService.getErrorMessage(productForm, "key_sat") }}
           </div>
         </div>
         <div class="form-group" *ngIf="classModal !== 'eye'">
@@ -258,10 +281,14 @@
             accept="image/*"
           />
           <div
-            *ngIf="isFieldInvalid(productForm, 'photoUpload')"
+            *ngIf="
+              validationsFormService.isFieldInvalid(productForm, 'photoUpload')
+            "
             class="error-message"
           >
-            {{ getErrorMessage(productForm, "photoUpload") }}
+            {{
+              validationsFormService.getErrorMessage(productForm, "photoUpload")
+            }}
           </div>
         </div>
 
