@@ -74,15 +74,26 @@
    display: inline !important;
   }
   
-  .btn-category{
-    font-size: 15px;
+  .btn-category {
+    font-size: 10px;
     font-weight: bolder;
     border: 1px solid transparent;
     border-radius: 10px !important;
-    height: 50px !important;
+    height: 30px !important;
     width: 100%;
-  }
-
+}
   .readonly-input{
     background-color: #0000003d;
+  }
+
+  .title-product{
+    font-size: 13px;
+  }
+
+  .category-product{
+    font-size: 10px;
+  }
+
+  .span-product{
+    font-size: 9px;
   }
