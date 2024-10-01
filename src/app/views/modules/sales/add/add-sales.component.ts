@@ -126,7 +126,7 @@ export class AddSalesComponent {
       header: 'Total',
       cell: (element: any) =>
         this.formatMoneyMx(element.price * element.quantity),
-    }
+    },
   ];
   buttons: ButtonConfig[] = [
     {
@@ -155,6 +155,10 @@ export class AddSalesComponent {
     this.userPayload = this.authService.getDecodedToken();
     this.products = [];
     this.getAllPaymentsForm();
+    this.initForm();
+  }
+
+  initForm(): void{
     this.saleForm.patchValue({
       typePayment: '',
       date: this.dateSale,
@@ -640,9 +644,6 @@ export class AddSalesComponent {
         );
       },
     });
-
-    if (result.isConfirmed) {
-    }
   }
 
   /* Add Sale BD */
@@ -669,6 +670,11 @@ export class AddSalesComponent {
               icon: 'success',
               html: message,
               confirmButtonText: 'Aceptar',
+              showConfirmButton: true,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                this.loadData();
+              }
             });
             resolve(response);
           }
@@ -678,7 +684,7 @@ export class AddSalesComponent {
             icon: 'error',
             title: 'Error',
             text:
-              error.error.message || 'Ocurrió un Error al Registrar la Venta',
+              error.error.error || 'Ocurrió un Error al Registrar la Venta',
           });
           reject(error);
         }
@@ -719,6 +725,12 @@ export class AddSalesComponent {
               icon: 'success',
               title: 'Venta Procesada con Éxito',
               text: response.message || 'Venta Pagada con Éxito',
+              showConfirmButton: true,
+              confirmButtonText: 'Aceptar',
+            }).then((result) => {
+              if (result.isConfirmed) {
+                this.loadData();
+              }
             });
           },
           (error) => {
@@ -744,6 +756,15 @@ export class AddSalesComponent {
       });
       return false;
     }
+  }
+
+  /* Reload Data */
+  loadData(): void {
+    this.totalSale = '$0.00';
+    this.productKey = '';
+    this.saleForm.reset();
+    this.initForm();
+    this.products = [];
   }
 
   /* Scann Product */

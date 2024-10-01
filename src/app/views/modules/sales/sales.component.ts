@@ -296,6 +296,11 @@ export class SalesComponent {
       header: 'Precio Unitario',
       cell: (element: any) => '$' + element.price,
     },
+    {
+      columnDef: 'total',
+      header: 'Total',
+      cell: (element: any) => '$' + (element.price * element.quantity),
+    },
   ];
 
   columnsInvoices = [
@@ -405,6 +410,8 @@ export class SalesComponent {
   }
 
   onViewProducts(sale: SaleInfoComplete): void {
+    console.log(sale);
+    
     this.showModal('eye', 'Ver Productos de la Venta', sale, 'viewProducts');
   }
 
