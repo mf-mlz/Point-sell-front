@@ -2,6 +2,7 @@ import { NgStyle, NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { ApiServiceEmployees } from 'src/app/services/api.service.employees';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
@@ -82,33 +83,50 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
     );
   });
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private apiServiceEmployees: ApiServiceEmployees
+  ) {
     super();
   }
 
   ngOnInit(): void {
     this.userPayload = this.authService.getDecodedToken();
-    console.log(this.userPayload);
   }
 
   onLogout() {
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-      },
-    });
-    Toast.fire({
-      icon: 'success',
-      title: 'Sesión Finalizada',
-    });
+    /* Clear SessionStorage */
+    this.authService.clearPayloadFromSession();
 
-    this.authService.removeToken();
+    /* Clear Cookie => Backend */
+    this.apiServiceEmployees.logout().subscribe(
+      (response) => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          },
+        });
+        Toast.fire({
+          icon: 'success',
+          title: response.message,
+        });
+      },
+      (error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.error?.message || 'Ocurrió un Error',
+        });
+      }
+    );
+
     this.router.navigate(['/login']);
   }
 
