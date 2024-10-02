@@ -2,18 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { AuthService } from '../services/auth.service';
-import { HttpHeadersService } from './http-headers.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiServiceInvoice {
   private apiUrl = environment.apiUrl;
-  public userPayload = this.authService.getDecodedToken();
-
-  constructor(private http: HttpClient, private authService: AuthService, private httpHeadersService: HttpHeadersService) {}
-
+  constructor(
+    private http: HttpClient
+  ) {}
 
   /* Post */
   createInvoice(credentials: {
@@ -22,15 +19,12 @@ export class ApiServiceInvoice {
     id_employee: Number;
   }): Observable<any> {
     const url = `${this.apiUrl}/invoices/create`;
-
-    const headers = this.httpHeadersService.getHeaders();
-    return this.http.post(url, credentials, { headers });
+    return this.http.post(url, credentials, { withCredentials: true });
   }
 
   downloadInvoice(credentials: { id_invoice: string }): Observable<Blob> {
-    const url = `${this.apiUrl}/invoices/download`;
-    const headers = this.httpHeadersService.getHeaders();
-    return this.http.post(url, credentials, { headers, responseType: 'blob' });
+    const url = `${this.apiUrl}/invoices/download/${credentials.id_invoice}`;
+    return this.http.get(url, { withCredentials: true, responseType: 'blob' });
   }
 
   cancelInvoice(credentials: {
@@ -39,17 +33,11 @@ export class ApiServiceInvoice {
     motive: string;
   }): Observable<any> {
     const url = `${this.apiUrl}/invoices/cancel`;
-
-    const headers = this.httpHeadersService.getHeaders();
-    return this.http.post(url, credentials, { headers });
+    return this.http.post(url, credentials, { withCredentials: true });
   }
 
-  invoicesByIdSale(credentials: {
-    id_sale: number;
-  }): Observable<any> {
-    const url = `${this.apiUrl}/invoices/getByIdSale`;
-    const headers = this.httpHeadersService.getHeaders();
-    return this.http.post(url, credentials, { headers });
+  invoicesByIdSale(credentials: { id_sale: number }): Observable<any> {
+    const url = `${this.apiUrl}/invoices/getByIdSale/${credentials.id_sale}`;
+    return this.http.get(url, { withCredentials: true });
   }
-
 }

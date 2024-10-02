@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { OpenPayPayment } from '../models/interfaces';
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { HttpHeadersService } from './http-headers.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +13,7 @@ export class OpenpayService {
   private pkeyOpenPay = environment.pkeyOpenPay;
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient, private authService: AuthService, private httpHeadersService: HttpHeadersService) {
+  constructor(private http: HttpClient, private authService: AuthService) {
     this.loadOpenPayScripts();
   }
 
@@ -91,7 +90,6 @@ export class OpenpayService {
   /* Post */
   processPayment(data: OpenPayPayment): Observable<any> {
     const url = `${this.apiUrl}/sales/payment`;
-    const headers = this.httpHeadersService.getHeaders();
-    return this.http.post(url, data, { headers });
+    return this.http.post(url, data, { withCredentials: true });
   }
 }

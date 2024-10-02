@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ProductFilterData } from '../models/interfaces';
-import { HttpHeadersService } from './http-headers.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,50 +10,36 @@ import { HttpHeadersService } from './http-headers.service';
 export class ApiServiceProducts {
   private apiUrl = environment.apiUrl;
   constructor(
-    private http: HttpClient,
-    private httpHeadersService: HttpHeadersService
+    private http: HttpClient
   ) {}
 
-  /* Get -- All Products */
+  /* Get  */
   allProducts(): Observable<any> {
-    const url = `${this.apiUrl}/products`;
-    const headers = this.httpHeadersService.getHeaders();
-    return this.http.get(url, { headers });
+    const url = `${this.apiUrl}/products`
+    return this.http.get(url, { withCredentials: true });
   }
 
-  /* Get -- All Categories */
   allCategories(): Observable<any> {
     const url = `${this.apiUrl}/products/categories`;
-
-    const headers = this.httpHeadersService.getHeaders();
-    return this.http.get(url, { headers });
+    return this.http.get(url, { withCredentials: true });
   }
 
-  /* Get -- All Key Sat */
   allKeySat(): Observable<any> {
     const url = `${this.apiUrl}/products/keySat`;
-
-    const headers = this.httpHeadersService.getHeaders();
-    return this.http.get(url, { headers });
+    return this.http.get(url, { withCredentials: true });
   }
 
-  /* Post -- Upload File */
+  /* Post */
   uploadFile(formData: FormData): Observable<any> {
     const url = `${this.apiUrl}/products/upload`;
-
-    const headers = this.httpHeadersService.getHeaders();
-    return this.http.post(url, formData, { headers });
+    return this.http.post(url, formData, { withCredentials: true });
   }
 
-  /* Post -- Filter Products */
   filterProducts(filters: ProductFilterData): Observable<any> {
     const url = `${this.apiUrl}/products/filter`;
-
-    const headers = this.httpHeadersService.getHeaders();
-    return this.http.post(url, filters, { headers });
+    return this.http.post(url, filters, { withCredentials: true });
   }
 
-  /* Post -- Register Products */
   registerProducts(credentials: {
     id: number;
     name: string;
@@ -65,12 +50,10 @@ export class ApiServiceProducts {
     photo: string;
   }): Observable<any> {
     const url = `${this.apiUrl}/products/register`;
-
-    const headers = this.httpHeadersService.getHeaders();
-    return this.http.post(url, credentials, { headers });
+    return this.http.post(url, credentials,{ withCredentials: true });
   }
 
-  /* Put -- Edit Product */
+  /* Put */
   editProduct(credentials: {
     id: number;
     name: string;
@@ -81,15 +64,12 @@ export class ApiServiceProducts {
     photo: string;
   }): Observable<any> {
     const url = `${this.apiUrl}/products/edit`;
-
-    const headers = this.httpHeadersService.getHeaders();
-    return this.http.put(url, credentials, { headers });
+    return this.http.put(url, credentials, { withCredentials: true });
   }
 
-  /* Delete -- Delete Product:Id */
+  /* Delete */
   deleteProduct(credentials: { id: number }): Observable<any> {
-    const url = `${this.apiUrl}/products/delete`;
-    const headers = this.httpHeadersService.getHeaders();
-    return this.http.delete(url, { headers, body: credentials });
+    const url = `${this.apiUrl}/products/delete/${credentials.id}`;
+    return this.http.delete(url, { withCredentials: true });
   }
 }
