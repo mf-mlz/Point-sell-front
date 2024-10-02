@@ -69,13 +69,9 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.getSaleDate();
-    // this.options = this.optionsDefault;
   }
 
   getSaleDate(): void {
-    // armar date para fechas diarias xD
-
-
     const today = new Date();
     const formattedDate = this.getFormattedDate(today, 0);
     const afterFormattedDate = this.getFormattedDate(today, 1);
@@ -85,7 +81,7 @@ export class DashboardComponent implements OnInit {
       dateAfter: afterFormattedDate
     };
 
-    this.apiServiceSales.getSaleDate(obj).subscribe(
+    this.apiServiceSales.postSaleDate(obj).subscribe(
       (response) => {
         this.sales = response.sales;
         const Toast = Swal.mixin({
