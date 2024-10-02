@@ -68,7 +68,7 @@ export class LoginComponent {
   }
 
   onInit(): void{
-    this.authService.removeToken();
+    /* Borrar Cokie */
   }
   
   onSubmit(): void {
@@ -93,8 +93,9 @@ export class LoginComponent {
             title: 'Bienvenido',
             text: response.message,
           });
-
-          localStorage.setItem('token', response.token);
+          
+          /* Save Session Storage => Payload */
+          this.authService.saveSessionStorage();
           this.router.navigate(['/dashboard']);
         },
         (error) => {
