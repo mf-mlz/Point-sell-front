@@ -68,7 +68,8 @@ export class LoginComponent {
   }
 
   onInit(): void{
-    /* Borrar Cokie */
+    /* Borrar Cokie and Session Data */
+    this.authService.clearPayloadFromSession();
   }
   
   onSubmit(): void {
@@ -93,9 +94,7 @@ export class LoginComponent {
             title: 'Bienvenido',
             text: response.message,
           });
-          
-          /* Save Session Storage => Payload */
-          this.authService.saveSessionStorage();
+          this.authService.saveSessionStorage(response);
           this.router.navigate(['/dashboard']);
         },
         (error) => {
