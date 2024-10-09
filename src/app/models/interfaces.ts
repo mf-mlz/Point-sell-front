@@ -1,3 +1,14 @@
+/* Login User */
+export interface loginUser {
+  id: number;
+  name: string;
+  role_name: string;
+}
+
+export interface loginUserEncrypt {
+ data: string
+}
+
 /* User Payload */
 export interface userPayload {
   id: number;
@@ -137,6 +148,7 @@ export interface ButtonConfig {
   icon: string;
   title: string;
   action: (element: any) => void;
+  
 }
 
 /* Employees */
