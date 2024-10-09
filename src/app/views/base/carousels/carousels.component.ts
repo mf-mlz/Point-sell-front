@@ -99,7 +99,6 @@ export class CarouselsComponent {
   }
 
   onItemChange($event: any): void {
-    console.log('Carousel onItemChange', $event);
   }
 
 }
