@@ -102,7 +102,7 @@ export class SalesComponent {
       payment: [0, [Validators.required, Validators.min(1)]],
       dataPayment: ['', Validators.required],
       payment_status: ['', Validators.required],
-      rejection_reason: ['', Validators.required],
+      rejection_reason: [''],
       typePayment: ['', Validators.required],
       customerId: [''],
       employeesId: [
@@ -299,7 +299,7 @@ export class SalesComponent {
     {
       columnDef: 'total',
       header: 'Total',
-      cell: (element: any) => '$' + (element.price * element.quantity),
+      cell: (element: any) => '$' + element.price * element.quantity,
     },
   ];
 
@@ -410,8 +410,6 @@ export class SalesComponent {
   }
 
   onViewProducts(sale: SaleInfoComplete): void {
-    console.log(sale);
-    
     this.showModal('eye', 'Ver Productos de la Venta', sale, 'viewProducts');
   }
 
@@ -440,7 +438,14 @@ export class SalesComponent {
   }
 
   onInvoice(sale: SaleInfoComplete): void {
-    if (sale.id_invoice && sale.status_invoice == 'Active') {
+    /* If status => Rechazada */
+    if (sale.payment_status === 'Rechazada') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Venta Rechazada',
+        text: 'No puedes facturar una venta Rechazada',
+      });
+    } else if (sale.id_invoice && sale.status_invoice == 'Active') {
       Swal.fire({
         icon: 'info',
         title: 'Factura Existente',
@@ -509,7 +514,17 @@ export class SalesComponent {
   }
 
   onViewInvoice(sale: SaleInfoComplete): void {
-    this.showModal('eye', 'Ver Facturas de la Venta', sale, 'viewInvoices');
+    if(sale.payment_status === 'Aprobada'){
+      this.showModal('eye', 'Ver Facturas de la Venta', sale, 'viewInvoices');
+    }else{
+      Swal.fire({
+        icon: 'error',
+        title: 'Venta Rechazada',
+        text: 'Las Ventas Rechazadas no cuentan con Facturas',
+      });
+    }
+    
+    
   }
 
   /* Show Modal */
@@ -698,7 +713,6 @@ export class SalesComponent {
 
   /* Functions */
   editSale(): void {
-    
     if (this.saleForm.valid) {
       const formValue = this.saleForm.value;
       const data = {
