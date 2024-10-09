@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import { OpenPayPayment } from '../models/interfaces';
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { AuthHeaderService } from './auth-header.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,7 @@ export class OpenpayService {
   private pkeyOpenPay = environment.pkeyOpenPay;
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient, private authService: AuthService) {
+  constructor(private http: HttpClient, private authHeaderService: AuthHeaderService ) {
     this.loadOpenPayScripts();
   }
 
@@ -47,10 +48,7 @@ export class OpenpayService {
       OpenPay.setId(this.idOpenPay);
       OpenPay.setApiKey(this.pkeyOpenPay);
       OpenPay.setSandboxMode(true);
-      console.log('OpenPay initialized successfully');
-    } else {
-      console.error('OpenPay is not defined');
-    }
+    } 
   }
 
   /* Promise Openpay loading */
@@ -58,8 +56,6 @@ export class OpenpayService {
     return new Promise((resolve) => {
       const interval = setInterval(() => {
         if (typeof OpenPay !== 'undefined') {
-          console.log(OpenPay);
-
           clearInterval(interval);
           resolve(true);
         }
@@ -90,6 +86,6 @@ export class OpenpayService {
   /* Post */
   processPayment(data: OpenPayPayment): Observable<any> {
     const url = `${this.apiUrl}/sales/payment`;
-    return this.http.post(url, data, { withCredentials: true });
+    return this.http.post(url, data, { headers: this.authHeaderService.getHeaders(), withCredentials: true });
   }
 }

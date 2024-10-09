@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AuthHeaderService } from './auth-header.service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,8 @@ import { environment } from '../../environments/environment';
 export class ApiServiceInvoice {
   private apiUrl = environment.apiUrl;
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private authHeaderService: AuthHeaderService
   ) {}
 
   /* Post */
@@ -19,12 +21,19 @@ export class ApiServiceInvoice {
     id_employee: Number;
   }): Observable<any> {
     const url = `${this.apiUrl}/invoices/create`;
-    return this.http.post(url, credentials, { withCredentials: true });
+    return this.http.post(url, credentials, {
+      headers: this.authHeaderService.getHeaders(),
+      withCredentials: true,
+    });
   }
 
   downloadInvoice(credentials: { id_invoice: string }): Observable<Blob> {
     const url = `${this.apiUrl}/invoices/download/${credentials.id_invoice}`;
-    return this.http.get(url, { withCredentials: true, responseType: 'blob' });
+    return this.http.get(url, {
+      headers: this.authHeaderService.getHeaders(),
+      withCredentials: true,
+      responseType: 'blob',
+    });
   }
 
   cancelInvoice(credentials: {
@@ -33,11 +42,17 @@ export class ApiServiceInvoice {
     motive: string;
   }): Observable<any> {
     const url = `${this.apiUrl}/invoices/cancel`;
-    return this.http.post(url, credentials, { withCredentials: true });
+    return this.http.post(url, credentials, {
+      headers: this.authHeaderService.getHeaders(),
+      withCredentials: true,
+    });
   }
 
   invoicesByIdSale(credentials: { id_sale: number }): Observable<any> {
     const url = `${this.apiUrl}/invoices/getByIdSale/${credentials.id_sale}`;
-    return this.http.get(url, { withCredentials: true });
+    return this.http.get(url, {
+      headers: this.authHeaderService.getHeaders(),
+      withCredentials: true,
+    });
   }
 }
