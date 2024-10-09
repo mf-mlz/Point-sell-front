@@ -75,9 +75,9 @@ export class LoginComponent {
   onSubmit(): void {
     if (this.loginForm.valid) {
       const credentials = this.loginForm.value;
-
-      this.apiService.login(credentials).subscribe(
-        (response) => {
+  
+      this.apiService.login(credentials).subscribe({
+        next: (response) => {
           const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -97,14 +97,14 @@ export class LoginComponent {
           this.authService.saveSessionStorage(response);
           this.router.navigate(['/dashboard']);
         },
-        (error) => {
+        error: (error) => {
           Swal.fire({
             icon: 'error',
             title: 'Error',
             text: error.error?.message || 'Ocurrió un error al Iniciar Sesión.',
           });
-        }
-      );
+        },
+      });
     } else {
       Swal.fire({
         icon: 'warning',
@@ -113,4 +113,4 @@ export class LoginComponent {
       });
     }
   }
-}
+}  

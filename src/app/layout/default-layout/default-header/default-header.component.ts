@@ -100,8 +100,8 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
     this.authService.clearPayloadFromSession();
 
     /* Clear Cookie => Backend */
-    this.apiServiceEmployees.logout().subscribe(
-      (response) => {
+    this.apiServiceEmployees.logout().subscribe({
+      next: (response) => {
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -118,14 +118,14 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
           title: response.message,
         });
       },
-      (error) => {
+      error: (error) => {
         Swal.fire({
           icon: 'error',
           title: 'Error',
           text: error.error?.message || 'Ocurrió un Error',
         });
-      }
-    );
+      },
+    });
 
     this.router.navigate(['/login']);
   }

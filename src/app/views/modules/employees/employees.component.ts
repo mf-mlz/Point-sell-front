@@ -39,8 +39,13 @@ import { environment } from '../../../../environments/environment';
 import { cilPlus, cilShieldAlt } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { AuthService } from '../../../services/auth.service';
-import { DeleteRequest, Employee, Rol, KeySat, Category } from '../../../models/interfaces';
-
+import {
+  DeleteRequest,
+  Employee,
+  Rol,
+  KeySat,
+  Category,
+} from '../../../models/interfaces';
 
 @Component({
   templateUrl: 'employees.component.html',
@@ -68,9 +73,7 @@ import { DeleteRequest, Employee, Rol, KeySat, Category } from '../../../models/
     forwardRef(() => ThemeColorComponent),
   ],
 })
-
 export class EmployeesComponent implements OnInit {
-
   public userPayload: any;
   employees: Employee[] = [];
   roles: Rol[] = [];
@@ -91,7 +94,6 @@ export class EmployeesComponent implements OnInit {
   icons = { cilPlus, cilShieldAlt };
   public apiUpload = environment.apiUpload;
 
-
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
@@ -100,16 +102,16 @@ export class EmployeesComponent implements OnInit {
     private authService: AuthService
   ) {
     this.employeeForm = this.fb.group({
-      name: [''/* , [Validators.required, Validators.minLength(3)] */],
-      email: [''/* , [Validators.required, Validators.minLength(10)] */],
-      password: [''/* , [Validators.required, Validators.min(1)] */],
-      phone: [''/* , Validators.required, Validators.min(1) */],
-      address: [''/* , [Validators.required, Validators.min(1)] */],
+      name: ['' /* , [Validators.required, Validators.minLength(3)] */],
+      email: ['' /* , [Validators.required, Validators.minLength(10)] */],
+      password: ['' /* , [Validators.required, Validators.min(1)] */],
+      phone: ['' /* , Validators.required, Validators.min(1) */],
+      address: ['' /* , [Validators.required, Validators.min(1)] */],
       status: [''],
       created_at: [''],
       updated_at: [''],
-      role_id: [0/* , [Validators.required, Validators.minLength(1)] */],
-      id: [0/* , [Validators.required, Validators.minLength(3)] */],
+      role_id: [0 /* , [Validators.required, Validators.minLength(1)] */],
+      id: [0 /* , [Validators.required, Validators.minLength(3)] */],
     });
   }
   ngOnInit(): void {
@@ -118,12 +120,10 @@ export class EmployeesComponent implements OnInit {
     this.getRolesAll();
   }
 
-
-
   /* Get All employee */
   getAllEmployees(): void {
-    this.ApiServiceEmployees.allEmployees().subscribe(
-      (response) => {
+    this.ApiServiceEmployees.allEmployees().subscribe({
+      next: (response) => {
         this.employees = response;
         const Toast = Swal.mixin({
           toast: true,
@@ -141,7 +141,7 @@ export class EmployeesComponent implements OnInit {
           title: 'Se encontraron ' + response.length + ' registros',
         });
       },
-      (error) => {
+      error: (error) => {
         this.employees = [];
         Swal.fire({
           icon: 'error',
@@ -149,8 +149,8 @@ export class EmployeesComponent implements OnInit {
           text:
             error.error?.message || 'Ocurrió un Error al Obtener los Empleados',
         });
-      }
-    );
+      },
+    });
   }
 
   //   /* Filter employee */
@@ -169,12 +169,10 @@ export class EmployeesComponent implements OnInit {
     }
   }
 
-
-
   //   /* Filter -- Post */
   getEmployeesFilter(data: any): void {
-    this.ApiServiceEmployees.filterEmployeesAll(data).subscribe(
-      (response) => {
+    this.ApiServiceEmployees.filterEmployeesAll(data).subscribe({
+      next: (response) => {
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -193,7 +191,7 @@ export class EmployeesComponent implements OnInit {
 
         this.employees = response.employee;
       },
-      (error) => {
+      error: (error) => {
         this.employees = [];
         const Toast = Swal.mixin({
           toast: true,
@@ -208,10 +206,10 @@ export class EmployeesComponent implements OnInit {
         });
         Toast.fire({
           icon: 'error',
-          title: 'Ocurrio un Error al Obtener los Empleados',
+          title: 'Ocurrió un Error al Obtener los Empleados',
         });
-      }
-    );
+      },
+    });
   }
 
   //   /* Delete Product -- Modal */
@@ -235,28 +233,26 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
-
   //   /* Delete Product -- Function */
   deleteEmployee(credentials: DeleteRequest): void {
-    this.ApiServiceEmployees.deleteEmployee(credentials).subscribe(
-      (response) => {
+    this.ApiServiceEmployees.deleteEmployee(credentials).subscribe({
+      next: (response) => {
         Swal.fire({
           icon: 'success',
           title: response.message || 'Empleado Eliminado Correctamente',
         });
         this.getAllEmployees();
       },
-      (error) => {
+      error: (error) => {
         Swal.fire({
           icon: 'error',
           title: 'Error',
           text:
             error.error?.message || 'Ocurrió un Error al Eliminar el Empleado',
         });
-      }
-    );
+      },
+    });
   }
-
 
   //   /* Modal -- Edit/View Employee */
   showModal(
@@ -265,7 +261,6 @@ export class EmployeesComponent implements OnInit {
     classModal: string = '',
     nameFile: string = ''
   ): void {
-
     const defaultEmployee = {
       name: '',
       email: '',
@@ -311,13 +306,12 @@ export class EmployeesComponent implements OnInit {
     }
   }
 
-
   //   /* Add Product  */
   addEmployee(): void {
     if (this.employeeForm.valid) {
       const formValue = this.employeeForm.value;
-      this.ApiServiceEmployees.registerEmployee(formValue).subscribe(
-        (response) => {
+      this.ApiServiceEmployees.registerEmployee(formValue).subscribe({
+        next: (response) => {
           Swal.fire({
             icon: 'success',
             title: response.message || 'Empleado Añadido con Éxito',
@@ -328,15 +322,15 @@ export class EmployeesComponent implements OnInit {
             }
           });
         },
-        (error) => {
+        error: (error) => {
           Swal.fire({
             icon: 'error',
             title: 'Error',
             text:
               error.error?.message || 'Ocurrió un error al Añadir el Empleado.',
           });
-        }
-      );
+        },
+      });
     } else {
       Swal.fire({
         icon: 'warning',
@@ -346,16 +340,14 @@ export class EmployeesComponent implements OnInit {
     }
   }
 
-
-
   //   /* Edit Product */
   editEmployee(): void {
     if (this.employeeForm.valid) {
       const formValue = this.employeeForm.value;
 
-      /* Send Data Put (Edit Product) */
-      this.ApiServiceEmployees.editEmployee(formValue).subscribe(
-        (response) => {
+      /* Send Data Put (Edit Employee) */
+      this.ApiServiceEmployees.editEmployee(formValue).subscribe({
+        next: (response) => {
           Swal.fire({
             icon: 'success',
             title: response.message || 'Empleado Modificado con Éxito',
@@ -366,16 +358,15 @@ export class EmployeesComponent implements OnInit {
             }
           });
         },
-        (error) => {
-
+        error: (error) => {
           Swal.fire({
             icon: 'error',
             title: 'Error',
             text:
               error.error?.message || 'Ocurrió un error al Editar el Empleado.',
           });
-        }
-      );
+        },
+      });
     } else {
       Swal.fire({
         icon: 'warning',
@@ -384,9 +375,6 @@ export class EmployeesComponent implements OnInit {
       });
     }
   }
-
-
-
 
   //   /* Modal Upload File */
   showModalUpload(id: number): void {
@@ -397,8 +385,6 @@ export class EmployeesComponent implements OnInit {
     });
     this.isModalVisibleUpload = true;
   }
-
-
 
   //   /* Change => File Selected */
   onFileSelected(event: any): void {
@@ -418,7 +404,6 @@ export class EmployeesComponent implements OnInit {
     }
   }
 
-
   /* Validate Upload => Image */
   fileTypeValidator(file: File): { [key: string]: any } | null {
     const validImageTypes = [
@@ -432,7 +417,6 @@ export class EmployeesComponent implements OnInit {
     }
     return null;
   }
-
 
   //   /* Reset Input File */
   resetFileInput() {
@@ -451,9 +435,6 @@ export class EmployeesComponent implements OnInit {
     const control = form.get(field);
     return !!control && control.invalid && (control.dirty || control.touched);
   }
-
-
-
 
   //   /* Validate Errors Fields Form */
   getErrorMessage(form: FormGroup, field: string): string {
@@ -475,31 +456,30 @@ export class EmployeesComponent implements OnInit {
       throw new Error('Dirección de correo electrónico inválida');
     }
     const visibleLength = 3; // Número de caracteres visibles al principio del nombre de usuario
-    const censoredUser = user.slice(0, visibleLength) + '*'.repeat(user.length - visibleLength);
+    const censoredUser =
+      user.slice(0, visibleLength) + '*'.repeat(user.length - visibleLength);
     return `${censoredUser}@${domain}`;
   }
 
   /* Get roles */
   getRolesAll(): void {
-    this.ApiServiceEmployees.getRoles().subscribe(
-      (response) => {
+    this.ApiServiceEmployees.getRoles().subscribe({
+      next: (response) => {
         this.roles = response;
       },
-      (error) => {
+      error: (error) => {
         this.roles = [];
         Swal.fire({
           icon: 'error',
           title: 'Error',
           text:
             error.error?.message ||
-            'Ocurrió un Error al Obtener las Categorias',
+            'Ocurrió un Error al Obtener las Categorías',
         });
-      }
-    );
+      },
+    });
   }
-
 }
-
 
 @Component({
   selector: 'app-theme-color',

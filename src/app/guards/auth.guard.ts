@@ -41,17 +41,18 @@ export const AuthGuard: CanActivateFn = async (route, state) => {
 /* Validate JWT and (Payload) */
 const isTokenValid = (apiServiceValidate: ApiServiceValidate): Promise<any> => {
   return new Promise((resolve, reject) => {
-    apiServiceValidate.validate().subscribe(
-      (response) => {
+    apiServiceValidate.validate().subscribe({
+      next: (response) => {
         if (response && response.status) {
           resolve(response);
         } else {
           reject(false);
         }
       },
-      (error) => {
+      error: () => {
         reject(false);
       }
-    );
+    });
   });
 };
+

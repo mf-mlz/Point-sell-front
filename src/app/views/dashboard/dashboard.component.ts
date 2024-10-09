@@ -17,14 +17,13 @@ import {
   RowComponent,
   TableDirective,
   TextColorDirective,
-
   DropdownComponent,
   DropdownItemDirective,
   DropdownMenuDirective,
   DropdownToggleDirective,
   TemplateIdDirective,
   ThemeDirective,
-  WidgetStatAComponent
+  WidgetStatAComponent,
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
 import { cilArrowTop, cilOptions } from '@coreui/icons';
@@ -37,13 +36,32 @@ import { SaleDate, Sale } from '../../models/interfaces';
 import Swal from 'sweetalert2';
 import { GridModule } from '@coreui/angular';
 
-
-
 @Component({
   templateUrl: 'dashboard.component.html',
   styleUrls: ['dashboard.component.scss'],
   standalone: true,
-  imports: [WidgetsDropdownComponent, TextColorDirective, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressBarDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent, GridModule,
+  imports: [
+    WidgetsDropdownComponent,
+    TextColorDirective,
+    CardComponent,
+    CardBodyComponent,
+    RowComponent,
+    ColComponent,
+    ButtonDirective,
+    IconDirective,
+    ButtonGroupComponent,
+    FormCheckLabelDirective,
+    ChartjsComponent,
+    NgStyle,
+    CardFooterComponent,
+    GutterDirective,
+    ProgressBarDirective,
+    ProgressComponent,
+    WidgetsBrandComponent,
+    CardHeaderComponent,
+    TableDirective,
+    AvatarComponent,
+    GridModule,
     WidgetStatAComponent,
     TemplateIdDirective,
     IconDirective,
@@ -53,19 +71,16 @@ import { GridModule } from '@coreui/angular';
     DropdownMenuDirective,
     DropdownItemDirective,
     RouterLink,
-
   ],
 })
-
 export class DashboardComponent implements OnInit {
-
   sales: Sale[] = [];
   public data: any = null;
   public total: number = 0;
 
   public options: any = {};
 
-  constructor(private apiServiceSales: ApiServiceSales) { }
+  constructor(private apiServiceSales: ApiServiceSales) {}
 
   ngOnInit(): void {
     this.getSaleDate();
@@ -78,11 +93,11 @@ export class DashboardComponent implements OnInit {
 
     const obj: SaleDate = {
       dateBefore: formattedDate,
-      dateAfter: afterFormattedDate
+      dateAfter: afterFormattedDate,
     };
 
-    this.apiServiceSales.postSaleDate(obj).subscribe(
-      (response) => {
+    this.apiServiceSales.postSaleDate(obj).subscribe({
+      next: (response) => {
         this.sales = response.sales;
         const Toast = Swal.mixin({
           toast: true,
@@ -100,20 +115,18 @@ export class DashboardComponent implements OnInit {
           title: 'Se encontraron ' + response.sales.length + ' registros',
         });
         this.createChart();
-
       },
-      (error) => {
+      error: (error) => {
         this.sales = [];
         Swal.fire({
           icon: 'error',
           title: 'Error',
           text:
-            error.error?.message || 'Ocurrió un Error al Obtener las Ventas Diarias',
+            error.error?.message ||
+            'Ocurrió un Error al Obtener las Ventas Diarias',
         });
-
-      }
-    );
-
+      },
+    });
   }
 
   createChart(): void {
@@ -125,14 +138,14 @@ export class DashboardComponent implements OnInit {
       last10Sales = this.sales.slice(-10);
     }
 
-    this.sales.forEach(e => {
+    this.sales.forEach((e) => {
       this.total += e.totalAmount;
     });
 
-    last10Sales.forEach(e => {
+    last10Sales.forEach((e) => {
       let totalAmount = e.totalAmount;
 
-      let arrayDate = e.date.split("T");
+      let arrayDate = e.date.split('T');
       let date = arrayDate[0];
 
       const d = new Date(e.date);
@@ -154,9 +167,9 @@ export class DashboardComponent implements OnInit {
           label: '',
           data: arrayTotalAmounts,
           borderColor: '#36A2EB',
-          backgroundColor: '#9BD0F5'
-        }
-      ]
+          backgroundColor: '#9BD0F5',
+        },
+      ],
     };
   }
 

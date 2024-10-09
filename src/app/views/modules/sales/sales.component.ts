@@ -143,8 +143,8 @@ export class SalesComponent {
 
   /* Get All Sales */
   getAllSales(): void {
-    this.apiServiceSales.getAllSales().subscribe(
-      (response) => {
+    this.apiServiceSales.getAllSales().subscribe({
+      next: (response) => {
         this.sales = response;
         const Toast = Swal.mixin({
           toast: true,
@@ -162,7 +162,7 @@ export class SalesComponent {
           title: 'Se encontraron ' + response.length + ' ventas',
         });
       },
-      (error) => {
+      error: (error) => {
         this.sales = [];
         Swal.fire({
           icon: 'error',
@@ -170,74 +170,70 @@ export class SalesComponent {
           text:
             error.error?.message || 'Ocurrió un Error al Obtener las Ventas',
         });
-      }
-    );
+      },
+    });
   }
 
   /* Get All Forms Payment */
   getAllPaymentsForm(): void {
-    this.apiServicePaymentForms.getallPaymentsForm().subscribe(
-      (response) => {
+    this.apiServicePaymentForms.getallPaymentsForm().subscribe({
+      next: (response) => {
         this.paymentsForm = response;
       },
-      (error) => {
+      error: (error) => {
         this.paymentsForm = [];
-      }
-    );
+      },
+    });
   }
 
   /* Get All Employees */
   getAllEmployees(): void {
-    this.apiServiceEmployees.allEmployees().subscribe(
-      (response) => {
+    this.apiServiceEmployees.allEmployees().subscribe({
+      next: (response) => {
         this.employees = response;
       },
-      (error) => {
+      error: (error) => {
         this.employees = [];
-      }
-    );
+      },
+    });
   }
 
   /* Get All Clients */
   getAllClients(): void {
-    this.apiServiceClients.getAllClients().subscribe(
-      (response) => {
+    this.apiServiceClients.getAllClients().subscribe({
+      next: (response) => {
         this.clients = response;
       },
-      (error) => {
+      error: () => {
         this.clients = [];
-      }
-    );
+      },
+    });
   }
 
   /* Sales Products By ID Sale */
   salesProductsByIdSale(salesId: number): void {
-    const data = {
-      salesId: salesId,
-    };
-    this.apiServiceSalesProducts.postFilterDescription(data).subscribe(
-      (response) => {
+    const data = { salesId };
+    this.apiServiceSalesProducts.postFilterDescription(data).subscribe({
+      next: (response) => {
         this.saleProducts = response.sales;
       },
-      (error) => {
+      error: () => {
         this.saleProducts = [];
-      }
-    );
+      },
+    });
   }
 
   /* Invoice By Id Sale */
   invoicesByIdSale(salesId: number): void {
-    const data = {
-      id_sale: salesId,
-    };
-    this.apiServiceInvoice.invoicesByIdSale(data).subscribe(
-      (response) => {
+    const data = { id_sale: salesId };
+    this.apiServiceInvoice.invoicesByIdSale(data).subscribe({
+      next: (response) => {
         this.invoicesList = response.invoices;
       },
-      (error) => {
+      error: () => {
         this.invoicesList = [];
-      }
-    );
+      },
+    });
   }
 
   /* Columns => Datatable */
@@ -514,17 +510,15 @@ export class SalesComponent {
   }
 
   onViewInvoice(sale: SaleInfoComplete): void {
-    if(sale.payment_status === 'Aprobada'){
+    if (sale.payment_status === 'Aprobada') {
       this.showModal('eye', 'Ver Facturas de la Venta', sale, 'viewInvoices');
-    }else{
+    } else {
       Swal.fire({
         icon: 'error',
         title: 'Venta Rechazada',
         text: 'Las Ventas Rechazadas no cuentan con Facturas',
       });
     }
-    
-    
   }
 
   /* Show Modal */
@@ -726,9 +720,8 @@ export class SalesComponent {
         status: Number(formValue.status),
       };
 
-      /* Send put Api */
-      this.apiServiceSales.editSale(data).subscribe(
-        (response) => {
+      this.apiServiceSales.editSale(data).subscribe({
+        next: (response) => {
           Swal.fire({
             icon: 'success',
             title: response.message || 'Venta Modificada con Éxito',
@@ -739,15 +732,14 @@ export class SalesComponent {
             }
           });
         },
-        (error) => {
+        error: () => {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text:
-              error.error?.message || 'Ocurrió un error al Modificar la Venta.',
+            text: 'Ocurrió un error al Modificar la Venta.',
           });
-        }
-      );
+        },
+      });
     } else {
       Swal.fire({
         icon: 'warning',
@@ -758,27 +750,27 @@ export class SalesComponent {
   }
 
   deleteSale(credentials: DeleteRequest): void {
-    this.apiServiceSales.deleteSale(credentials).subscribe(
-      (response) => {
+    this.apiServiceSales.deleteSale(credentials).subscribe({
+      next: (response) => {
         Swal.fire({
           icon: 'success',
           title: response.message || 'Venta Eliminada Correctamente',
         });
         this.getAllSales();
       },
-      (error) => {
+      error: () => {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: error.error?.message || 'Ocurrió un Error al Eliminar la Venta',
+          text: 'Ocurrió un Error al Eliminar la Venta',
         });
-      }
-    );
+      },
+    });
   }
 
   createInvoice(credentials: Invoice): void {
-    this.apiServiceInvoice.createInvoice(credentials).subscribe(
-      (response) => {
+    this.apiServiceInvoice.createInvoice(credentials).subscribe({
+      next: (response) => {
         Swal.fire({
           title: response.message || 'Factura Generada con Éxito',
           icon: 'success',
@@ -791,19 +783,19 @@ export class SalesComponent {
           }
         });
       },
-      (error) => {
+      error: () => {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: error.error?.error || 'Ocurrió un Error al Generar la Factura',
+          text: 'Ocurrió un Error al Generar la Factura',
         });
-      }
-    );
+      },
+    });
   }
 
   downloadIncoice(credentials: InvoiceDownload): void {
-    this.apiServiceInvoice.downloadInvoice(credentials).subscribe(
-      (response: Blob) => {
+    this.apiServiceInvoice.downloadInvoice(credentials).subscribe({
+      next: (response: Blob) => {
         const url = window.URL.createObjectURL(response);
         const a = document.createElement('a');
         a.href = url;
@@ -813,15 +805,15 @@ export class SalesComponent {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
       },
-      (error) => {
+      error: (error) => {
         console.error('Error al descargar la factura:', error);
-      }
-    );
+      },
+    });
   }
 
   cancelInvoice(credentials: CancelInvoice): void {
-    this.apiServiceInvoice.cancelInvoice(credentials).subscribe(
-      (response) => {
+    this.apiServiceInvoice.cancelInvoice(credentials).subscribe({
+      next: (response) => {
         Swal.fire({
           title: response.message || 'Factura Cancelada con Éxito',
           icon: 'success',
@@ -834,14 +826,14 @@ export class SalesComponent {
           }
         });
       },
-      (error) => {
+      error: (error) => {
         Swal.fire({
           icon: 'error',
           title: 'Error',
           text: error.error?.error || 'Ocurrió un Error al Cancelar la Factura',
         });
-      }
-    );
+      },
+    });
   }
 
   /* SwalFunctions */
