@@ -1,22 +1,21 @@
 import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
-import { jwtDecode } from 'jwt-decode';
+import { loginUserEncrypt } from '../models/interfaces';
+import * as CryptoJS from 'crypto-js';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private token: string = '';
-  constructor(private cookieService: CookieService) {
-    this.token = this.cookieService.get('token');
-  }
+  private secretKey = environment.secret_key;
+  constructor(private cookieService: CookieService) {}
 
   /* Get Payload => and add in Session Storage */
-  public saveSessionStorage(): any {
-    if (this.token) {
+  public saveSessionStorage(data: loginUserEncrypt): any {
+    if (data) {
       try {
-        const payload: any = jwtDecode(this.token);
-        sessionStorage.setItem('payload', JSON.stringify(payload));
+        sessionStorage.setItem('data', data.data);
       } catch (error) {
         return false;
       }
@@ -27,15 +26,25 @@ export class AuthService {
 
   /* Get SessionStorage Payload */
   public getDecodedToken() {
-    const payload = sessionStorage.getItem('payload');
-    return payload ? JSON.parse(payload) : null;
+    const user = sessionStorage.getItem('data');
+    if(user){
+      const decryptedData = CryptoJS.AES.decrypt(user, this.secretKey);
+      const decryptedPayload = JSON.parse(decryptedData.toString(CryptoJS.enc.Utf8));
+      return user ? decryptedPayload : null;
+    }
+    
+  }
+
+  
+  public getPayloadEncript() {
+    const data = sessionStorage.getItem('data');
+    return data || null;
   }
 
   /* Remove SessionStorage => Payload */
   public clearPayloadFromSession() {
+    sessionStorage.clear();
     this.cookieService.delete('token');
-    sessionStorage.removeItem('payload');
+
   }
-
-
 }
