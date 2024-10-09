@@ -1,42 +1,57 @@
 import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
 import { Router } from '@angular/router';
-import { CookieService } from 'ngx-cookie-service';
-import { jwtDecode } from 'jwt-decode';
 import Swal from 'sweetalert2';
+import { ApiServiceValidate } from '../services/api.service.validate';
+import { AuthService } from '../services/auth.service';
 
-export const AuthGuard: CanActivateFn = (route, state) => {
+export const AuthGuard: CanActivateFn = async (route, state) => {
   const router = inject(Router);
-  const cookieService = inject(CookieService); 
-  const token = cookieService.get('token'); 
-  
+  const apiServiceValidate = inject(ApiServiceValidate);
+  const authService = inject(AuthService);
 
-  if (isTokenValid(token)) {
-    return true;
-  } else {
+  try {
+    const data = await isTokenValid(apiServiceValidate);
+    if (data.status) {
+      return true;
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No estás autenticado. Redirigiendo al login...',
+      }).then(() => {
+        authService.clearPayloadFromSession();
+        router.navigate(['/login']);
+      });
+      return false;
+    }
+  } catch (error) {
     Swal.fire({
       icon: 'error',
       title: 'Error',
       text: 'No estás autenticado. Redirigiendo al login...',
     }).then(() => {
+      authService.clearPayloadFromSession();
       router.navigate(['/login']);
     });
     return false;
   }
 };
 
-const isTokenValid = (token: string): boolean => {
-  if (!token) {
-    return false;
-  }
-
-  try {
-    const decoded: any = jwtDecode(token);
-    const expirationDate = decoded.exp * 1000;
-    const now = Date.now();
-
-    return now < expirationDate;
-  } catch (error) {
-    return false;
-  }
+/* Validate JWT and (Payload) */
+const isTokenValid = (apiServiceValidate: ApiServiceValidate): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    apiServiceValidate.validate().subscribe(
+      (response) => {
+        if (response && response.status) {
+          resolve(response);
+        } else {
+          reject(false);
+        }
+      },
+      (error) => {
+        reject(false);
+      }
+    );
+  });
 };
