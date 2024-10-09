@@ -1,9 +1,4 @@
-import {
-  Component,
-  Input,
-  AfterViewInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, Input, AfterViewInit, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -75,7 +70,11 @@ export interface ColumnDef {
     DropdownDividerDirective,
   ],
   templateUrl: './datatable.component.html',
-  styleUrls: ['./datatable.component.scss', '../../scss/buttons.scss', '../../scss/datatable.scss'],
+  styleUrls: [
+    './datatable.component.scss',
+    '../../scss/buttons.scss',
+    '../../scss/datatable.scss',
+  ],
 })
 export class DatatableComponent implements AfterViewInit {
   @Input() data: any[] = [];
@@ -86,7 +85,6 @@ export class DatatableComponent implements AfterViewInit {
   @Input() classGroup: string = 'btn-success';
   @Input() titleGroup: string = 'Menú';
   @Input() showButtonGroup: boolean = false;
-  
 
   displayedColumns: string[] = [];
   dataSource = new MatTableDataSource<any>(this.data);
@@ -102,7 +100,12 @@ export class DatatableComponent implements AfterViewInit {
     this.dataSource.data = this.data;
     this.displayedColumns = this.columns
       .map((col) => col.columnDef)
-      .concat((this.buttons && this.buttons.length > 0) || (this.buttonsGroup && this.buttonsGroup.length > 0) ? 'actions' : []);
+      .concat(
+        (this.buttons && this.buttons.length > 0) ||
+          (this.buttonsGroup && this.buttonsGroup.length > 0)
+          ? 'actions'
+          : []
+      );
   }
 
   applyFilter(event: Event) {
