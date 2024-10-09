@@ -239,12 +239,8 @@ export class ChartSample implements AfterViewInit {
       const newLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May'];
       const newData = [42, 88, 42, 66, 77];
       let { datasets, labels } = { ...this.data };
-      // @ts-ignore
+     
       const before = this.chartComponent?.chart?.data.datasets.length;
-      console.log('before', before);
-      // console.log('datasets, labels', datasets, labels)
-      // @ts-ignore
-      // this.data = data()
       this.data = {
         ...this.data,
         datasets: [{ ...this.data.datasets[0], data: newData }, {
@@ -254,11 +250,8 @@ export class ChartSample implements AfterViewInit {
         }],
         labels: newLabels
       };
-      // console.log('datasets, labels', { datasets, labels } = {...this.data})
-      // @ts-ignore
       setTimeout(() => {
         const after = this.chartComponent?.chart?.data.datasets.length;
-        console.log('after', after);
       });
     }, 5000);
   }
