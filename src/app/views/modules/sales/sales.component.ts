@@ -16,6 +16,7 @@ import {
   InvoiceDownload,
   CancelInvoice,
   InvoiceList,
+  InvoiceSendEmail,
 } from 'src/app/models/interfaces';
 import { ModalComponentHtml } from '../../../modalHtml/modalhtml.component';
 import Swal from 'sweetalert2';
@@ -391,6 +392,12 @@ export class SalesComponent {
           icon: 'trash',
           title: 'Cancelar Factura',
           action: (element: any) => this.onCancelInvoice(element),
+        },
+        {
+          class: 'btn-delete',
+          icon: 'email',
+          title: 'Enviar Factura Por Correo',
+          action: (element: any) => this.openSendInvoice(element),
         }
       );
     }
@@ -505,6 +512,18 @@ export class SalesComponent {
         icon: 'info',
         title: 'Factura Inexistente o Cancelada',
         text: 'La Factura Seleccionada no sé puede Cancelar',
+      });
+    }
+  }
+
+  openSendInvoice(invoice: SaleInvoice): void {
+    if (invoice.id_invoice && invoice.status === 'Active') {
+      this.swalSend(invoice);
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'Factura Inexistente o Cancelada',
+        text: 'La Factura Seleccionada no sé puede Enviar',
       });
     }
   }
@@ -664,7 +683,7 @@ export class SalesComponent {
           value.id.toString().includes(inputValue) ||
           value.name.includes(inputValue)
       )
-      .slice(0, 5);
+      .slice(0, 10);
   }
 
   /* Get Client Selected */
@@ -806,7 +825,7 @@ export class SalesComponent {
         window.URL.revokeObjectURL(url);
       },
       error: (error) => {
-        console.error('Error al descargar la factura:', error);
+        /* console.error('Error al descargar la factura:', error); */
       },
     });
   }
@@ -831,6 +850,31 @@ export class SalesComponent {
           icon: 'error',
           title: 'Error',
           text: error.error?.error || 'Ocurrió un Error al Cancelar la Factura',
+        });
+      },
+    });
+  }
+
+  sendInvoice(credentials: InvoiceSendEmail): void {
+    this.apiServiceInvoice.sendEmail(credentials).subscribe({
+      next: (response) => {
+        Swal.fire({
+          title: response.message || 'Factura Enviada con Éxito',
+          icon: 'success',
+          showCancelButton: false,
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Ok',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.getAllSales();
+          }
+        });
+      },
+      error: (error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.error?.error || 'Ocurrió un Error al Enviar la Factura',
         });
       },
     });
@@ -866,6 +910,41 @@ export class SalesComponent {
           motive: motivo,
         };
         this.cancelInvoice(obj);
+      }
+    });
+  }
+
+  /* Send Email Invoice */
+  swalSend(invoice: SaleInvoice): void {
+    Swal.fire({
+      title: `Enviar Factura - ${invoice.folio}`,
+      html: `
+        <p>La factura se enviará al siguiente correo:</p>
+        <input style="width: 80%;" id="emailInput" class="swal2-input" value="${invoice.email_client}" placeholder="Ingresa el correo" type="email">
+      `,
+      showDenyButton: true,
+      showCancelButton: false,
+      confirmButtonText: 'Enviar',
+      denyButtonText: `Cancelar`,
+      preConfirm: () => {
+        const email = (
+          document.getElementById('emailInput') as HTMLInputElement
+        ).value;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!email || !emailPattern.test(email)) {
+          Swal.showValidationMessage('Por favor, ingresa un correo válido');
+          return false;
+        }
+        return { email };
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const obj: InvoiceSendEmail = {
+          emails: result.value?.email,
+          invoiceId: invoice.id_invoice,
+        };
+        this.sendInvoice(obj);
       }
     });
   }

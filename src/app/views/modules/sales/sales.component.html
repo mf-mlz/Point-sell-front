@@ -129,12 +129,15 @@
         (change)="clientSelected($event)"
       />
       <datalist id="clients_list">
-        <option *ngFor="let client of filteredClients" [value]="client.name">
+        <option
+          *ngFor="let client of filteredClients"
+          [value]="client.name"
+        >
           {{ client.id }} - {{ client.name }}
         </option>
       </datalist>
     </div>
-
+    
     <div class="form-group">
       <label for="emailClient">E-mail Cliente: </label>
       <input
