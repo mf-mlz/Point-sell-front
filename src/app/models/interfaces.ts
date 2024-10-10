@@ -6,7 +6,7 @@ export interface loginUser {
 }
 
 export interface loginUserEncrypt {
- data: string
+  data: string;
 }
 
 /* User Payload */
@@ -32,6 +32,8 @@ export interface Product {
   stock: number;
   photo: string;
   key_sat: string;
+  expiration_date: string;
+  isGranular: boolean;
 }
 
 export interface Category {
@@ -44,7 +46,6 @@ export interface KeySat {
 }
 
 /* Sales */
-
 export interface SaleDate {
   dateBefore: string;
   dateAfter: string;
@@ -127,10 +128,10 @@ export interface OpenPayPayment {
   };
 }
 
-export interface customerOpenPay{
-  name: string,
-  lastName: string,
-  email: string,
+export interface customerOpenPay {
+  name: string;
+  lastName: string;
+  email: string;
 }
 
 /* Forms Payment */
@@ -148,7 +149,6 @@ export interface ButtonConfig {
   icon: string;
   title: string;
   action: (element: any) => void;
-  
 }
 
 /* Employees */
@@ -189,6 +189,12 @@ export interface SaleProductDescription {
 }
 
 /* Invoices */
+
+export interface InvoiceSendEmail {
+  invoiceId: string;
+  emails: string;
+}
+
 export interface Invoice {
   customer: Number;
   id_sale: Number;
@@ -228,6 +234,8 @@ export interface SaleInvoice {
   updated_at: Date;
   employee_name: string;
   employee_cancel_name: string;
+  folio: string;
+  email_client: string;
 }
 
 /* Delete Interface */
@@ -248,6 +256,8 @@ export interface AddProductSale {
   name: string;
   price: number;
   code: string;
+  isGranular: boolean;
+  photo: string;
 }
 
 export interface ProductFilterData {
@@ -272,6 +282,7 @@ export interface ProductFilter {
   created_at: Date;
   updated_at: Date;
   code: string;
+  isGranular: boolean;
 }
 
 export interface SimpleProductSwal {
