@@ -67,10 +67,7 @@ export class LoginComponent {
     });
   }
 
-  onInit(): void{
-    /* Borrar Cokie and Session Data */
-    this.authService.clearPayloadFromSession();
-  }
+  onInit(): void{ }
   
   onSubmit(): void {
     if (this.loginForm.valid) {
