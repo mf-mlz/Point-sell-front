@@ -34,7 +34,7 @@ import {
 export interface ColumnDef {
   columnDef: string;
   header: string;
-  cell: (element: any) => string | number;
+  cell: (element: any) => any;
 }
 
 @Component({
@@ -114,4 +114,12 @@ export class DatatableComponent implements AfterViewInit {
       .toLowerCase();
     this.dataSource.filter = filterValue;
   }
+
+  isImage(url: string): boolean {
+    const isValidUrl = /^(http|https):\/\//i.test(url);
+    const validImageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+    return isValidUrl && validImageExtensions.some(ext => url.toLowerCase().endsWith(ext));
+  }
+  
+  
 }

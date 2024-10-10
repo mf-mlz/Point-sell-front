@@ -16,7 +16,15 @@
         [matColumnDef]="column.columnDef"
       >
         <th mat-header-cell *matHeaderCellDef>{{ column.header }}</th>
-        <td mat-cell *matCellDef="let element">{{ column.cell(element) }}</td>
+        <td mat-cell *matCellDef="let element">
+          <ng-container *ngIf="isImage(column.cell(element)); else textTemplate">
+            <img [src]="column.cell(element)" alt="Image" class="photo" />
+          </ng-container>
+          <ng-template #textTemplate>
+            {{ column.cell(element) }}
+          </ng-template>
+        </td>
+        
       </ng-container>
 
       <!-- Acciones -->
