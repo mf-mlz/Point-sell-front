@@ -35,6 +35,7 @@ import { ApiServiceSalesProducts } from '../../../services/api.service.salesProd
 import { AuthService } from '../../../services/auth.service';
 import { ApiServiceInvoice } from '../../../services/api.service.invoice';
 import { IconsModule } from '../../../icons/icons.module';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-sales',
@@ -84,6 +85,7 @@ export class SalesComponent {
   iconGroup: string = 'book';
   titleGroup: string = 'Menú Facturas';
   classGroup: string = 'btn-success';
+  public apiUpload = environment.apiUpload;
   constructor(
     private apiServiceSales: ApiServiceSales,
     private apiServicePaymentForms: ApiServicePaymentForms,
@@ -268,6 +270,11 @@ export class SalesComponent {
   ];
 
   columnsProductsSale = [
+    {
+      columnDef: 'photo',
+      header: '',
+      cell: (element: any) => this.apiUpload + element.photo,
+    },
     {
       columnDef: 'quantity',
       header: 'Cantidad',

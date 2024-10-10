@@ -598,7 +598,7 @@ export class AddSalesComponent {
         if (receivedAmount >= totalNumber) {
           obj.status = 1;
           obj.dataPayment = '0';
-          this.addSale(obj, changeAmount, 'money');
+          this.addSale(obj, changeAmount, receivedAmount, 'money');
         } else {
           /* The entered amount is less than the total */
           Swal.fire({
@@ -710,10 +710,13 @@ export class AddSalesComponent {
   /* Add Sale BD */
   async addSale(
     data: TransactionSale,
-    changeAmount?: number,
+    changeAmount: number,
+    receivedAmount: number,
     type?: string
   ): Promise<any> {
     return new Promise((resolve, reject) => {
+      data.amount = receivedAmount;
+      data.changeAmount = changeAmount;
       this.apiServiceSales.addSale(data).subscribe({
         next: (response) => {
           if (type === 'card') {
@@ -762,7 +765,7 @@ export class AddSalesComponent {
       obj.status = 0;
       obj.dataPayment = cardData.card_number.toString();
       cardData.cvv2 = decrypt(cardData.cvv2);
-      const saleResponse = await this.addSale(obj, undefined, 'card');
+      const saleResponse = await this.addSale(obj, 0, totalAmount, 'card');
 
       if (saleResponse.idSale) {
         const token = await this.openpayService.createToken(cardData);

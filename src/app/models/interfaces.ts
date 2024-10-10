@@ -97,6 +97,8 @@ export interface TransactionSale {
   dataPayment?: string;
   total: string;
   products: ProductObjSale[];
+  amount?: number;
+  changeAmount?: number;
 }
 
 export interface DataCard {
