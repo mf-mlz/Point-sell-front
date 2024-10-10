@@ -1,99 +1,155 @@
 .form-group {
-    margin-bottom: 5px;
-    padding: 5px;
-  }
-  
-  .form-group label {
-    margin-bottom: 10px;
-  }
-  
-  .error-message {
-    color: red;
-    padding: 3px;
-  }
-  
-  .span-color {
-    padding: 1px;
-    color: white;
-    width: 50%;
-    border-radius: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 10px auto;
-    height: 30px;
-  }
-  
-  .hidden {
-    display: none !important;
-  }
-  
-  .Electronics {
-    background-color: gray;
-  }
-  
-  .Furniture {
-    background-color: rgb(93, 0, 124);
-  }
-  
-  .Fashion {
-    background-color: rgb(251, 4, 82);
-  }
-  
-  .Accessories {
-    background-color: green;
-  }
-  
-  .Home {
-    background-color: yellow;
-    color: black;
-  }
-  
-  .desconocidaa {
-    background-color: black;
-    color: white;
-  }
-  
-  .desconocida{
-    background-color: black;
-    color: white;
-  }
-  
-  .btn-product {
-    font-size: 15px;
-  }
-  
-  .eye {
-    z-index: 1 !important;
-    pointer-events: none;
-    opacity: 0.5;
-  }
-  
-  .add input,
-  select {
-   display: inline !important;
-  }
-  
-  .btn-category {
-    font-size: 10px;
-    font-weight: bolder;
-    border: 1px solid transparent;
-    border-radius: 10px !important;
-    height: 30px !important;
-    width: 100%;
+  margin-bottom: 5px;
+  padding: 5px;
 }
-  .readonly-input{
-    background-color: #0000003d;
-  }
 
-  .title-product{
-    font-size: 13px;
-  }
+.form-group label {
+  margin-bottom: 10px;
+}
 
-  .category-product{
-    font-size: 10px;
-  }
+.error-message {
+  color: red;
+  padding: 3px;
+}
 
-  .span-product{
-    font-size: 9px;
-  }
+.span-color {
+  padding: 1px;
+  color: white;
+  width: 50%;
+  border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto;
+  height: 30px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.Electronics {
+  background-color: gray;
+}
+
+.Furniture {
+  background-color: rgb(93, 0, 124);
+}
+
+.Fashion {
+  background-color: rgb(251, 4, 82);
+}
+
+.Accessories {
+  background-color: green;
+}
+
+.Home {
+  background-color: yellow;
+  color: black;
+}
+
+.desconocidaa {
+  background-color: black;
+  color: white;
+}
+
+.desconocida {
+  background-color: black;
+  color: white;
+}
+
+.btn-product {
+  font-size: 15px;
+}
+
+.eye {
+  z-index: 1 !important;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.add input,
+select {
+  display: inline !important;
+}
+
+.btn-category {
+  font-size: 10px;
+  font-weight: bolder;
+  border: 1px solid transparent;
+  border-radius: 10px !important;
+  height: 30px !important;
+  width: 100%;
+}
+.readonly-input {
+  background-color: #0000003d;
+}
+
+.title-product {
+  font-size: 13px;
+}
+
+.category-product {
+  font-size: 10px;
+}
+
+.span-product {
+  font-size: 9px;
+}
+
+.span-sku {
+  font-size: 11px;
+}
+
+/* Switch */
+
+.switchLabel {
+  display: flex;
+  justify-content: space-between;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
