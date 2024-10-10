@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthHeaderService } from './auth-header.service';
+import { InvoiceSendEmail } from '../models/interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -55,4 +56,15 @@ export class ApiServiceInvoice {
       withCredentials: true,
     });
   }
+
+  sendEmail(filters: InvoiceSendEmail): Observable<any> {
+    const url = `${this.apiUrl}/invoices/sendEmail`;
+    return this.http.post(url, filters, {
+      headers: this.authHeaderService.getHeaders(),
+      withCredentials: true,
+    });
+  } 
+
 }
+
+
