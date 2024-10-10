@@ -126,6 +126,8 @@ export class ProductsComponent implements OnInit {
       photoUpload: [null],
       id: [''],
       key_sat: [0, [Validators.required, Validators.minLength(1)]],
+      expiration_date: [0, [Validators.required]],
+      isGranular: [false, [Validators.required]],
     });
   }
 
@@ -288,7 +290,7 @@ export class ProductsComponent implements OnInit {
           value.clave.includes(inputValue) ||
           value.descripcion.includes(inputValue)
       )
-      .slice(0, 5);
+      .slice(0, 10);
   }
 
   /* Delete Product -- Modal */
@@ -335,7 +337,7 @@ export class ProductsComponent implements OnInit {
 
   /* Modal -- Edit/View Product */
   showModal(
-    product?: any,
+    product: Product | null,
     titleModal: string = '',
     classModal: string = '',
     nameFile: string = ''
@@ -349,9 +351,13 @@ export class ProductsComponent implements OnInit {
       photo: '',
       id: 0,
       key_sat: '',
+      expiration_date: '',
+      isGranular: false,
+      code: ''
     };
 
     this.selectedProduct = product || defaultProduct;
+    const expiration_date = this.selectedProduct?.expiration_date;
 
     this.productForm.patchValue({
       code: this.selectedProduct?.code ?? '',
@@ -363,6 +369,8 @@ export class ProductsComponent implements OnInit {
       photo: this.selectedProduct?.photo ?? '',
       id: this.selectedProduct?.id ?? 0,
       key_sat: this.selectedProduct?.key_sat ?? '',
+      expiration_date: expiration_date.split('T')[0] ?? '',
+      isGranular: this.selectedProduct?.isGranular ?? false
     });
 
     this.isModalVisible = true;
@@ -431,7 +439,6 @@ export class ProductsComponent implements OnInit {
   editProduct(): void {
     if (this.productForm.valid) {
       const formValue = this.productForm.value;
-
       /* Send Data Put (Edit Product) */
       this.apiServiceProducts.editProduct(formValue).subscribe({
         next: (response) => {

@@ -25,7 +25,7 @@
   <div class="col-12 col-md-6 mb-4 d-flex justify-content-end">
     <button
       class="btn btn-success fw-bold d-flex align-items-center justify-content-center"
-      (click)="showModal({}, 'Ver Datos del Producto', 'add', '')"
+      (click)="showModal(null, 'Ver Datos del Producto', 'add', '')"
       style="width: 100%; max-width: 200px; height: 40px; color: white"
       *ngIf="userPayload.role_name === 'Administrador'"
     >
@@ -91,12 +91,12 @@
         [src]="apiUpload + (product.photo || 'noImage.png')"
       />
       <h5>{{ product.name }}</h5>
-      <span>Sku: {{ product.id }}</span>
+      <span class="span-sku">Sku: {{ product.code }}</span>
       <br />
       <div [ngClass]="'span-color ' + product.category">
-        <b>{{ product.category }}</b>
+        <b class="span-sku">{{ product.category }}</b>
       </div>
-      <b> Stock: </b>
+      <b> Stock {{product.isGranular ? 'Kg' : '' }}: </b>
       <b [ngClass]="{ 'text-danger': product.stock <= 10 }">{{
         product.stock
       }}</b>
@@ -156,7 +156,12 @@
       >
         <div class="form-group">
           <label for="code">Código:</label>
-          <input id="code" formControlName="code" class="form-control" (keydown)="onKeydownScanner($event, 'modal')"/>
+          <input
+            id="code"
+            formControlName="code"
+            class="form-control"
+            (keydown)="onKeydownScanner($event, 'modal')"
+          />
           <div
             *ngIf="validationsFormService.isFieldInvalid(productForm, 'code')"
             class="error-message"
@@ -270,6 +275,57 @@
             {{ validationsFormService.getErrorMessage(productForm, "key_sat") }}
           </div>
         </div>
+
+        <div class="form-group">
+          <label for="expiration_date">Fecha de Caducidad:</label>
+          <input
+            type="date"
+            id="expiration_date"
+            formControlName="expiration_date"
+            class="form-control"
+          />
+          <div
+            *ngIf="
+              validationsFormService.isFieldInvalid(
+                productForm,
+                'expiration_date'
+              )
+            "
+            class="error-message"
+          >
+            {{
+              validationsFormService.getErrorMessage(
+                productForm,
+                "expiration_date"
+              )
+            }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="switchLabel my-3">
+            <label for="isGranular">Venta a Granel</label>
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="isGranular"
+                formControlName="isGranular"
+              />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div
+            *ngIf="
+              validationsFormService.isFieldInvalid(productForm, 'isGranular')
+            "
+            class="error-message"
+          >
+            {{
+              validationsFormService.getErrorMessage(productForm, "isGranular")
+            }}
+          </div>
+        </div>
+
         <div class="form-group" *ngIf="classModal !== 'eye'">
           <label for="photoUpload">Foto:</label>
           <input
@@ -291,7 +347,6 @@
             }}
           </div>
         </div>
-
         <div class="form-group hidden">
           <input
             id="photo"
