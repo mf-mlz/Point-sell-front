@@ -4,7 +4,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ApiServiceEmployees } from 'src/app/services/api.service.employees';
 import { Router } from '@angular/router';
-import Swal from 'sweetalert2';
 
 import {
   AvatarComponent,
@@ -31,6 +30,7 @@ import {
 } from '@coreui/angular';
 
 import { IconDirective } from '@coreui/icons-angular';
+import { IconsModule } from '../../../icons/icons.module';
 import { OnInit } from '@angular/core';
 
 @Component({
@@ -38,6 +38,7 @@ import { OnInit } from '@angular/core';
   templateUrl: './default-header.component.html',
   standalone: true,
   imports: [
+    IconsModule,
     ContainerComponent,
     HeaderTogglerDirective,
     SidebarToggleDirective,
@@ -98,35 +99,6 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   onLogout() {
     /* Clear SessionStorage */
     this.authService.clearPayloadFromSession();
-
-    /* Clear Cookie => Backend */
-    this.apiServiceEmployees.logout().subscribe({
-      next: (response) => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: 'success',
-          title: response.message,
-        });
-      },
-      error: (error) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: error.error?.message || 'Ocurrió un Error',
-        });
-      },
-    });
-
     this.router.navigate(['/login']);
   }
 
