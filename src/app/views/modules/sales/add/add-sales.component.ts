@@ -32,6 +32,7 @@ import { OpenpayService } from '../../../../services/openpay.service';
 import { ValidationsFormService } from 'src/app/utils/form-validations';
 import { onKeydownScanner } from '../../../../utils/scanner';
 import { encrypt, decrypt } from '../../../../utils/crypto';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-add-sales',
@@ -80,6 +81,7 @@ export class AddSalesComponent {
     iat: 0,
     exp: 0,
   };
+  public apiUpload = environment.apiUpload;
   saleForm!: FormGroup;
   paymentsForm: PaymentForm[] = [];
   filteredPaymentForms: PaymentForm[] = [];
@@ -101,6 +103,11 @@ export class AddSalesComponent {
     iva: '$0.00',
   };
   columns = [
+    {
+      columnDef: 'Photo',
+      header: '',
+      cell: (element: any) => this.apiUpload + element.photo,
+    },
     {
       columnDef: 'Código',
       header: 'Código',
@@ -268,13 +275,30 @@ export class AddSalesComponent {
   }
 
   /* Add Product in the Sale List */
-  addNewProduct(product: AddProductSale): void {
+  async addNewProduct(product: AddProductSale): Promise<void> {
+    let quantity: number = 1;
+
+    if (product.isGranular) {
+      const kg = await this.addKgProductGranuel();
+      const productToUpdate = this.products.find(
+        (item) => item.id === product.id
+      );
+
+      if (productToUpdate) {
+        quantity = kg || productToUpdate.quantity;
+      } else {
+        quantity = kg || 1;
+      }
+    }
+
     const newProduct = {
       id: product.id,
-      quantity: 1,
+      quantity: quantity,
       name: product.name,
       price: product.price,
       code: product.code,
+      isGranular: product.isGranular,
+      photo: product.photo,
     };
 
     const checkProductIndex = this.products.findIndex(
@@ -283,13 +307,44 @@ export class AddSalesComponent {
 
     if (checkProductIndex !== -1) {
       this.products = this.products.map((p, index) =>
-        index === checkProductIndex ? { ...p, quantity: p.quantity + 1 } : p
+        index === checkProductIndex
+          ? { ...p, quantity: p.quantity + quantity }
+          : p
       );
     } else {
       this.products = [...this.products, newProduct];
     }
 
     this.getTotalSale();
+  }
+
+  /* Insert Kg in Product */
+  async addKgProductGranuel(): Promise<number | undefined> {
+    return Swal.fire({
+      title: 'Ingrese la cantidad de kilos',
+      input: 'text',
+      inputAttributes: {
+        pattern: '[0-9]+([.,][0-9]+)?',
+        inputMode: 'decimal',
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Aceptar',
+      preConfirm: (kilos) => {
+        const kilosNum = parseFloat(kilos.replace(',', '.'));
+        if (kilosNum <= 0 || isNaN(kilosNum)) {
+          Swal.showValidationMessage(
+            'Por favor, ingrese un valor válido en kilos'
+          );
+          return;
+        }
+        return kilosNum;
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        return result.value as number;
+      }
+      return undefined;
+    });
   }
 
   /* Open Swal Multiple Products */
@@ -301,6 +356,8 @@ export class AddSalesComponent {
         name: product.name,
         price: product.price,
         code: product.code,
+        isGranular: product.isGranular,
+        photo: product.photo,
       })
     );
 
@@ -367,24 +424,31 @@ export class AddSalesComponent {
   async editQuantity(productSelected: ProductFilter) {
     const { value: newQuantity } = await Swal.fire({
       title: 'Modificar Cantidad',
-      input: 'number',
+      input: productSelected.isGranular ? 'text' : 'number',
       inputLabel: 'Ingresa la Cantidad',
       inputValue: productSelected.quantity.toString(),
       showCancelButton: true,
-      inputValidator: (value) => {
+      inputValidator: (value: string) => {
         if (!value) {
           return 'Ingresa una Cantidad';
         }
-        const numValue = Number(value);
+        const numValue = productSelected.isGranular
+          ? parseFloat(value)
+          : Number(value);
         if (isNaN(numValue) || numValue <= 0) {
           return 'Ingresa una Cantidad Válida';
+        }
+        if (!productSelected.isGranular && !Number.isInteger(numValue)) {
+          return 'El Producto No se vende a Granel, ingresa un número Entero';
         }
         return undefined;
       },
     });
 
     if (newQuantity !== undefined && newQuantity !== null) {
-      const parsedQuantity = Number(newQuantity);
+      const parsedQuantity = productSelected.isGranular
+        ? parseFloat(newQuantity)
+        : Number(newQuantity);
       if (parsedQuantity > 0) {
         const productIndex = this.products.findIndex(
           (product) => product.id === productSelected.id
@@ -400,6 +464,7 @@ export class AddSalesComponent {
         }
       }
     }
+
     this.getTotalSale();
   }
 
