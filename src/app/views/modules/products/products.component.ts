@@ -182,10 +182,7 @@ export class ProductsComponent implements OnInit {
           : { name: this.searchInput };
         this.getProductsFilter(data);
       } else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Ingresa un Valor a Buscar',
-        });
+        this.getAllProducts();
       }
     } else if (type === 'category') {
       const data: ProductFilterData = {
