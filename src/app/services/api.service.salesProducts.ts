@@ -23,4 +23,10 @@ export class ApiServiceSalesProducts {
       withCredentials: true,
     });
   }
+
+  downloadTicket(credentials: { salesId: Number }): Observable<Blob> {
+    return this.http.post(`${this.apiUrl}/salesproducts/generateTicket/`, credentials, { responseType: 'blob', headers: this.authHeaderService.getHeaders(),
+      withCredentials: true });
+  }
+
 }
