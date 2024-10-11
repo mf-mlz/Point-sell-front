@@ -28,6 +28,7 @@ import {
   userPayload,
 } from 'src/app/models/interfaces';
 import { ApiServicePaymentForms } from '../../../../services/api.service.paymentForms';
+import { ApiServiceSalesProducts } from 'src/app/services/api.service.salesProducts';
 import { OpenpayService } from '../../../../services/openpay.service';
 import { ValidationsFormService } from 'src/app/utils/form-validations';
 import { onKeydownScanner } from '../../../../utils/scanner';
@@ -56,6 +57,7 @@ export class AddSalesComponent {
     private router: Router,
     private apiServiceProducts: ApiServiceProducts,
     private apiServicePaymentForms: ApiServicePaymentForms,
+    private apiServiceSalesProducts: ApiServiceSalesProducts,
     private apiServiceSales: ApiServiceSales,
     private fb: FormBuilder,
     private openpayService: OpenpayService,
@@ -735,6 +737,7 @@ export class AddSalesComponent {
               showConfirmButton: true,
             }).then((result) => {
               if (result.isConfirmed) {
+                this.downloadPDF(response.idSale);
                 this.loadData();
               }
             });
@@ -750,6 +753,23 @@ export class AddSalesComponent {
           reject(error);
         },
       });
+    });
+  }
+
+  /* Download Ticket */
+  downloadPDF(idSale: number) {
+    const data = { salesId: idSale }; 
+
+    this.apiServiceSalesProducts.downloadTicket(data).subscribe({
+      next: (response) => {
+        const blob = new Blob([response], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        window.URL.revokeObjectURL(url);
+      },
+      error: (error) => {
+        console.error('Error downloading PDF', error);
+      },
     });
   }
 
@@ -788,6 +808,7 @@ export class AddSalesComponent {
               confirmButtonText: 'Aceptar',
             }).then((result) => {
               if (result.isConfirmed) {
+                this.downloadPDF(saleResponse.idSale);
                 this.loadData();
               }
             });
