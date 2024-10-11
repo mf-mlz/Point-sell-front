@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { DatatableComponent } from '../../../datatable/datatable.component';
 import { ApiServiceSales } from 'src/app/services/api.service.sales';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import {
   SaleInfoComplete,
   SaleInvoice,
@@ -46,12 +46,13 @@ import { environment } from '../../../../environments/environment';
     CommonModule,
     ReactiveFormsModule,
     IconsModule,
-    RouterModule,
+    RouterModule
   ],
   templateUrl: './sales.component.html',
   styleUrls: ['../../../../scss/forms.scss', '../../../../scss/buttons.scss'],
 })
 export class SalesComponent {
+  idSale: string | null = null;
   showButtonGroupSale: boolean = true;
   showButtonGroupInvoice: boolean = true;
   isAddRoute: boolean = false;
@@ -96,7 +97,8 @@ export class SalesComponent {
     private authService: AuthService,
     private fb: FormBuilder,
     private router: Router,
-    public validationsFormService: ValidationsFormService
+    public validationsFormService: ValidationsFormService,
+    private route: ActivatedRoute
   ) {
     /* Init Form and Add Validations */
     this.saleForm = this.fb.group({
@@ -136,17 +138,61 @@ export class SalesComponent {
   buttonsInvoice: ButtonConfig[] = [];
 
   ngOnInit(): void {
+    this.idSale = '';
+    this.route.params.subscribe(params => {
+      this.idSale = params['idSale'] || null;
+    });
+
+    if(this.idSale){
+      this.getSaleById(this.idSale);
+    }else{
+      this.getAllSales();
+    }
     this.userPayload = this.authService.getDecodedToken();
     this.generateButtons();
-    this.getAllSales();
     this.getAllPaymentsForm();
     this.getAllEmployees();
     this.getAllClients();
+
+
   }
 
   /* Get All Sales */
   getAllSales(): void {
     this.apiServiceSales.getAllSales().subscribe({
+      next: (response) => {
+        this.sales = response;
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: true,
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          },
+        });
+        Toast.fire({
+          icon: 'success',
+          title: 'Se encontraron ' + response.length + ' ventas',
+        });
+      },
+      error: (error) => {
+        this.sales = [];
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text:
+            error.error?.message || 'Ocurrió un Error al Obtener las Ventas',
+        });
+      },
+    });
+  }
+
+  /* Get Sale By Id */
+  getSaleById(idSale: string): void {
+    this.apiServiceSales.getSaleById(idSale).subscribe({
       next: (response) => {
         this.sales = response;
         const Toast = Swal.mixin({
