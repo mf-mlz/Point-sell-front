@@ -158,13 +158,19 @@ export interface Employee {
   id: number;
   name: string;
   email: string;
-  password: string;
+  password?: string;
   phone: number;
   address: string;
   status: string;
   role_id: number;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
+  role?: string;
+}
+
+export interface EmployeeFilter {
+  id?: number;
+  name?: string;
 }
 
 /* Clients */
@@ -306,4 +312,10 @@ export interface OpenPayError {
     message?: string;
     description?: string;
   };
+}
+
+/* Roles */
+export interface Roles {
+  id: number;
+  name: string;
 }

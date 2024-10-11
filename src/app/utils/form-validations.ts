@@ -23,7 +23,7 @@ export class ValidationsFormService {
     } else if (control?.hasError('email')) {
       return 'Ingresa un correo válido';
     } else if (control?.hasError('pattern')) {
-      return 'Ingresa únicamente números';
+      return 'Ingresa correctamente la información';
     } else if (control?.hasError('invalidTotal')) {
       return 'La Venta no puede ser de $0.00';
     }

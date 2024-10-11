@@ -1,178 +1,103 @@
+import { Component } from '@angular/core';
+import { DatatableComponent } from '../../../datatable/datatable.component';
+import { RouterModule } from '@angular/router';
 import {
-  Component,
-  HostBinding,
-  Inject,
-  Input,
-  OnInit,
-  Renderer2,
-  forwardRef,
-} from '@angular/core';
-import { DOCUMENT, NgClass, CommonModule } from '@angular/common';
-import {
-  TextColorDirective,
-  CardComponent,
-  CardHeaderComponent,
-  CardBodyComponent,
-  RowComponent,
-  ColComponent,
-  ButtonCloseDirective,
-  ButtonDirective,
-  ModalBodyComponent,
-  ModalComponent,
-  ModalFooterComponent,
-  ModalHeaderComponent,
-  ModalTitleDirective,
-  ThemeDirective,
-} from '@coreui/angular';
-
-import { ApiServiceEmployees } from '../../../services/api.service.employees';
-import Swal from 'sweetalert2';
+  Employee,
+  DeleteRequest,
+  ButtonConfig,
+  userPayload,
+  EmployeeFilter,
+  Roles,
+} from 'src/app/models/interfaces';
 import { ModalComponentHtml } from '../../../modalHtml/modalhtml.component';
+import Swal from 'sweetalert2';
 import {
   FormBuilder,
   FormGroup,
-  ReactiveFormsModule,
   Validators,
+  ReactiveFormsModule,
   FormsModule,
 } from '@angular/forms';
-import { environment } from '../../../../environments/environment';
-import { cilPlus, cilShieldAlt } from '@coreui/icons';
-import { IconDirective } from '@coreui/icons-angular';
+import { CommonModule } from '@angular/common';
+import { ValidationsFormService } from 'src/app/utils/form-validations';
+import { ApiServiceEmployees } from '../../../services/api.service.employees';
 import { AuthService } from '../../../services/auth.service';
-import {
-  DeleteRequest,
-  Employee,
-  Rol,
-  KeySat,
-  Category,
-} from '../../../models/interfaces';
+import { ApiServiceRoles } from '../../../services/api.service.roles';
+import { IconsModule } from '../../../icons/icons.module';
+import { environment } from '../../../../environments/environment';
 
 @Component({
-  templateUrl: 'employees.component.html',
-  styleUrls: ['./employees.component.scss'],
+  selector: 'app-sales',
   standalone: true,
   imports: [
-    TextColorDirective,
-    CardComponent,
-    CardHeaderComponent,
-    CardBodyComponent,
-    RowComponent,
-    CommonModule,
-    ButtonCloseDirective,
-    ButtonDirective,
-    ModalBodyComponent,
-    ModalComponent,
-    ModalFooterComponent,
-    ModalHeaderComponent,
-    ModalTitleDirective,
-    ThemeDirective,
+    DatatableComponent,
     ModalComponentHtml,
+    CommonModule,
     ReactiveFormsModule,
+    IconsModule,
+    RouterModule,
     FormsModule,
-    IconDirective,
-    forwardRef(() => ThemeColorComponent),
   ],
+  templateUrl: './employees.component.html',
+  styleUrls: ['../../../../scss/forms.scss', '../../../../scss/buttons.scss'],
 })
-export class EmployeesComponent implements OnInit {
-  public userPayload: any;
+export class EmployeesComponent {
+  idEmployeeSearch: string = '';
+  showButtonGroupEmployee: boolean = false;
+  userPayload: userPayload = {
+    id: 0,
+    name: '',
+    email: '',
+    phone: '',
+    role_id: 0,
+    role_name: '',
+    iat: 0,
+    exp: 0,
+  };
+  
   employees: Employee[] = [];
-  roles: Rol[] = [];
-  keySat: KeySat[] = [];
-  filteredKeySat: KeySat[] = [];
+  roles: Roles[] = [];
   selectedEmployee: Employee | null = null;
-  error: string | null = null;
+  employeeForm: FormGroup;
   isModalVisible = false;
-  isModalVisibleUpload = false;
-  idEmployeeSelect: number | null = null;
-  employeeForm!: FormGroup;
-  uploadForm!: FormGroup;
-  selectedFile: File | null = null;
   titleModal: string = '';
   classModal: string = '';
-  nameFile: string = '';
-  searchInput: string = '';
-  icons = { cilPlus, cilShieldAlt };
-  public apiUpload = environment.apiUpload;
-
+  error: string | null = null;
+  private passString = environment.temporary_string;
   constructor(
-    @Inject(DOCUMENT) private document: Document,
-    private renderer: Renderer2,
-    private ApiServiceEmployees: ApiServiceEmployees,
+    private apiServiceEmployees: ApiServiceEmployees,
+    private apiServiceRoles: ApiServiceRoles,
+    private authService: AuthService,
     private fb: FormBuilder,
-    private authService: AuthService
+    public validationsFormService: ValidationsFormService
   ) {
+    /* Init Form and Add Validations */
     this.employeeForm = this.fb.group({
-      name: ['' /* , [Validators.required, Validators.minLength(3)] */],
-      email: ['' /* , [Validators.required, Validators.minLength(10)] */],
-      password: ['' /* , [Validators.required, Validators.min(1)] */],
-      phone: ['' /* , Validators.required, Validators.min(1) */],
-      address: ['' /* , [Validators.required, Validators.min(1)] */],
-      status: [''],
-      created_at: [''],
-      updated_at: [''],
-      role_id: [0 /* , [Validators.required, Validators.minLength(1)] */],
-      id: [0 /* , [Validators.required, Validators.minLength(3)] */],
+      id: [''],
+      name: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      address: ['', [Validators.required]],
+      role: [''],
+      role_id: ['', [Validators.required]],
     });
   }
+
+  /* Buttons Datatable */
+  buttons: ButtonConfig[] = [];
+
   ngOnInit(): void {
     this.userPayload = this.authService.getDecodedToken();
+    this.generateButtons();
     this.getAllEmployees();
-    this.getRolesAll();
+    this.getAllRoles();
   }
 
-  /* Get All employee */
-  getAllEmployees(): void {
-    this.ApiServiceEmployees.allEmployees().subscribe({
+  /* Get Employee By Id */
+  getEmployeeById(employee: EmployeeFilter): void {
+    this.apiServiceEmployees.filter(employee).subscribe({
       next: (response) => {
-        this.employees = response;
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: true,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: 'success',
-          title: 'Se encontraron ' + response.length + ' registros',
-        });
-      },
-      error: (error) => {
-        this.employees = [];
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text:
-            error.error?.message || 'Ocurrió un Error al Obtener los Empleados',
-        });
-      },
-    });
-  }
-
-  //   /* Filter employee */
-  filterEmployees(type: string): void {
-    /* Search by input */
-    if (type === 'input') {
-      if (this.searchInput) {
-        const data = { search: this.searchInput };
-        this.getEmployeesFilter(data);
-      } else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Ingresa un Valor a Buscar',
-        });
-      }
-    }
-  }
-
-  //   /* Filter -- Post */
-  getEmployeesFilter(data: any): void {
-    this.ApiServiceEmployees.filterEmployeesAll(data).subscribe({
-      next: (response) => {
+        this.employees = response.employee;
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -188,11 +113,24 @@ export class EmployeesComponent implements OnInit {
           icon: 'success',
           title: response.message,
         });
-
-        this.employees = response.employee;
       },
       error: (error) => {
         this.employees = [];
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text:
+            error.error?.message || 'Ocurrió un Error al Obtener los Empleados',
+        });
+      },
+    });
+  }
+
+  /* Get All Employees */
+  getAllEmployees(): void {
+    this.apiServiceEmployees.allEmployees().subscribe({
+      next: (response) => {
+        this.employees = response;
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -205,15 +143,99 @@ export class EmployeesComponent implements OnInit {
           },
         });
         Toast.fire({
-          icon: 'error',
-          title: 'Ocurrió un Error al Obtener los Empleados',
+          icon: 'success',
+          title: response.message || `Se encontraron ${response.length} registros`,
         });
+      },
+      error: (error) => {
+        this.employees = [];
       },
     });
   }
 
-  //   /* Delete Product -- Modal */
-  showModaldeleteProduct(idProduct: number): void {
+  /* Get All Roles */
+  getAllRoles(): void {
+    this.apiServiceRoles.getAllRoles().subscribe({
+      next: (response) => {
+        this.roles = response;
+        console.log(response);
+      },
+      error: (error) => {
+        this.roles = [];
+      },
+    });
+  }
+
+  /* Columns => Datatable */
+  columns = [
+    { columnDef: 'id', header: 'ID', cell: (element: any) => element.id },
+    {
+      columnDef: 'name',
+      header: 'Nombre',
+      cell: (element: any) => element.name,
+    },
+    {
+      columnDef: 'phone',
+      header: 'Télefono',
+      cell: (element: any) => element.phone,
+    },
+    {
+      columnDef: 'email',
+      header: 'E-mail',
+      cell: (element: any) => element.email,
+    },
+    {
+      columnDef: 'role',
+      header: 'Rol',
+      cell: (element: any) => element.role,
+    },
+  ];
+
+  /* Generate Btns Datatable */
+  generateButtons(): void {
+    const btns: ButtonConfig[] = [
+      {
+        class: 'btn-view',
+        icon: 'view',
+        title: 'Ver',
+        action: (element: any) => this.onView(element),
+      },
+    ];
+
+    if (this.userPayload.role_name === 'Administrador') {
+      btns.push(
+        {
+          class: 'btn-edit',
+          icon: 'pencil',
+          title: 'Editar',
+          action: (element: any) => this.onEdit(element),
+        },
+        {
+          class: 'btn-delete',
+          icon: 'trash',
+          title: 'Eliminar',
+          action: (element: any) => this.onDelete(element),
+        }
+      );
+    }
+
+    this.buttons = btns;
+  }
+
+  /* Functions Datatable Buttons -- Open Modals */
+  onAdd(): void {
+    this.showModal('add', 'Añadir Empleado');
+  }
+
+  onView(employee: Employee): void {
+    this.showModal('eye', 'Ver Información del Empleado', employee);
+  }
+
+  onEdit(employee: Employee): void {
+    this.showModal('edit', 'Editar Venta', employee);
+  }
+
+  onDelete(employee: Employee): void {
     Swal.fire({
       title: '¿Estás seguro que deseas eliminar?',
       text: '¡Esta acción no se puede deshacer!',
@@ -226,95 +248,83 @@ export class EmployeesComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         const obj: DeleteRequest = {
-          id: idProduct,
+          id: employee.id,
         };
-        this.deleteEmployee(obj);
+        this.deleteSale(obj);
       }
     });
   }
 
-  //   /* Delete Product -- Function */
-  deleteEmployee(credentials: DeleteRequest): void {
-    this.ApiServiceEmployees.deleteEmployee(credentials).subscribe({
-      next: (response) => {
-        Swal.fire({
-          icon: 'success',
-          title: response.message || 'Empleado Eliminado Correctamente',
-        });
-        this.getAllEmployees();
-      },
-      error: (error) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text:
-            error.error?.message || 'Ocurrió un Error al Eliminar el Empleado',
-        });
-      },
-    });
-  }
-
-  //   /* Modal -- Edit/View Employee */
-  showModal(
-    employee?: any,
-    titleModal: string = '',
-    classModal: string = '',
-    nameFile: string = ''
-  ): void {
-    const defaultEmployee = {
+  /* Show Modal */
+  showModal(classModal: string, title: string, employee?: Employee): void {
+    /* Select Element or Default */
+    const defaultSale = {
+      id: 0,
       name: '',
       email: '',
-      password: '',
-      phone: '',
+      phone: 0,
       address: '',
       status: '',
+      role: '',
+      role_id: 0,
       created_at: '',
       updated_at: '',
-      role_id: '',
     };
 
-    this.selectedEmployee = employee || defaultEmployee;
+    this.selectedEmployee = employee ? employee : defaultSale;
 
+    /* Inti Form => Show Modal */
     this.employeeForm.patchValue({
-      id: this.selectedEmployee?.id ?? '',
-      name: this.selectedEmployee?.name ?? '',
-      email: this.selectedEmployee?.email ?? '',
-      password: this.selectedEmployee?.password ?? '',
-      phone: this.selectedEmployee?.phone ?? 0,
-      address: this.selectedEmployee?.address ?? '',
-      status: this.selectedEmployee?.status ?? '',
-      created_at: this.selectedEmployee?.created_at ?? '',
-      updated_at: this.selectedEmployee?.updated_at ?? '',
-      role_id: this.selectedEmployee?.role_id ?? '',
+      id: this.selectedEmployee?.id || 0,
+      name: this.selectedEmployee?.name || '',
+      email: this.selectedEmployee?.email || '',
+      phone: this.selectedEmployee?.phone || '',
+      address: this.selectedEmployee?.address || '',
+      status: this.selectedEmployee?.status || '',
+      role_id: this.selectedEmployee?.role_id || 0,
+      role: this.selectedEmployee?.role || '',
     });
+
+    /* Pass => Data Modal (Class, Visible and Title) */
     this.isModalVisible = true;
-    this.titleModal = titleModal;
+    this.titleModal = title;
     this.classModal = classModal;
-    this.nameFile = nameFile || 'noImage.png';
   }
 
-  handleModalVisibilityChange(visible: boolean) {
+  /* Open / Close Modal */
+  handleModalVisibilityChange(visible: boolean): void {
     this.isModalVisible = visible;
   }
 
-  //   /* Handle Click */
+  /* Execute Function Add-Edit-Delete-Create Invoice */
   handleClick(): void {
-    if (this.classModal === 'add') {
-      this.addEmployee();
-    } else if (this.classModal === 'edit') {
-      this.editEmployee();
+    switch (this.classModal) {
+      case 'edit':
+        this.editEmployee();
+        break;
+      case 'add':
+        this.addEmployee();
+        break;
+      default:
+        break;
     }
   }
 
-  //   /* Add Product  */
+  /* Functions */
   addEmployee(): void {
     if (this.employeeForm.valid) {
-      const formValue = this.employeeForm.value;
-      this.ApiServiceEmployees.registerEmployee(formValue).subscribe({
+      let formValue = this.employeeForm.value;
+      const temporaryPassword = this.createTemporaryPassword(formValue);
+      formValue.password = temporaryPassword;
+      this.apiServiceEmployees.registerEmployee(formValue).subscribe({
         next: (response) => {
           Swal.fire({
-            icon: 'success',
-            title: response.message || 'Empleado Añadido con Éxito',
+            icon: 'info',
+            title:
+              `<strong>${response.message}</strong>` ||
+              '<strong> Empleado Agregado con Éxito </strong>',
+            html: `Por favor, proporcionale al Empleado su Contraseña Temporal: <br><br><b> ${temporaryPassword} </b><br><br>
+                  Para cambiar la contraseña es necesario ingresar al Sistema y dar clic en el apartado <br><br><strong> Cambiar Contraseña </strong>`,
           }).then((result) => {
             if (result.isConfirmed) {
               this.resetFileInput();
@@ -323,11 +333,12 @@ export class EmployeesComponent implements OnInit {
           });
         },
         error: (error) => {
+          console.log(error);
+
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text:
-              error.error?.message || 'Ocurrió un error al Añadir el Empleado.',
+            text: 'Ocurrió un error al Agregar el Empleado, verifica que el Correo y el Télefono no estén registrados en otro empleado Activo',
           });
         },
       });
@@ -340,13 +351,10 @@ export class EmployeesComponent implements OnInit {
     }
   }
 
-  //   /* Edit Product */
   editEmployee(): void {
     if (this.employeeForm.valid) {
       const formValue = this.employeeForm.value;
-
-      /* Send Data Put (Edit Employee) */
-      this.ApiServiceEmployees.editEmployee(formValue).subscribe({
+      this.apiServiceEmployees.editEmployee(formValue).subscribe({
         next: (response) => {
           Swal.fire({
             icon: 'success',
@@ -358,12 +366,11 @@ export class EmployeesComponent implements OnInit {
             }
           });
         },
-        error: (error) => {
+        error: () => {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text:
-              error.error?.message || 'Ocurrió un error al Editar el Empleado.',
+            text: 'Ocurrió un error al Modificar el Empleado, verifica que el Correo y el Télefono no estén registrados en otro empleado Activo',
           });
         },
       });
@@ -376,134 +383,76 @@ export class EmployeesComponent implements OnInit {
     }
   }
 
-  //   /* Modal Upload File */
-  showModalUpload(id: number): void {
-    this.idEmployeeSelect = id;
-    this.uploadForm.get('photoUpload')?.reset();
-    this.uploadForm.patchValue({
-      id: id,
-    });
-    this.isModalVisibleUpload = true;
-  }
-
-  //   /* Change => File Selected */
-  onFileSelected(event: any): void {
-    const file: File = event.target.files[0];
-    if (file) {
-      const validationError = this.fileTypeValidator(file);
-      if (validationError) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Error',
-          text: 'Solo se permiten imágenes (JPG, PNG, GIF, JPEG)',
-        });
-        return;
-      }
-
-      this.selectedFile = file;
-    }
-  }
-
-  /* Validate Upload => Image */
-  fileTypeValidator(file: File): { [key: string]: any } | null {
-    const validImageTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'image/jpg',
-    ];
-    if (!validImageTypes.includes(file.type)) {
-      return { invalidFileType: true };
-    }
-    return null;
-  }
-
-  //   /* Reset Input File */
-  resetFileInput() {
-    const fileInput = document.getElementById(
-      'photoUpload'
-    ) as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = '';
-    }
-    this.selectedFile = null;
-    this.employeeForm.reset();
-  }
-
-  //   /* Validate Fields Form */
-  isFieldInvalid(form: FormGroup, field: string): boolean {
-    const control = form.get(field);
-    return !!control && control.invalid && (control.dirty || control.touched);
-  }
-
-  //   /* Validate Errors Fields Form */
-  getErrorMessage(form: FormGroup, field: string): string {
-    const control = form.get(field);
-    if (control?.hasError('required')) {
-      return 'El Campo es Requerido';
-    } else if (control?.hasError('minlength')) {
-      const minLength = control.errors?.['minlength'].requiredLength;
-      return `Ingresa Minímo ${minLength} Caracteres`;
-    } else if (control?.hasError('invalidFileType')) {
-      return 'Solo se permiten imágenes (JPG, PNG, GIF, JPEG)';
-    }
-    return '';
-  }
-
-  censorEmail(email: string): string {
-    const [user, domain] = email.split('@');
-    if (!user || !domain) {
-      throw new Error('Dirección de correo electrónico inválida');
-    }
-    const visibleLength = 3; // Número de caracteres visibles al principio del nombre de usuario
-    const censoredUser =
-      user.slice(0, visibleLength) + '*'.repeat(user.length - visibleLength);
-    return `${censoredUser}@${domain}`;
-  }
-
-  /* Get roles */
-  getRolesAll(): void {
-    this.ApiServiceEmployees.getRoles().subscribe({
+  deleteSale(credentials: DeleteRequest): void {
+    this.apiServiceEmployees.deleteEmployee(credentials).subscribe({
       next: (response) => {
-        this.roles = response;
+        Swal.fire({
+          icon: 'success',
+          title: response.message || 'Empleado Eliminado Correctamente',
+        });
+        this.getAllEmployees();
       },
-      error: (error) => {
-        this.roles = [];
+      error: () => {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text:
-            error.error?.message ||
-            'Ocurrió un Error al Obtener las Categorías',
+          text: 'Ocurrió un Error al Eliminar el Empleado',
         });
       },
     });
   }
-}
 
-@Component({
-  selector: 'app-theme-color',
-  template: `
-    <c-col xl="2" md="4" sm="6" xs="12" class="my-4 ms-4">
-      <div [ngClass]="colorClasses" style="padding-top: 75%;"></div>
-      <ng-content></ng-content>
-    </c-col>
-  `,
-  standalone: true,
-  imports: [ColComponent, NgClass],
-})
-export class ThemeColorComponent implements OnInit {
-  @Input() color = '';
-  public colorClasses = {
-    'theme-color w-75 rounded mb-3': true,
-  };
+  /* Create Temporary Password */
+  createTemporaryPassword(employee: Employee): string {
+    const arrayPassword: string[] = [];
 
-  @HostBinding('style.display') display = 'contents';
+    for (const key in employee) {
+      if (employee.hasOwnProperty(key)) {
+        const value = employee[key as keyof Employee];
 
-  ngOnInit(): void {
-    this.colorClasses = {
-      ...this.colorClasses,
-      [`bg-${this.color}`]: !!this.color,
-    };
+        if (typeof value === 'string' && value.length > 0) {
+          const valueArr = value.replace(/\s+/g, '').split('');
+          const lengthArr = valueArr.length;
+
+          for (let index = 0; index < 2; index++) {
+            const randomIndex = Math.floor(Math.random() * lengthArr);
+            const randomChar = valueArr[randomIndex];
+            if (randomChar !== '') {
+              arrayPassword.push(randomChar);
+            }
+          }
+        }
+      }
+    }
+    const password = this.passString + arrayPassword.join('');
+    return password;
+  }
+
+  /* Search Employee */
+  searchEmployee(): void {
+    if (this.idEmployeeSearch) {
+      const isNumber = (value: string | number) => /^\d+$/.test(String(value));
+      const isValid = isNumber(this.idEmployeeSearch);
+      let data = null;
+
+      if (isValid) {
+        data = {
+          id: Number(this.idEmployeeSearch),
+        };
+      } else {
+        data = {
+          name: this.idEmployeeSearch.toString(),
+        };
+      }
+
+      this.getEmployeeById(data);
+    } else {
+      this.getAllEmployees();
+    }
+  }
+
+  /* Reset Input File */
+  resetFileInput(): void {
+    this.employeeForm.reset();
   }
 }
