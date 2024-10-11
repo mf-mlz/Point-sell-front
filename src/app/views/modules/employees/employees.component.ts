@@ -202,7 +202,7 @@ export class EmployeesComponent {
       },
     ];
 
-    if (this.userPayload.role_name === 'Administrador') {
+    if (this.userPayload.role_name === environment.name_role) {
       btns.push(
         {
           class: 'btn-edit',

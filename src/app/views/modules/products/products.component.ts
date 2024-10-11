@@ -105,6 +105,7 @@ export class ProductsComponent implements OnInit {
   nameFile: string = '';
   searchInput: string = '';
   public apiUpload = environment.apiUpload;
+  public nameRole = environment.name_role;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,

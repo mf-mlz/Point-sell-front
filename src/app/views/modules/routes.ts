@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { ModuleGuard } from '../../guards/module/module.guard';
 
 export const routes: Routes = [
   {
@@ -43,6 +44,7 @@ export const routes: Routes = [
       {
         path: 'employees',
         loadComponent: () => import('./employees/employees.component').then(m => m.EmployeesComponent),
+        canActivate: [ModuleGuard],
         data: {
           title: 'Empleados'
         }

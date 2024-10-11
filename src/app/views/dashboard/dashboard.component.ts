@@ -99,21 +99,6 @@ export class DashboardComponent implements OnInit {
     this.apiServiceSales.postSaleDate(obj).subscribe({
       next: (response) => {
         this.sales = response.sales;
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: true,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: 'success',
-          title: 'Se encontraron ' + response.sales.length + ' registros',
-        });
         this.createChart();
       },
       error: (error) => {

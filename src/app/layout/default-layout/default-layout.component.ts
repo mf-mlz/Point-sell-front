@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { NgScrollbar } from 'ngx-scrollbar';
-
 import { IconDirective } from '@coreui/icons-angular';
 import {
   ContainerComponent,
@@ -12,11 +11,11 @@ import {
   SidebarHeaderComponent,
   SidebarNavComponent,
   SidebarToggleDirective,
-  SidebarTogglerDirective
+  SidebarTogglerDirective,
 } from '@coreui/angular';
-
 import { DefaultFooterComponent, DefaultHeaderComponent } from './';
-import { navItems } from './_nav';
+import { NavService } from './_nav'; 
+import { INavData } from '@coreui/angular'; 
 
 function isOverflown(element: HTMLElement) {
   return (
@@ -45,12 +44,19 @@ function isOverflown(element: HTMLElement) {
     ShadowOnScrollDirective,
     ContainerComponent,
     RouterOutlet,
-    DefaultFooterComponent
-  ]
+    DefaultFooterComponent,
+  ],
 })
-export class DefaultLayoutComponent {
-  public navItems = navItems;
+export class DefaultLayoutComponent implements OnInit {
+  public navItems: INavData[] = [];
+
+  constructor(private navService: NavService) {}
+
+  ngOnInit(): void {
+    this.navItems = this.navService.getNavItems(); 
+  }
 
   onScrollbarUpdate($event: any) {
+    
   }
 }
