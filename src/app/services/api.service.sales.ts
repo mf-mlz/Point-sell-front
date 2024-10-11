@@ -43,6 +43,14 @@ export class ApiServiceSales {
     });
   }
 
+  getSaleById(idSale: string): Observable<any> {
+    const url = `${this.apiUrl}/sales/getSaleById/${idSale}`;
+    return this.http.get(url, {
+      headers: this.authHeaderService.getHeaders(),
+      withCredentials: true,
+    });
+  }
+
   /* Put */
   editSale(credentials: {
     id: Number;
