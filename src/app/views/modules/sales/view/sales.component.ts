@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DatatableComponent } from '../../../datatable/datatable.component';
+import { DatatableComponent } from '../../../../datatable/datatable.component';
 import { ApiServiceSales } from 'src/app/services/api.service.sales';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import {
@@ -18,7 +18,7 @@ import {
   InvoiceList,
   InvoiceSendEmail,
 } from 'src/app/models/interfaces';
-import { ModalComponentHtml } from '../../../modalHtml/modalhtml.component';
+import { ModalComponentHtml } from '../../../../modalHtml/modalhtml.component';
 import Swal from 'sweetalert2';
 import {
   FormBuilder,
@@ -29,14 +29,14 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ValidationsFormService } from 'src/app/utils/form-validations';
-import { ApiServicePaymentForms } from '../../../services/api.service.paymentForms';
-import { ApiServiceEmployees } from '../../../services/api.service.employees';
-import { ApiServiceClients } from '../../../services/api.service.clients';
-import { ApiServiceSalesProducts } from '../../../services/api.service.salesProducts';
-import { AuthService } from '../../../services/auth.service';
-import { ApiServiceInvoice } from '../../../services/api.service.invoice';
-import { IconsModule } from '../../../icons/icons.module';
-import { environment } from '../../../../environments/environment';
+import { ApiServicePaymentForms } from '../../../../services/api.service.paymentForms';
+import { ApiServiceEmployees } from '../../../../services/api.service.employees';
+import { ApiServiceClients } from '../../../../services/api.service.clients';
+import { ApiServiceSalesProducts } from '../../../../services/api.service.salesProducts';
+import { AuthService } from '../../../../services/auth.service';
+import { ApiServiceInvoice } from '../../../../services/api.service.invoice';
+import { IconsModule } from '../../../../icons/icons.module';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-sales',
@@ -51,7 +51,7 @@ import { environment } from '../../../../environments/environment';
     FormsModule 
   ],
   templateUrl: './sales.component.html',
-  styleUrls: ['../../../../scss/forms.scss', '../../../../scss/buttons.scss'],
+  styleUrls: ['../../../../../scss/forms.scss', '../../../../../scss/buttons.scss'],
 })
 export class SalesComponent {
   idSaleSearch: string = '';
