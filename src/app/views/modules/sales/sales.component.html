@@ -1,13 +1,25 @@
-<!-- Botón "Añadir Producto" -->
-<div class="col-12 mb-4 d-flex justify-content-end">
-  <button
-    class="btn btn-success fw-bold d-flex align-items-center justify-content-center"
-    style="width: 100%; max-width: 200px; height: 35px; color: white"
-    (click)="addSale()"
-  >
-    <app-icons icon="plus"></app-icons>
-    <span>Añadir Venta</span>
-  </button>
+<div class="d-flex flex-column flex-md-row p-4">
+  <div class="col-12 mb-3 mb-md-0 d-flex align-items-center">
+    <input
+      type="text"
+      class="form-control me-2"
+      placeholder="Ingresa el Id de la Venta"
+      [(ngModel)]="idSaleSearch"
+      (keyup.enter)="searchSale()"
+    />
+    <button
+      class="btn btn-success fw-bold d-flex align-items-center justify-content-center btn-search"
+    >
+      <app-icons icon="search"></app-icons>
+      <span>Buscar</span>
+    </button>
+    <button
+      class="mx-3 btn btn-success fw-bold d-flex align-items-center justify-content-center btn-filter"
+      (click)="addSale()">
+      <app-icons icon="plus"></app-icons>
+      <span>Añadir Venta</span>
+    </button>
+  </div>
 </div>
 
 <!-- Datatable General Sale -->
@@ -45,7 +57,10 @@
         class="form-control"
         type="date"
       />
-      <div *ngIf="validationsFormService.isFieldInvalid(saleForm, 'date')" class="error-message">
+      <div
+        *ngIf="validationsFormService.isFieldInvalid(saleForm, 'date')"
+        class="error-message"
+      >
         {{ validationsFormService.getErrorMessage(saleForm, "date") }}
       </div>
     </div>
@@ -129,15 +144,12 @@
         (change)="clientSelected($event)"
       />
       <datalist id="clients_list">
-        <option
-          *ngFor="let client of filteredClients"
-          [value]="client.name"
-        >
+        <option *ngFor="let client of filteredClients" [value]="client.name">
           {{ client.id }} - {{ client.name }}
         </option>
       </datalist>
     </div>
-    
+
     <div class="form-group">
       <label for="emailClient">E-mail Cliente: </label>
       <input

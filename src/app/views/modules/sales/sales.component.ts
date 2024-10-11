@@ -25,6 +25,7 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
+  FormsModule
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ValidationsFormService } from 'src/app/utils/form-validations';
@@ -46,12 +47,14 @@ import { environment } from '../../../../environments/environment';
     CommonModule,
     ReactiveFormsModule,
     IconsModule,
-    RouterModule
+    RouterModule,
+    FormsModule 
   ],
   templateUrl: './sales.component.html',
   styleUrls: ['../../../../scss/forms.scss', '../../../../scss/buttons.scss'],
 })
 export class SalesComponent {
+  idSaleSearch: string = '';
   idSale: string | null = null;
   showButtonGroupSale: boolean = true;
   showButtonGroupInvoice: boolean = true;
@@ -139,13 +142,13 @@ export class SalesComponent {
 
   ngOnInit(): void {
     this.idSale = '';
-    this.route.params.subscribe(params => {
+    this.route.params.subscribe((params) => {
       this.idSale = params['idSale'] || null;
     });
 
-    if(this.idSale){
+    if (this.idSale) {
       this.getSaleById(this.idSale);
-    }else{
+    } else {
       this.getAllSales();
     }
     this.userPayload = this.authService.getDecodedToken();
@@ -153,8 +156,6 @@ export class SalesComponent {
     this.getAllPaymentsForm();
     this.getAllEmployees();
     this.getAllClients();
-
-
   }
 
   /* Get All Sales */
@@ -425,6 +426,18 @@ export class SalesComponent {
           icon: 'trash',
           title: 'Eliminar',
           action: (element: any) => this.onDelete(element),
+        },
+        {
+          class: 'btn-view-products',
+          icon: 'sharedBox',
+          title: 'Ver Productos',
+          action: (element: any) => this.onViewProducts(element),
+        },
+        {
+          class: 'btn-success',
+          icon: 'print',
+          title: 'Imprimir Ticket',
+          action: (element: any) => this.downloadPDF(element),
         }
       );
       btnsGroup.push({
@@ -883,6 +896,23 @@ export class SalesComponent {
     });
   }
 
+  /* Download Ticket */
+  downloadPDF(sale: SaleInfoComplete) {
+    const data = { salesId: sale.id };
+
+    this.apiServiceSalesProducts.downloadTicket(data).subscribe({
+      next: (response) => {
+        const blob = new Blob([response], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        window.URL.revokeObjectURL(url);
+      },
+      error: (error) => {
+        console.error('Error downloading PDF', error);
+      },
+    });
+  }
+
   cancelInvoice(credentials: CancelInvoice): void {
     this.apiServiceInvoice.cancelInvoice(credentials).subscribe({
       next: (response) => {
@@ -1000,6 +1030,18 @@ export class SalesComponent {
         this.sendInvoice(obj);
       }
     });
+  }
+
+  /* Search Sale */
+  searchSale(): void {
+    if (this.idSaleSearch) {
+      const data = {
+        id: this.idSaleSearch,
+      };
+      this.getSaleById(data.id);
+    } else {
+      this.getAllSales();
+    }
   }
 
   /* Reset Input File */
