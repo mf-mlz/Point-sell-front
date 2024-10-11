@@ -27,6 +27,13 @@ export const routes: Routes = [
         }
       },
       {
+        path: 'sales/:idSale',
+        loadComponent: () => import('./sales/sales.component').then(m => m.SalesComponent),
+        data: {
+          title: 'Ventas'
+        }
+      },
+      {
         path: 'addSale',
         loadComponent: () => import('./sales/add/add-sales.component').then(m => m.AddSalesComponent),
         data: {
