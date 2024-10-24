@@ -4,7 +4,6 @@ import {
   Inject,
   Input,
   OnInit,
-  Renderer2,
   forwardRef,
 } from '@angular/core';
 import { DOCUMENT, NgClass, CommonModule } from '@angular/common';
@@ -45,10 +44,13 @@ import {
   KeySat,
   userPayload,
   ProductFilterData,
+  RoutePermissions
 } from '../../../models/interfaces';
 import { IconsModule } from '../../../icons/icons.module';
 import { ValidationsFormService } from '../../../utils/form-validations';
 import { onKeydownScanner } from '../../../utils/scanner';
+import { PermissionsService } from 'src/app/services/permissionsService';
+
 @Component({
   templateUrl: 'products.component.html',
   styleUrls: ['../../../../scss/forms.scss', '../../../../scss/buttons.scss'],
@@ -104,16 +106,18 @@ export class ProductsComponent implements OnInit {
   classModal: string = '';
   nameFile: string = '';
   searchInput: string = '';
+  permissions!: RoutePermissions;
   public apiUpload = environment.apiUpload;
   public nameRole = environment.name_role;
-
+  
   constructor(
     @Inject(DOCUMENT) private document: Document,
-    private renderer: Renderer2,
     private apiServiceProducts: ApiServiceProducts,
     private fb: FormBuilder,
     private authService: AuthService,
-    public validationsFormService: ValidationsFormService
+    public validationsFormService: ValidationsFormService,
+    private permissionsService: PermissionsService
+
   ) {
     /* Init Form and Validations */
     this.productForm = this.fb.group({
@@ -134,6 +138,7 @@ export class ProductsComponent implements OnInit {
 
   ngOnInit(): void {
     this.userPayload = this.authService.getDecodedToken();
+    this.permissions = this.permissionsService.getPermissions();
     this.getAllProducts();
     this.getAllCategories();
     this.getAllKeySat();

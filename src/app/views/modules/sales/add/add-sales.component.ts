@@ -26,6 +26,7 @@ import {
   OpenPayPayment,
   customerOpenPay,
   userPayload,
+  RoutePermissions
 } from 'src/app/models/interfaces';
 import { ApiServicePaymentForms } from '../../../../services/api.service.paymentForms';
 import { ApiServiceSalesProducts } from 'src/app/services/api.service.salesProducts';
@@ -34,6 +35,7 @@ import { ValidationsFormService } from 'src/app/utils/form-validations';
 import { onKeydownScanner } from '../../../../utils/scanner';
 import { encrypt, decrypt } from '../../../../utils/crypto';
 import { environment } from '../../../../../environments/environment';
+import { PermissionsService } from 'src/app/services/permissionsService';
 
 @Component({
   selector: 'app-add-sales',
@@ -62,7 +64,8 @@ export class AddSalesComponent {
     private fb: FormBuilder,
     private openpayService: OpenpayService,
     private authService: AuthService,
-    public validationsFormService: ValidationsFormService
+    public validationsFormService: ValidationsFormService,
+    private permissionsService: PermissionsService
   ) {
     this.saleForm = this.fb.group({
       typePayment: ['', [Validators.required]],
@@ -84,6 +87,7 @@ export class AddSalesComponent {
     exp: 0,
   };
   public apiUpload = environment.apiUpload;
+  permissions!: RoutePermissions;
   saleForm!: FormGroup;
   paymentsForm: PaymentForm[] = [];
   filteredPaymentForms: PaymentForm[] = [];
@@ -161,6 +165,7 @@ export class AddSalesComponent {
 
   /* Functions  */
   ngOnInit(): void {
+    this.permissions = this.permissionsService.getPermissions();
     this.userPayload = this.authService.getDecodedToken();
     this.products = [];
     this.getAllPaymentsForm();

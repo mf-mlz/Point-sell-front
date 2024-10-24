@@ -1,0 +1,144 @@
+<!-- Section Filters and Add -->
+<div class="d-flex flex-column flex-md-row p-4">
+  <div class="col-12 mb-3 mb-md-0 d-flex align-items-center">
+    <input
+      type="text"
+      class="form-control me-2"
+      placeholder="Ingresa el Id Rol/Módulo"
+      [(ngModel)]="idpPermissionsSearch"
+      (keyup.enter)="searchPermissions()"
+    />
+    <button
+      class="btn btn-success fw-bold d-flex align-items-center justify-content-center btn-search"
+      (click)="searchPermissions()"
+    >
+      <app-icons icon="search"></app-icons>
+      <span>Buscar</span>
+    </button>
+    <button
+      class="mx-3 btn btn-success fw-bold d-flex align-items-center justify-content-center btn-filter"
+      (click)="onAdd()"
+      *ngIf="permissionsModule.add"
+    >
+      <app-icons icon="plus"></app-icons>
+      <span>Añadir Permiso</span>
+    </button>
+  </div>
+</div>
+
+<!-- Datatable General Permiso -->
+<app-datatable
+  [columns]="columns"
+  [data]="permissions"
+  [buttons]="buttons"
+  [showButtonGroup]="thishowButtonGroupPermissions"
+></app-datatable>
+
+<!-- Modal Component -->
+<app-modal
+  [visible]="isModalVisible"
+  (visibleChange)="handleModalVisibilityChange($event)"
+  [title]="titleModal"
+  [class]="classModal"
+  (executeFunction)="handleClick()"
+>
+  <!-- Form View || Form Edit -->
+  <form
+    [formGroup]="permissionsForm"
+    class="product-form"
+    [ngClass]="classModal"
+  >
+    <div class="form-group" *ngIf="classModal !== 'add'">
+      <label for="id">N° Permiso:</label>
+      <input
+        id="id"
+        formControlName="id"
+        class="form-control readonly-input"
+        type="text"
+        readonly
+        (keydown)="validationsFormService.preventInput($event)"
+        (input)="validationsFormService.preventInput($event)"
+      />
+      <div
+        *ngIf="validationsFormService.isFieldInvalid(permissionsForm, 'id')"
+        class="error-message"
+      >
+        {{ validationsFormService.getErrorMessage(permissionsForm, "id") }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="module">Módulo:</label>
+      <select id="module" formControlName="module" class="form-control">
+        <option value="">Selecciona una Módulo</option>
+        <option *ngFor="let item of navItems" [value]="item.name">
+          {{ item.name }}
+        </option>
+      </select>
+      <div
+        *ngIf="validationsFormService.isFieldInvalid(permissionsForm, 'module')"
+        class="error-message"
+      >
+        {{ validationsFormService.getErrorMessage(permissionsForm, "module") }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-group d-flex justify-content-evenly">
+        <label class="checkbox-container">
+          <input type="checkbox" name="permissions" formControlName="add" />
+          <span class="checkmark"></span>
+          Add </label
+        ><br />
+        <label class="checkbox-container">
+          <input type="checkbox" name="permissions" formControlName="edit" />
+          <span class="checkmark"></span>
+          Edit </label
+        ><br />
+        <label class="checkbox-container">
+          <input type="checkbox" name="permissions" formControlName="delete" />
+          <span class="checkmark"></span>
+          Delete </label
+        ><br />
+        <label class="checkbox-container">
+          <input type="checkbox" name="permissions" formControlName="view" />
+          <span class="checkmark"></span>
+          View </label
+        ><br />
+        <label class="checkbox-container">
+          <input type="checkbox" name="permissions" formControlName="access" />
+          <span class="checkmark"></span>
+          Access </label
+        ><br />
+      </div>
+      <div
+        *ngIf="
+          validationsFormService.isFieldInvalid(permissionsForm, 'permissions')
+        "
+        class="error-message"
+      >
+        {{
+          validationsFormService.getErrorMessage(permissionsForm, "permissions")
+        }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="role_id">Rol:</label>
+      <select id="role_id" formControlName="role_id" class="form-control">
+        <option value="">Selecciona un Rol</option>
+        <option *ngFor="let rol of roles" [value]="rol.id">
+          {{ rol.name }}
+        </option>
+      </select>
+      <div
+        *ngIf="
+          validationsFormService.isFieldInvalid(permissionsForm, 'role_id')
+        "
+        class="error-message"
+      >
+        {{ validationsFormService.getErrorMessage(permissionsForm, "role_id") }}
+      </div>
+    </div>
+  </form>
+</app-modal>

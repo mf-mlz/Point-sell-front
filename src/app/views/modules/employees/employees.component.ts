@@ -8,6 +8,7 @@ import {
   userPayload,
   EmployeeFilter,
   Roles,
+  RoutePermissions,
 } from 'src/app/models/interfaces';
 import { ModalComponentHtml } from '../../../modalHtml/modalhtml.component';
 import Swal from 'sweetalert2';
@@ -25,6 +26,7 @@ import { AuthService } from '../../../services/auth.service';
 import { ApiServiceRoles } from '../../../services/api.service.roles';
 import { IconsModule } from '../../../icons/icons.module';
 import { environment } from '../../../../environments/environment';
+import { PermissionsService } from 'src/app/services/permissionsService';
 
 @Component({
   selector: 'app-sales',
@@ -54,7 +56,7 @@ export class EmployeesComponent {
     iat: 0,
     exp: 0,
   };
-  
+
   employees: Employee[] = [];
   roles: Roles[] = [];
   selectedEmployee: Employee | null = null;
@@ -63,13 +65,14 @@ export class EmployeesComponent {
   titleModal: string = '';
   classModal: string = '';
   error: string | null = null;
-  private passString = environment.temporary_string;
+  permissions!: RoutePermissions;
   constructor(
     private apiServiceEmployees: ApiServiceEmployees,
     private apiServiceRoles: ApiServiceRoles,
     private authService: AuthService,
     private fb: FormBuilder,
-    public validationsFormService: ValidationsFormService
+    public validationsFormService: ValidationsFormService,
+    private permissionsService: PermissionsService
   ) {
     /* Init Form and Add Validations */
     this.employeeForm = this.fb.group({
@@ -88,9 +91,11 @@ export class EmployeesComponent {
 
   ngOnInit(): void {
     this.userPayload = this.authService.getDecodedToken();
+    this.permissions = this.permissionsService.getPermissions();
     this.generateButtons();
     this.getAllEmployees();
     this.getAllRoles();
+    
   }
 
   /* Get Employee By Id */
@@ -144,7 +149,8 @@ export class EmployeesComponent {
         });
         Toast.fire({
           icon: 'success',
-          title: response.message || `Se encontraron ${response.length} registros`,
+          title:
+            response.message || `Se encontraron ${response.length} registros`,
         });
       },
       error: (error) => {
@@ -158,7 +164,6 @@ export class EmployeesComponent {
     this.apiServiceRoles.getAllRoles().subscribe({
       next: (response) => {
         this.roles = response;
-        console.log(response);
       },
       error: (error) => {
         this.roles = [];
@@ -193,30 +198,33 @@ export class EmployeesComponent {
 
   /* Generate Btns Datatable */
   generateButtons(): void {
-    const btns: ButtonConfig[] = [
-      {
+    const btns: ButtonConfig[] = [];
+
+    if (this.permissions.view) {
+      btns.push({
         class: 'btn-view',
         icon: 'view',
         title: 'Ver',
         action: (element: any) => this.onView(element),
-      },
-    ];
+      });
+    }
 
-    if (this.userPayload.role_name === environment.name_role) {
-      btns.push(
-        {
-          class: 'btn-edit',
-          icon: 'pencil',
-          title: 'Editar',
-          action: (element: any) => this.onEdit(element),
-        },
-        {
-          class: 'btn-delete',
-          icon: 'trash',
-          title: 'Eliminar',
-          action: (element: any) => this.onDelete(element),
-        }
-      );
+    if (this.permissions.edit) {
+      btns.push({
+        class: 'btn-edit',
+        icon: 'pencil',
+        title: 'Editar',
+        action: (element: any) => this.onEdit(element),
+      });
+    }
+
+    if (this.permissions.delete) {
+      btns.push({
+        class: 'btn-delete',
+        icon: 'trash',
+        title: 'Eliminar',
+        action: (element: any) => this.onDelete(element),
+      });
     }
 
     this.buttons = btns;
@@ -333,8 +341,6 @@ export class EmployeesComponent {
           });
         },
         error: (error) => {
-          console.log(error);
-
           Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -424,7 +430,7 @@ export class EmployeesComponent {
         }
       }
     }
-    const password = this.passString + arrayPassword.join('');
+    const password = arrayPassword.join('');
     return password;
   }
 

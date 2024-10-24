@@ -17,6 +17,7 @@ import {
   CancelInvoice,
   InvoiceList,
   InvoiceSendEmail,
+  RoutePermissions,
 } from 'src/app/models/interfaces';
 import { ModalComponentHtml } from '../../../../modalHtml/modalhtml.component';
 import Swal from 'sweetalert2';
@@ -25,7 +26,7 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
-  FormsModule
+  FormsModule,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ValidationsFormService } from 'src/app/utils/form-validations';
@@ -37,6 +38,7 @@ import { AuthService } from '../../../../services/auth.service';
 import { ApiServiceInvoice } from '../../../../services/api.service.invoice';
 import { IconsModule } from '../../../../icons/icons.module';
 import { environment } from '../../../../../environments/environment';
+import { PermissionsService } from 'src/app/services/permissionsService';
 
 @Component({
   selector: 'app-sales',
@@ -48,12 +50,16 @@ import { environment } from '../../../../../environments/environment';
     ReactiveFormsModule,
     IconsModule,
     RouterModule,
-    FormsModule 
+    FormsModule,
   ],
   templateUrl: './sales.component.html',
-  styleUrls: ['../../../../../scss/forms.scss', '../../../../../scss/buttons.scss'],
+  styleUrls: [
+    '../../../../../scss/forms.scss',
+    '../../../../../scss/buttons.scss',
+  ],
 })
 export class SalesComponent {
+  permissions!: RoutePermissions;
   idSaleSearch: string = '';
   idSale: string | null = null;
   showButtonGroupSale: boolean = true;
@@ -101,7 +107,8 @@ export class SalesComponent {
     private fb: FormBuilder,
     private router: Router,
     public validationsFormService: ValidationsFormService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private permissionsService: PermissionsService
   ) {
     /* Init Form and Add Validations */
     this.saleForm = this.fb.group({
@@ -141,6 +148,7 @@ export class SalesComponent {
   buttonsInvoice: ButtonConfig[] = [];
 
   ngOnInit(): void {
+    this.permissions = this.permissionsService.getPermissions();
     this.idSale = '';
     this.route.params.subscribe((params) => {
       this.idSale = params['idSale'] || null;
@@ -390,42 +398,48 @@ export class SalesComponent {
   /* Generate Btns Datatable */
   generateButtons(): void {
     const buttonsInvoice: ButtonConfig[] = [];
-    const btnsGroup: ButtonConfig[] = [
-      {
-        class: 'btn-delete',
-        icon: 'trash',
-        title: 'Ver Facturas',
-        action: (element: any) => this.onViewInvoice(element),
-      },
-    ];
-    const btns: ButtonConfig[] = [
-      {
-        class: 'btn-view',
-        icon: 'view',
-        title: 'Ver',
-        action: (element: any) => this.onView(element),
-      },
-      {
-        class: 'btn-view-products',
-        icon: 'sharedBox',
-        title: 'Ver Productos',
-        action: (element: any) => this.onViewProducts(element),
-      },
-    ];
+    const btnsGroup: ButtonConfig[] = [];
+    const btns: ButtonConfig[] = ([] = []);
 
-    if (this.userPayload.role_name === environment.name_role) {
-      btns.push(
+    /* Btns Add */
+    if (this.permissions.add) {
+      btnsGroup.push({
+        class: 'btn-success',
+        icon: 'book',
+        title: 'Facturar',
+        action: (element: any) => this.onInvoice(element),
+      });
+    }
+
+    /* Btns View */
+    if (this.permissions.view) {
+      buttonsInvoice.push(
         {
-          class: 'btn-edit',
-          icon: 'pencil',
-          title: 'Editar',
-          action: (element: any) => this.onEdit(element),
+          class: 'btn-view',
+          icon: 'view',
+          title: 'Ver',
+          action: (element: any) => this.onView(element),
+        },
+        {
+          class: 'btn-download',
+          icon: 'download',
+          title: 'Descargar Factura',
+          action: (element: any) => this.onDownloadInvoice(element),
         },
         {
           class: 'btn-delete',
-          icon: 'trash',
-          title: 'Eliminar',
-          action: (element: any) => this.onDelete(element),
+          icon: 'email',
+          title: 'Enviar Factura Por Correo',
+          action: (element: any) => this.openSendInvoice(element),
+        }
+      );
+
+      btns.push(
+        {
+          class: 'btn-view',
+          icon: 'view',
+          title: 'Ver',
+          action: (element: any) => this.onView(element),
         },
         {
           class: 'btn-view-products',
@@ -440,32 +454,40 @@ export class SalesComponent {
           action: (element: any) => this.downloadPDF(element),
         }
       );
+
       btnsGroup.push({
-        class: 'btn-success',
-        icon: 'book',
-        title: 'Facturar',
-        action: (element: any) => this.onInvoice(element),
+        class: 'btn-delete',
+        icon: 'trash',
+        title: 'Ver Facturas',
+        action: (element: any) => this.onViewInvoice(element),
       });
-      buttonsInvoice.push(
-        {
-          class: 'btn-download',
-          icon: 'download',
-          title: 'Descargar Factura',
-          action: (element: any) => this.onDownloadInvoice(element),
-        },
-        {
-          class: 'btn-delete',
-          icon: 'trash',
-          title: 'Cancelar Factura',
-          action: (element: any) => this.onCancelInvoice(element),
-        },
-        {
-          class: 'btn-delete',
-          icon: 'email',
-          title: 'Enviar Factura Por Correo',
-          action: (element: any) => this.openSendInvoice(element),
-        }
-      );
+    }
+
+    /* Btns Delete */
+    if (this.permissions.delete) {
+      btns.push({
+        class: 'btn-delete',
+        icon: 'trash',
+        title: 'Eliminar',
+        action: (element: any) => this.onDelete(element),
+      });
+
+      buttonsInvoice.push({
+        class: 'btn-delete',
+        icon: 'trash',
+        title: 'Cancelar Factura',
+        action: (element: any) => this.onCancelInvoice(element),
+      });
+    }
+
+    /* Btns Edit */
+    if (this.permissions.edit) {
+      btns.push({
+        class: 'btn-edit',
+        icon: 'pencil',
+        title: 'Editar',
+        action: (element: any) => this.onEdit(element),
+      });
     }
 
     this.buttons = btns;

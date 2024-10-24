@@ -4,6 +4,7 @@
     <button
       class="btn btn-success fw-bold d-flex align-items-center justify-content-center"
       (click)="listSale()"
+      *ngIf="permissions.view"
     >
       <app-icons icon="list"></app-icons>
       <span>Ver Ventas</span>
@@ -150,7 +151,7 @@
           </div>
           <!-- Btn Send Sale -->
           <div class="d-flex justify-content-end">
-            <button type="submit" class="btn-view btn btn-primary">
+            <button type="submit" class="btn-view btn btn-primary" *ngIf="permissions.add">
               Generar Venta
             </button>
           </div>
