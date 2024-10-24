@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { NgScrollbar } from 'ngx-scrollbar';
 import { IconDirective } from '@coreui/icons-angular';
+import { ModulesPermissions } from 'src/app/models/interfaces';
 import {
   ContainerComponent,
   ShadowOnScrollDirective,
@@ -14,8 +15,9 @@ import {
   SidebarTogglerDirective,
 } from '@coreui/angular';
 import { DefaultFooterComponent, DefaultHeaderComponent } from './';
-import { NavService } from './_nav'; 
-import { INavData } from '@coreui/angular'; 
+import { NavService } from './_nav';
+import { INavData } from '@coreui/angular';
+import { ApiServicePermissions } from 'src/app/services/api.service.permissions';
 
 function isOverflown(element: HTMLElement) {
   return (
@@ -49,14 +51,25 @@ function isOverflown(element: HTMLElement) {
 })
 export class DefaultLayoutComponent implements OnInit {
   public navItems: INavData[] = [];
+  public navItemsPermissions: INavData[] = [];
+  public accessModule: ModulesPermissions[] = [];
 
-  constructor(private navService: NavService) {}
+  constructor(
+    private navService: NavService,
+    private apiServicePermissions: ApiServicePermissions
+  ) {}
 
   ngOnInit(): void {
-    this.navItems = this.navService.getNavItems(); 
+    this.navItems = [];
+    this.navService.generateModule().subscribe({
+      next: (items) => {
+        this.navItems = items;
+      },
+      error: (error) => {
+        console.log('Error al obtener los elementos de navegación:', error);
+      },
+    });
   }
 
-  onScrollbarUpdate($event: any) {
-    
-  }
+  onScrollbarUpdate($event: any) {}
 }
