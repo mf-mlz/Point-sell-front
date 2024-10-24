@@ -34,16 +34,15 @@ export class AuthService {
       const decryptedPayload = JSON.parse(decryptedData.toString(CryptoJS.enc.Utf8));
       return user ? decryptedPayload : null;
     }
-    
   }
 
-  
   public getPayloadEncript() {
     const data = sessionStorage.getItem('data');
     return data || null;
   }
 
   /* Remove SessionStorage => Payload */
+  /* Unsuscribe => Nav (Pendiente) */
   public clearPayloadFromSession() {
     sessionStorage.clear();
     this.cookieService.delete('token');
