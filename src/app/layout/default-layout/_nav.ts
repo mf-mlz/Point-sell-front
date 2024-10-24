@@ -2,15 +2,27 @@ import { Injectable } from '@angular/core';
 import { INavData } from '@coreui/angular';
 import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
+import { ApiServicePermissions } from 'src/app/services/api.service.permissions';
+import { ModulesPermissions } from 'src/app/models/interfaces';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NavService {
-  constructor(private authService: AuthService) {}
+  public navItems: INavData[] = [];
+  public navItemsPermissions: INavData[] = [];
 
-  getNavItems(): INavData[] {
-    
+  constructor(
+    private authService: AuthService,
+    private apiServicePermissions: ApiServicePermissions
+  ) {
+    this.navItems = [];
+  }
+
+  /* All NavItems */
+  allItems(): INavData[] {
     const navItems: INavData[] = [
       {
         name: 'Dashboard',
@@ -47,236 +59,15 @@ export class NavService {
           },
         ],
       },
-      ...(this.authService.getDecodedToken()?.role_name ===  environment.name_role ? [{
+      {
         name: 'Empleados',
         url: '/modules/employees',
         iconComponent: { name: 'cil-list' },
-      }] : []),
-      {
-        name: 'Components',
-        title: true,
       },
       {
-        name: 'Base',
-        url: '/base',
-        iconComponent: { name: 'cil-puzzle' },
-        children: [
-          {
-            name: 'Accordion',
-            url: '/base/accordion',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Breadcrumbs',
-            url: '/base/breadcrumbs',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Cards',
-            url: '/base/cards',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Carousel',
-            url: '/base/carousel',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Collapse',
-            url: '/base/collapse',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'List Group',
-            url: '/base/list-group',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Navs & Tabs',
-            url: '/base/navs',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Pagination',
-            url: '/base/pagination',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Placeholder',
-            url: '/base/placeholder',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Popovers',
-            url: '/base/popovers',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Progress',
-            url: '/base/progress',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Spinners',
-            url: '/base/spinners',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Tables',
-            url: '/base/tables',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Tabs',
-            url: '/base/tabs',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Tooltips',
-            url: '/base/tooltips',
-            icon: 'nav-icon-bullet',
-          },
-        ],
-      },
-      {
-        name: 'Buttons',
-        url: '/buttons',
-        iconComponent: { name: 'cil-cursor' },
-        children: [
-          {
-            name: 'Buttons',
-            url: '/buttons/buttons',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Button groups',
-            url: '/buttons/button-groups',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Dropdowns',
-            url: '/buttons/dropdowns',
-            icon: 'nav-icon-bullet',
-          },
-        ],
-      },
-      {
-        name: 'Forms',
-        url: '/forms',
-        iconComponent: { name: 'cil-notes' },
-        children: [
-          {
-            name: 'Form Control',
-            url: '/forms/form-control',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Select',
-            url: '/forms/select',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Checks & Radios',
-            url: '/forms/checks-radios',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Range',
-            url: '/forms/range',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Input Group',
-            url: '/forms/input-group',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Floating Labels',
-            url: '/forms/floating-labels',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Layout',
-            url: '/forms/layout',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Validation',
-            url: '/forms/validation',
-            icon: 'nav-icon-bullet',
-          },
-        ],
-      },
-      {
-        name: 'Charts',
-        iconComponent: { name: 'cil-chart-pie' },
-        url: '/charts',
-      },
-      {
-        name: 'Icons',
-        iconComponent: { name: 'cil-star' },
-        url: '/icons',
-        children: [
-          {
-            name: 'CoreUI Free',
-            url: '/icons/coreui-icons',
-            icon: 'nav-icon-bullet',
-            badge: {
-              color: 'success',
-              text: 'FREE',
-            },
-          },
-          {
-            name: 'CoreUI Flags',
-            url: '/icons/flags',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'CoreUI Brands',
-            url: '/icons/brands',
-            icon: 'nav-icon-bullet',
-          },
-        ],
-      },
-      {
-        name: 'Notifications',
-        url: '/notifications',
-        iconComponent: { name: 'cil-bell' },
-        children: [
-          {
-            name: 'Alerts',
-            url: '/notifications/alerts',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Badges',
-            url: '/notifications/badges',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Modal',
-            url: '/notifications/modal',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Toast',
-            url: '/notifications/toasts',
-            icon: 'nav-icon-bullet',
-          },
-        ],
-      },
-      {
-        name: 'Widgets',
-        url: '/widgets',
-        iconComponent: { name: 'cil-calculator' },
-        badge: {
-          color: 'info',
-          text: 'NEW',
-        },
-      },
-      {
-        title: true,
-        name: 'Extras',
+        name: 'Permisos',
+        url: '/modules/permissions',
+        iconComponent: { name: 'cil-list' },
       },
       {
         name: 'Pages',
@@ -305,19 +96,74 @@ export class NavService {
           },
         ],
       },
-      {
-        title: true,
-        name: 'Links',
-        class: 'mt-auto',
-      },
-      {
-        name: 'Docs',
-        url: 'https://coreui.io/angular/docs/5.x/',
-        iconComponent: { name: 'cil-description' },
-        attributes: { target: '_blank' },
-      },
     ];
 
     return navItems;
+  }
+
+  /* Generate Modules By Permissions */
+  generateModule(): Observable<INavData[]> {
+    /* Nav items */
+    this.navItems = this.allItems();
+
+    return new Observable((observer) => {
+      this.apiServicePermissions
+        .getModuleAccessByRole()
+        .pipe(
+          map((response) => {
+            if (response.status) {
+              /* Filter Modules */
+              for (let i = 0; i < this.navItems.length; i++) {
+                const elementModule = this.navItems[i];
+                const filterModules = response.data.filter(
+                  (module: ModulesPermissions) =>
+                    module.module === elementModule.name
+                );
+
+                if (filterModules.length > 0) {
+                  this.navItemsPermissions.push(elementModule);
+                }
+              }
+
+              /* Filter Children */
+              for (let j = 0; j < this.navItemsPermissions.length; j++) {
+                let children = this.navItemsPermissions[j].children;
+
+                if (children) {
+                  const permissionModules = response.data.map(
+                    (permission: ModulesPermissions) => permission.module
+                  );
+
+                  const filteredChildren = children.filter((child) =>
+                    permissionModules.includes(child.name)
+                  );
+
+                  this.navItemsPermissions[j].children = filteredChildren;
+                }
+              }
+
+              /* Return Modules Permissions */
+              this.navItems = this.navItemsPermissions;
+
+              /* Filter Unique Items */
+              this.navItems = this.navItems.filter(
+                (item, index, self) =>
+                  index === self.findIndex((i) => i.name === item.name)
+              );
+
+              observer.next(this.navItems);
+              observer.complete();
+            } else {
+              observer.next([]);
+              observer.complete();
+            }
+          }),
+          catchError((error) => {
+            observer.error(error);
+            return of([]);
+          })
+        )
+        .subscribe();
+    });
   }
 }
