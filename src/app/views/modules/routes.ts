@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
-import { ModuleGuard } from '../../guards/module/module.guard';
+import { PermissiosGuard } from '../../guards/permissions.guard';
+import { AuthGuard } from '../../guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -7,6 +8,7 @@ export const routes: Routes = [
     data: {
       title: 'Modules'
     },
+    canActivateChild: [AuthGuard, PermissiosGuard],
     children: [
       {
         path: '',
@@ -24,14 +26,14 @@ export const routes: Routes = [
         path: 'sales',
         loadComponent: () => import('./sales/view/sales.component').then(m => m.SalesComponent),
         data: {
-          title: 'Ventas'
+          title: 'Ver Ventas'
         }
       },
       {
         path: 'sales/:idSale',
         loadComponent: () => import('./sales/view/sales.component').then(m => m.SalesComponent),
         data: {
-          title: 'Ventas'
+          title: 'Ver Ventas'
         }
       },
       {
@@ -44,9 +46,15 @@ export const routes: Routes = [
       {
         path: 'employees',
         loadComponent: () => import('./employees/employees.component').then(m => m.EmployeesComponent),
-        canActivate: [ModuleGuard],
         data: {
           title: 'Empleados'
+        }
+      },
+      {
+        path: 'permissions',
+        loadComponent: () => import('./permissions/permissions.component').then(m => m.PermissionsComponent),
+        data: {
+          title: 'Permisos'
         }
       }
     ]
