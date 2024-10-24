@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { DefaultLayoutComponent } from './layout';
-import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -14,8 +13,6 @@ export const routes: Routes = [
     data: {
       title: 'Home'
     },
-    canActivate: [AuthGuard],
-    canActivateChild: [AuthGuard],
     children: [
       {
         path: 'dashboard',
