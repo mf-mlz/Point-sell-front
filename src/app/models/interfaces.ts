@@ -319,3 +319,42 @@ export interface Roles {
   id: number;
   name: string;
 }
+
+/* Permissions */
+export interface Permissions {
+  id?: number;
+  role_id?: string;
+  module?: string;
+  permissions?: string;
+  name_rol?: string;
+}
+
+export interface NavItem {
+  name: string;
+  url: string;
+  iconComponent: {
+    name: string;
+  };
+  badge: {
+    color: string;
+    text: string;
+  };
+  children?: NavItem[];
+}
+
+export interface objPermissionsByRole {
+  data: string;
+}
+
+export interface RoutePermissions {
+  add: boolean;
+  edit: boolean;
+  delete: boolean;
+  view: boolean;
+  access: boolean;
+}
+
+/* Modules */
+export interface ModulesPermissions {
+  module: string;
+}
