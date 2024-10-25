@@ -407,7 +407,8 @@ export class PermissionsComponent {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'Ocurrió un error al Agregar el Permiso',
+            text:
+              error.error?.error || 'Ocurrió un error al Agregar el Permiso',
           });
         },
       });
@@ -442,7 +443,10 @@ export class PermissionsComponent {
         submodules = submodules.replace(/,$/, '');
         Swal.fire({
           icon: 'info',
-          html: '<p> Si realizaste una modificación de <b>Acceso</b>, afectará a los siguientes Submódulos: </p> <b>' + submodules + '</b>',
+          html:
+            '<p> Si realizaste una modificación de <b>Acceso</b>, afectará a los siguientes Submódulos: </p> <b>' +
+            submodules +
+            '</b>',
         }).then((result) => {
           if (result.isConfirmed) {
             this.editPermissionsExecute(formValue);
@@ -473,11 +477,11 @@ export class PermissionsComponent {
           }
         });
       },
-      error: () => {
+      error: (error) => {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Ocurrió un error al Modificar el Permiso',
+          text: error.error?.error || 'Ocurrió un error al Modificar el Permiso',
         });
       },
     });
