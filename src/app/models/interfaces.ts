@@ -359,3 +359,9 @@ export interface RoutePermissions {
 export interface ModulesPermissions {
   module: string;
 }
+
+export interface ModuleAndSubmodule {
+  name: string;
+  type: string;
+  modulo?: string;
+}
