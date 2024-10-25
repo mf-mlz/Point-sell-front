@@ -327,6 +327,7 @@ export interface Permissions {
   module?: string;
   permissions?: string;
   name_rol?: string;
+  type?: string;
 }
 
 export interface NavItem {
