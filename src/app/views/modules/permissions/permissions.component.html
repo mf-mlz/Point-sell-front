@@ -68,11 +68,11 @@
     </div>
 
     <div class="form-group">
-      <label for="module">Módulo:</label>
+      <label for="module">Módulo / Submódulo:</label>
       <select id="module" formControlName="module" class="form-control">
-        <option value="">Selecciona una Módulo</option>
+        <option value="">Selecciona una Opción</option>
         <option *ngFor="let item of navItems" [value]="item.name">
-          {{ item.name }}
+          {{ item.name }} [   {{item.type}}   {{item.modulo}}  ]  
         </option>
       </select>
       <div
