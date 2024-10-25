@@ -7,7 +7,6 @@ import {
   Roles,
   Permissions,
   RoutePermissions,
-  ModuleAndSubmodule
 } from '../../../models/interfaces';
 import { ModalComponentHtml } from '../../../modalHtml/modalhtml.component';
 import Swal from 'sweetalert2';
@@ -25,8 +24,8 @@ import { ApiServiceRoles } from '../../../services/api.service.roles';
 import { IconsModule } from '../../../icons/icons.module';
 import { ApiServicePermissions } from '../../../services/api.service.permissions';
 import { NavService } from 'src/app/layout/default-layout/_nav';
+import { INavData } from '@coreui/angular';
 import { PermissionsService } from 'src/app/services/permissionsService';
-import { ApiServiceModules } from '../../../services/api.service.modules';
 
 @Component({
   selector: 'app-sales',
@@ -40,10 +39,10 @@ import { ApiServiceModules } from '../../../services/api.service.modules';
     RouterModule,
     FormsModule,
   ],
-  templateUrl: './permissions.component.html',
+  templateUrl: './modules.component.html',
   styleUrls: ['../../../../scss/forms.scss', '../../../../scss/buttons.scss'],
 })
-export class PermissionsComponent {
+export class ModulesComponent {
   idpPermissionsSearch: string = '';
   thishowButtonGroupPermissions: boolean = false;
   userPayload: userPayload = {
@@ -66,7 +65,7 @@ export class PermissionsComponent {
   classModal: string = '';
   error: string | null = null;
   permissionsModule!: RoutePermissions;
-  navItems: ModuleAndSubmodule[] = [];
+  public navItems: INavData[] = [];
   constructor(
     private apiServiceRoles: ApiServiceRoles,
     private apiServicePermissions: ApiServicePermissions,
@@ -74,8 +73,7 @@ export class PermissionsComponent {
     private fb: FormBuilder,
     public validationsFormService: ValidationsFormService,
     private navService: NavService,
-    private permissionsService: PermissionsService,
-    private apiServiceModules: ApiServiceModules
+    private permissionsService: PermissionsService
   ) {
     /* Init Form and Add Validations */
     this.permissionsForm = this.fb.group({
@@ -89,6 +87,7 @@ export class PermissionsComponent {
       delete: [false],
       view: [false],
       access: [false],
+      type: ['']
     });
   }
 
@@ -105,17 +104,30 @@ export class PermissionsComponent {
   }
 
   /* Get Routes */
-  getRoutes(): void {
-    this.apiServiceModules.allModulesAndSubmodules().subscribe({
-      next: (response) => {
-        this.navItems = response.modulesSubmodules;
-        console.log(this.navItems);
-        
-      },
-      error: (error) => {
-        this.navItems = [];
-      },
+  async getRoutes(): Promise<void> {
+    this.navItems = await this.navService.allItems();
+
+    for (let index = 0; index < this.navItems.length; index++) {
+      const element = this.navItems[index];
+      if (element.children) {
+        for (let index = 0; index < element.children.length; index++) {
+          const children = element.children[index];
+          this.navItems = [...this.navItems, children];
+        }
+      }
+    }
+
+    /* Order Nav Items By Name */
+    this.navItems = this.navItems.sort((a, b) => {
+      if (a.name && b.name) {
+        return a.name.localeCompare(b.name);
+      }
+      return a.name ? -1 : 1;
     });
+
+    /* Quit Dashboard */
+    this.navItems = this.navItems.filter(item => item.name !== 'Dashboard');
+    
   }
 
   /* Get Permission By Id */
@@ -158,7 +170,7 @@ export class PermissionsComponent {
     this.apiServicePermissions.all().subscribe({
       next: (response) => {
         this.permissions = response.permissions;
-
+        
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -251,7 +263,7 @@ export class PermissionsComponent {
 
   /* Functions Datatable Buttons -- Open Modals */
   onAdd(): void {
-    this.showModal('add', 'Añadir Permisos Generales');
+    this.showModal('add', 'Añadir Permiso');
   }
 
   onView(permissions: Permissions): void {
@@ -331,6 +343,7 @@ export class PermissionsComponent {
       delete: false,
       view: false,
       access: false,
+      type: ''
     };
 
     this.selectedPermissions = permission ? permission : defaultPermission;
@@ -350,6 +363,7 @@ export class PermissionsComponent {
       delete: permissionsArray.includes('delete'),
       view: permissionsArray.includes('view'),
       access: permissionsArray.includes('access'),
+      type: this.selectedPermissions?.type || ''
     });
 
     /* Pass => Data Modal (Class, Visible and Title) */

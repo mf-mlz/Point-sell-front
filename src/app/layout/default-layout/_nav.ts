@@ -4,8 +4,10 @@ import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
 import { ApiServicePermissions } from 'src/app/services/api.service.permissions';
 import { ModulesPermissions } from 'src/app/models/interfaces';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import * as CryptoJS from 'crypto-js';
+import { ApiServiceModules } from 'src/app/services/api.service.modules';
+import { lastValueFrom, from, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -13,157 +15,80 @@ import { catchError, map } from 'rxjs/operators';
 export class NavService {
   public navItems: INavData[] = [];
   public navItemsPermissions: INavData[] = [];
+  private secretKey = environment.secret_key;
 
   constructor(
-    private authService: AuthService,
-    private apiServicePermissions: ApiServicePermissions
+    private apiServicePermissions: ApiServicePermissions,
+    private apiServiceModules: ApiServiceModules
   ) {
     this.navItems = [];
   }
 
-  /* All NavItems */
-  allItems(): INavData[] {
-    const navItems: INavData[] = [
-      {
-        name: 'Dashboard',
-        url: '/dashboard',
-        iconComponent: { name: 'cil-speedometer' },
-        badge: {
-          color: 'info',
-          text: 'NEW',
-        },
-      },
-      {
-        title: true,
-        name: 'Módulos',
-      },
-      {
-        name: 'Productos',
-        url: '/modules/products',
-        iconComponent: { name: 'cil-list' },
-      },
-      {
-        name: 'Ventas',
-        url: '/modules/sales',
-        iconComponent: { name: 'cil-calculator' },
-        children: [
-          {
-            name: 'Ver Ventas',
-            url: '/modules/sales',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Añadir Venta',
-            url: '/modules/addSale',
-            icon: 'nav-icon-bullet',
-          },
-        ],
-      },
-      {
-        name: 'Empleados',
-        url: '/modules/employees',
-        iconComponent: { name: 'cil-list' },
-      },
-      {
-        name: 'Permisos',
-        url: '/modules/permissions',
-        iconComponent: { name: 'cil-list' },
-      },
-      {
-        name: 'Pages',
-        url: '/login',
-        iconComponent: { name: 'cil-star' },
-        children: [
-          {
-            name: 'Login',
-            url: '/login',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Register',
-            url: '/register',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Error 404',
-            url: '/404',
-            icon: 'nav-icon-bullet',
-          },
-          {
-            name: 'Error 500',
-            url: '/500',
-            icon: 'nav-icon-bullet',
-          },
-        ],
-      },
-    ];
-
-    return navItems;
+  /* All NavItems => BD */
+  async allItems(): Promise<INavData[]> {
+    const response = lastValueFrom(this.apiServiceModules.all()).then(
+      (response) => response.modules || []
+    );
+    return response;
   }
 
   /* Generate Modules By Permissions */
   generateModule(): Observable<INavData[]> {
-    /* Nav items */
-    this.navItems = this.allItems();
-
-    return new Observable((observer) => {
-      this.apiServicePermissions
-        .getModuleAccessByRole()
-        .pipe(
+    return from(this.allItems()).pipe(
+      switchMap((items) => {
+        this.navItems = items;
+        return this.apiServicePermissions.getModuleAccessByRole().pipe(
           map((response) => {
             if (response.status) {
-              /* Filter Modules */
-              for (let i = 0; i < this.navItems.length; i++) {
-                const elementModule = this.navItems[i];
-                const filterModules = response.data.filter(
+              const decryptedData = CryptoJS.AES.decrypt(
+                response.data,
+                this.secretKey
+              );
+              const decryptedModules = JSON.parse(
+                decryptedData.toString(CryptoJS.enc.Utf8)
+              );
+
+              /* Modules => Permissions */
+              this.navItemsPermissions = this.navItems.filter((elementModule) =>
+                decryptedModules.some(
                   (module: ModulesPermissions) =>
                     module.module === elementModule.name
-                );
+                )
+              );
 
-                if (filterModules.length > 0) {
-                  this.navItemsPermissions.push(elementModule);
-                }
-              }
-
-              /* Filter Children */
-              for (let j = 0; j < this.navItemsPermissions.length; j++) {
-                let children = this.navItemsPermissions[j].children;
-
-                if (children) {
-                  const permissionModules = response.data.map(
+              /* SubModules */
+              this.navItemsPermissions.forEach((module) => {
+                if (module.children) {
+                  const permissionModules = decryptedModules.map(
                     (permission: ModulesPermissions) => permission.module
                   );
 
-                  const filteredChildren = children.filter((child) =>
+                  module.children = module.children.filter((child) =>
                     permissionModules.includes(child.name)
                   );
-
-                  this.navItemsPermissions[j].children = filteredChildren;
                 }
-              }
+              });
 
-              /* Return Modules Permissions */
-              this.navItems = this.navItemsPermissions;
+              /* Filter Unique Modules */
+              this.navItems = Array.from(
+                new Set(this.navItemsPermissions.map((item) => item.name))
+              )
+                .map((name) =>
+                  this.navItemsPermissions.find((item) => item.name === name)
+                )
+                .filter((item): item is INavData => item !== undefined);
 
-              /* Filter Unique Items */
-              this.navItems = this.navItems.filter(
-                (item, index, self) =>
-                  index === self.findIndex((i) => i.name === item.name)
-              );
-
-              observer.next(this.navItems);
-              observer.complete();
+              return this.navItems;
             } else {
-              observer.next([]);
-              observer.complete();
+              return [];
             }
           }),
           catchError((error) => {
-            observer.error(error);
+            console.error(error);
             return of([]);
           })
-        )
-        .subscribe();
-    });
+        );
+      })
+    );
   }
 }

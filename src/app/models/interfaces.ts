@@ -327,6 +327,7 @@ export interface Permissions {
   module?: string;
   permissions?: string;
   name_rol?: string;
+  type?: string;
 }
 
 export interface NavItem {
@@ -357,4 +358,10 @@ export interface RoutePermissions {
 /* Modules */
 export interface ModulesPermissions {
   module: string;
+}
+
+export interface ModuleAndSubmodule {
+  name: string;
+  type: string;
+  modulo?: string;
 }
