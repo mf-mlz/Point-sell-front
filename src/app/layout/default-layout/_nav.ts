@@ -6,6 +6,7 @@ import { ApiServicePermissions } from 'src/app/services/api.service.permissions'
 import { ModulesPermissions } from 'src/app/models/interfaces';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import * as CryptoJS from 'crypto-js';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +14,7 @@ import { catchError, map } from 'rxjs/operators';
 export class NavService {
   public navItems: INavData[] = [];
   public navItemsPermissions: INavData[] = [];
+  private secretKey = environment.secret_key;
 
   constructor(
     private authService: AuthService,
@@ -28,18 +30,15 @@ export class NavService {
         name: 'Dashboard',
         url: '/dashboard',
         iconComponent: { name: 'cil-speedometer' },
-        badge: {
-          color: 'info',
-          text: 'NEW',
-        },
-      },
-      {
-        title: true,
-        name: 'Módulos',
       },
       {
         name: 'Productos',
         url: '/modules/products',
+        iconComponent: { name: 'cil-list' },
+      },
+      {
+        name: 'Módulos',
+        url: '/modules/modules',
         iconComponent: { name: 'cil-list' },
       },
       {
@@ -112,10 +111,14 @@ export class NavService {
         .pipe(
           map((response) => {
             if (response.status) {
+              /* Decrypt Data */
+              const decryptedData = CryptoJS.AES.decrypt(response.data, this.secretKey);
+              const decryptedModules = JSON.parse(decryptedData.toString(CryptoJS.enc.Utf8));
+              
               /* Filter Modules */
               for (let i = 0; i < this.navItems.length; i++) {
                 const elementModule = this.navItems[i];
-                const filterModules = response.data.filter(
+                const filterModules = decryptedModules.filter(
                   (module: ModulesPermissions) =>
                     module.module === elementModule.name
                 );
@@ -130,7 +133,7 @@ export class NavService {
                 let children = this.navItemsPermissions[j].children;
 
                 if (children) {
-                  const permissionModules = response.data.map(
+                  const permissionModules = decryptedModules.map(
                     (permission: ModulesPermissions) => permission.module
                   );
 
