@@ -104,8 +104,8 @@ export class ModulesComponent {
   }
 
   /* Get Routes */
-  getRoutes(): void {
-    this.navItems = this.navService.allItems();
+  async getRoutes(): Promise<void> {
+    this.navItems = await this.navService.allItems();
 
     for (let index = 0; index < this.navItems.length; index++) {
       const element = this.navItems[index];
