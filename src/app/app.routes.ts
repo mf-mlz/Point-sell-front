@@ -91,5 +91,12 @@ export const routes: Routes = [
       title: 'forgot Password'
     }
   },
+  {
+    path: 'resetPassword/:token',
+    loadComponent: () => import('./views/pages/resetPassword/resetPassword.component').then(m => m.ResetPasswordComponent),
+    data: {
+      title: 'Reset Password'
+    }
+  },
   { path: '**', redirectTo: 'dashboard' }
 ];

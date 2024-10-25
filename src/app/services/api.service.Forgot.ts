@@ -18,4 +18,12 @@ export class ApiServiceForgot {
     const url = `${this.apiUrl}/employees/recover`;
     return this.http.post(url, credentials, { withCredentials: true });
   }
+
+  public changePassword(credentials: {
+    token: string;
+    password: string;
+  }): Observable<any> {
+    const url = `${this.apiUrl}/employees/verification`;
+    return this.http.put(url, credentials, { withCredentials: true });
+  }
 }
