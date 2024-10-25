@@ -7,7 +7,7 @@ import {
   Roles,
   Permissions,
   RoutePermissions,
-  ModuleAndSubmodule
+  ModuleAndSubmodule,
 } from '../../../models/interfaces';
 import { ModalComponentHtml } from '../../../modalHtml/modalhtml.component';
 import Swal from 'sweetalert2';
@@ -109,8 +109,6 @@ export class PermissionsComponent {
     this.apiServiceModules.allModulesAndSubmodules().subscribe({
       next: (response) => {
         this.navItems = response.modulesSubmodules;
-        console.log(this.navItems);
-        
       },
       error: (error) => {
         this.navItems = [];
@@ -434,26 +432,25 @@ export class PermissionsComponent {
         .join(',');
       const formValue = this.permissionsForm.value;
       formValue.permissions = permissionsString;
-      this.apiServicePermissions.edit(formValue).subscribe({
-        next: (response) => {
-          Swal.fire({
-            icon: 'success',
-            title: response.message || 'Permiso Modificado con Éxito',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              this.resetFileInput();
-              this.getAllPermissions();
-            }
-          });
-        },
-        error: () => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Ocurrió un error al Modificar el Permiso',
-          });
-        },
-      });
+
+      /* Alert Children */
+      const filterChildren = this.navItems
+        .filter((module) => module.modulo === formValue.module)
+        .map((module) => module.name);
+      if (filterChildren.length > 0) {
+        let submodules = filterChildren.join(', ');
+        submodules = submodules.replace(/,$/, '');
+        Swal.fire({
+          icon: 'info',
+          html: '<p> Si realizaste una modificación de <b>Acceso</b>, afectará a los siguientes Submódulos: </p> <b>' + submodules + '</b>',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.editPermissionsExecute(formValue);
+          }
+        });
+      } else {
+        this.editPermissionsExecute(formValue);
+      }
     } else {
       Swal.fire({
         icon: 'warning',
@@ -461,6 +458,29 @@ export class PermissionsComponent {
         text: 'Por favor, ingresa correctamente la información.',
       });
     }
+  }
+
+  editPermissionsExecute(formValue: any): void {
+    this.apiServicePermissions.edit(formValue).subscribe({
+      next: (response) => {
+        Swal.fire({
+          icon: 'success',
+          title: response.message || 'Permiso Modificado con Éxito',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.resetFileInput();
+            this.getAllPermissions();
+          }
+        });
+      },
+      error: () => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un error al Modificar el Permiso',
+        });
+      },
+    });
   }
 
   deletePermissions(credentials: Permissions): void {
