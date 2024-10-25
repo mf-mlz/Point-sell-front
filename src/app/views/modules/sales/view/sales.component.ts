@@ -415,12 +415,6 @@ export class SalesComponent {
     if (this.permissions.view) {
       buttonsInvoice.push(
         {
-          class: 'btn-view',
-          icon: 'view',
-          title: 'Ver',
-          action: (element: any) => this.onView(element),
-        },
-        {
           class: 'btn-download',
           icon: 'download',
           title: 'Descargar Factura',
