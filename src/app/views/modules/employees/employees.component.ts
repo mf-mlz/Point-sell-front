@@ -240,7 +240,7 @@ export class EmployeesComponent {
   }
 
   onEdit(employee: Employee): void {
-    this.showModal('edit', 'Editar Venta', employee);
+    this.showModal('edit', 'Editar Empleado', employee);
   }
 
   onDelete(employee: Employee): void {
