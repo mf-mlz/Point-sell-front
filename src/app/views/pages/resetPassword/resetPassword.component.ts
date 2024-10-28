@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { IconDirective } from '@coreui/icons-angular';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import {
   ContainerComponent,
@@ -59,14 +59,16 @@ export class ResetPasswordComponent {
   constructor(
     private fb: FormBuilder,
     private apiServiceForgot: ApiServiceForgot,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.changePasswordForm = this.fb.group(
       {
-        token: ['', [Validators.required]],
-        pass1: ['', [Validators.required]],
-        password: ['', [Validators.required]]
-      }
+        token: [''/* , [Validators.required] */],
+        pass1: ['', [Validators.required, Validators.minLength(6)]],
+        password: ['', Validators.required]
+      },
+      { validators: this.passwordMatchValidator }
     );
     this.tkn = "";
   }
@@ -75,10 +77,17 @@ export class ResetPasswordComponent {
 
   onSubmit() {
     this.route.paramMap.subscribe(params => {
-      const token = params.get('token');
-      this.tkn = token ? decodeURIComponent(token) : '';
-      console.log(this.tkn);
-      
+      const token: string = params.get('token') ?? "";
+      if (token !== "") {
+        this.tkn = decodeURIComponent(token);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text:
+            'Falta el token',
+        });
+      }
     });
 
     /* armado */
@@ -96,18 +105,22 @@ export class ResetPasswordComponent {
         });
       }
 
-      this.apiServiceForgot.changePassword(formValue).subscribe(
-        (response) => {
+      this.apiServiceForgot.changePassword(formValue).subscribe({
+        next: (response) => {
           Swal.fire({
             icon: 'success',
             title: response.message || 'Contraseña modificada correctamente',
           }).then((result) => {
             if (result.isConfirmed) {
-              console.log('Send Success');
+
+              setTimeout(() => {
+                this.router.navigate(['/login']);
+              }, 1000);
+              
             }
           });
         },
-        (error) => {
+        error: (error) => {
           Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -115,7 +128,7 @@ export class ResetPasswordComponent {
               error.error?.message || 'Ocurrió un error al cambiar la contraseña.',
           });
         }
-      );
+      });
     } else {
       Swal.fire({
         icon: 'warning',
@@ -125,6 +138,10 @@ export class ResetPasswordComponent {
     }
   }
 
+  public passwordMatchValidator(form: FormGroup) {
+    return form.get('pass1')?.value === form.get('password')?.value
+      ? null : { 'mismatch': true };
+  }
 
   public getTkn(): string {
     return this.tkn;
