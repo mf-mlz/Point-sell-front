@@ -365,3 +365,9 @@ export interface ModuleAndSubmodule {
   type: string;
   modulo?: string;
 }
+
+/* SMS */
+export interface VerifyCodeSms {
+  code: number;
+  codeResend: string;
+}
