@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthHeaderService } from './auth-header.service';
-import { Employee, EmployeeFilter } from '../models/interfaces';
+import { Employee, EmployeeFilter, VerifyCodeSms } from '../models/interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -49,6 +49,11 @@ export class ApiServiceEmployees {
       headers: this.authHeaderService.getHeaders(),
       withCredentials: true,
     });
+  }
+
+  verifyCode(credentials: VerifyCodeSms): Observable<any> {
+    const url = `${this.apiUrl}/employees/verifyCode`;
+    return this.http.post(url, credentials, { withCredentials: true });
   }
 
   /* Get */
