@@ -25,8 +25,8 @@ import { ApiServiceEmployees } from '../../../services/api.service.employees';
 import { AuthService } from '../../../services/auth.service';
 import { ApiServiceRoles } from '../../../services/api.service.roles';
 import { IconsModule } from '../../../icons/icons.module';
-import { environment } from '../../../../environments/environment';
-import { PermissionsService } from 'src/app/services/permissionsService';
+import { PermissionsService } from 'src/app/services/permissions.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-sales',
@@ -72,7 +72,8 @@ export class EmployeesComponent {
     private authService: AuthService,
     private fb: FormBuilder,
     public validationsFormService: ValidationsFormService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private userService: UserService
   ) {
     /* Init Form and Add Validations */
     this.employeeForm = this.fb.group({
@@ -89,14 +90,13 @@ export class EmployeesComponent {
   /* Buttons Datatable */
   buttons: ButtonConfig[] = [];
 
-  ngOnInit(): void {
-    this.userPayload = this.authService.getDecodedToken();
+  async ngOnInit(): Promise<void> {
     this.permissions = this.permissionsService.getPermissions();
     this.generateButtons();
     this.getAllEmployees();
     this.getAllRoles();
-    
   }
+
 
   /* Get Employee By Id */
   getEmployeeById(employee: EmployeeFilter): void {
@@ -200,7 +200,7 @@ export class EmployeesComponent {
   generateButtons(): void {
     const btns: ButtonConfig[] = [];
 
-    if (this.permissions.view) {
+    if (this.permissions && this.permissions.view) {
       btns.push({
         class: 'btn-view',
         icon: 'view',
@@ -209,7 +209,7 @@ export class EmployeesComponent {
       });
     }
 
-    if (this.permissions.edit) {
+    if (this.permissions && this.permissions.edit) {
       btns.push({
         class: 'btn-edit',
         icon: 'pencil',
@@ -218,7 +218,7 @@ export class EmployeesComponent {
       });
     }
 
-    if (this.permissions.delete) {
+    if (this.permissions && this.permissions.delete) {
       btns.push({
         class: 'btn-delete',
         icon: 'trash',

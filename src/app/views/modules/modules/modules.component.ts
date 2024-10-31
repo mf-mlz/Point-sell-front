@@ -25,7 +25,8 @@ import { IconsModule } from '../../../icons/icons.module';
 import { ApiServicePermissions } from '../../../services/api.service.permissions';
 import { NavService } from 'src/app/layout/default-layout/_nav';
 import { INavData } from '@coreui/angular';
-import { PermissionsService } from 'src/app/services/permissionsService';
+import { PermissionsService } from 'src/app/services/permissions.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-sales',
@@ -73,7 +74,8 @@ export class ModulesComponent {
     private fb: FormBuilder,
     public validationsFormService: ValidationsFormService,
     private navService: NavService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private userService: UserService
   ) {
     /* Init Form and Add Validations */
     this.permissionsForm = this.fb.group({
@@ -87,15 +89,14 @@ export class ModulesComponent {
       delete: [false],
       view: [false],
       access: [false],
-      type: ['']
+      type: [''],
     });
   }
 
   /* Buttons Datatable */
   buttons: ButtonConfig[] = [];
 
-  ngOnInit(): void {
-    this.userPayload = this.authService.getDecodedToken();
+  async ngOnInit(): Promise<void> {
     this.permissionsModule = this.permissionsService.getPermissions();
     this.generateButtons();
     this.getAllPermissions();
@@ -126,8 +127,7 @@ export class ModulesComponent {
     });
 
     /* Quit Dashboard */
-    this.navItems = this.navItems.filter(item => item.name !== 'Dashboard');
-    
+    this.navItems = this.navItems.filter((item) => item.name !== 'Dashboard');
   }
 
   /* Get Permission By Id */
@@ -170,7 +170,7 @@ export class ModulesComponent {
     this.apiServicePermissions.all().subscribe({
       next: (response) => {
         this.permissions = response.permissions;
-        
+
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -231,7 +231,7 @@ export class ModulesComponent {
   generateButtons(): void {
     const btns: ButtonConfig[] = [];
 
-    if (this.permissionsModule.view) {
+    if (this.permissionsModule && this.permissionsModule.view) {
       btns.push({
         class: 'btn-view',
         icon: 'view',
@@ -240,7 +240,7 @@ export class ModulesComponent {
       });
     }
 
-    if (this.permissionsModule.edit) {
+    if (this.permissionsModule && this.permissionsModule.edit) {
       btns.push({
         class: 'btn-edit',
         icon: 'pencil',
@@ -249,7 +249,7 @@ export class ModulesComponent {
       });
     }
 
-    if (this.permissionsModule.delete) {
+    if (this.permissionsModule && this.permissionsModule.delete) {
       btns.push({
         class: 'btn-delete',
         icon: 'trash',
@@ -343,7 +343,7 @@ export class ModulesComponent {
       delete: false,
       view: false,
       access: false,
-      type: ''
+      type: '',
     };
 
     this.selectedPermissions = permission ? permission : defaultPermission;
@@ -363,7 +363,7 @@ export class ModulesComponent {
       delete: permissionsArray.includes('delete'),
       view: permissionsArray.includes('view'),
       access: permissionsArray.includes('access'),
-      type: this.selectedPermissions?.type || ''
+      type: this.selectedPermissions?.type || '',
     });
 
     /* Pass => Data Modal (Class, Visible and Title) */

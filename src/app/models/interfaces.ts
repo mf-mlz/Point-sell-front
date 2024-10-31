@@ -344,7 +344,8 @@ export interface NavItem {
 }
 
 export interface objPermissionsByRole {
-  data: string;
+  module: string;
+  role: string;
 }
 
 export interface RoutePermissions {
@@ -370,4 +371,5 @@ export interface ModuleAndSubmodule {
 export interface VerifyCodeSms {
   code: number;
   codeResend: string;
+  data: string;
 }

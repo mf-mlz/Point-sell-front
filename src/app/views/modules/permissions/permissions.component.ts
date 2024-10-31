@@ -25,8 +25,9 @@ import { ApiServiceRoles } from '../../../services/api.service.roles';
 import { IconsModule } from '../../../icons/icons.module';
 import { ApiServicePermissions } from '../../../services/api.service.permissions';
 import { NavService } from 'src/app/layout/default-layout/_nav';
-import { PermissionsService } from 'src/app/services/permissionsService';
+import { PermissionsService } from 'src/app/services/permissions.service';
 import { ApiServiceModules } from '../../../services/api.service.modules';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-sales',
@@ -75,7 +76,8 @@ export class PermissionsComponent {
     public validationsFormService: ValidationsFormService,
     private navService: NavService,
     private permissionsService: PermissionsService,
-    private apiServiceModules: ApiServiceModules
+    private apiServiceModules: ApiServiceModules,
+    private userService: UserService
   ) {
     /* Init Form and Add Validations */
     this.permissionsForm = this.fb.group({
@@ -95,8 +97,7 @@ export class PermissionsComponent {
   /* Buttons Datatable */
   buttons: ButtonConfig[] = [];
 
-  ngOnInit(): void {
-    this.userPayload = this.authService.getDecodedToken();
+  async ngOnInit(): Promise<void> {
     this.permissionsModule = this.permissionsService.getPermissions();
     this.generateButtons();
     this.getAllPermissions();
@@ -217,7 +218,7 @@ export class PermissionsComponent {
   generateButtons(): void {
     const btns: ButtonConfig[] = [];
 
-    if (this.permissionsModule.view) {
+    if (this.permissionsModule && this.permissionsModule.view) {
       btns.push({
         class: 'btn-view',
         icon: 'view',
@@ -226,7 +227,7 @@ export class PermissionsComponent {
       });
     }
 
-    if (this.permissionsModule.edit) {
+    if (this.permissionsModule && this.permissionsModule.edit) {
       btns.push({
         class: 'btn-edit',
         icon: 'pencil',
@@ -235,7 +236,7 @@ export class PermissionsComponent {
       });
     }
 
-    if (this.permissionsModule.delete) {
+    if (this.permissionsModule && this.permissionsModule.delete) {
       btns.push({
         class: 'btn-delete',
         icon: 'trash',

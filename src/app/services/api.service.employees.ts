@@ -73,6 +73,22 @@ export class ApiServiceEmployees {
     });
   }
 
+  getDataSession(): Observable<any> {
+    const url = `${this.apiUrl}/employees/getDataSession`;
+    return this.http.get(url, {
+      headers: this.authHeaderService.getHeaders(),
+      withCredentials: true,
+    });
+  }
+
+  getModulesSession(): Observable<any> {
+    const url = `${this.apiUrl}/employees/getModulesSession`;
+    return this.http.get(url, {
+      headers: this.authHeaderService.getHeaders(),
+      withCredentials: true,
+    });
+  }
+
   /* Put */
   editEmployee(credentials: Employee): Observable<any> {
     const url = `${this.apiUrl}/employees/edit`;

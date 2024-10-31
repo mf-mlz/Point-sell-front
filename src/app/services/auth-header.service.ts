@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
-import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthHeaderService {
-  constructor(private authService: AuthService) {}
+  constructor() {}
 
   getHeaders(): HttpHeaders {
-    const data = this.authService.getPayloadEncript();
+    const data = sessionStorage.getItem('session-employee');
     if (data) {
       return new HttpHeaders({ 'session-employee': data });
     }

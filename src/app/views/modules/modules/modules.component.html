@@ -18,7 +18,7 @@
     <button
       class="mx-3 btn btn-success fw-bold d-flex align-items-center justify-content-center btn-filter"
       (click)="onAdd()"
-      *ngIf="permissionsModule.add"
+      *ngIf="permissionsModule && permissionsModule.add"
     >
       <app-icons icon="plus"></app-icons>
       <span>Añadir Permiso</span>
