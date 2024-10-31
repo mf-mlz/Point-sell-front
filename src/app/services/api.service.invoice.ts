@@ -19,7 +19,7 @@ export class ApiServiceInvoice {
   createInvoice(credentials: {
     customer: Number;
     id_sale: Number;
-    id_employee: Number;
+    employee: string;
   }): Observable<any> {
     const url = `${this.apiUrl}/invoices/create`;
     return this.http.post(url, credentials, {
@@ -39,7 +39,7 @@ export class ApiServiceInvoice {
 
   cancelInvoice(credentials: {
     id_invoice: string;
-    id_employee: number;
+    employee: string;
     motive: string;
   }): Observable<any> {
     const url = `${this.apiUrl}/invoices/cancel`;

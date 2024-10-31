@@ -548,7 +548,7 @@ export class AddSalesComponent {
         const objData = {
           date: this.saleForm.value.date,
           payment: this.saleForm.value.payment,
-          employeesId: this.userPayload.id,
+          employees: this.userPayload.name,
           total: this.saleForm.value.total,
           typePayment: this.saleForm.value.typePayment,
           products: this.products,

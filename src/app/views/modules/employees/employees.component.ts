@@ -358,6 +358,13 @@ export class EmployeesComponent {
   }
 
   editEmployee(): void {
+    Object.keys(this.employeeForm.controls).forEach(key => {
+      const controlErrors = this.employeeForm.get(key)?.errors;
+      if (controlErrors) {
+        console.log(`Errores en el control ${key}:`, controlErrors);
+      }
+    });
+    
     if (this.employeeForm.valid) {
       const formValue = this.employeeForm.value;
       this.apiServiceEmployees.editEmployee(formValue).subscribe({

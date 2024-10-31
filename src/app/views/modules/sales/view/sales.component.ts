@@ -552,7 +552,7 @@ export class SalesComponent {
           const obj: Invoice = {
             customer: sale.customerId,
             id_sale: sale.id,
-            id_employee: this.userPayload.id,
+            employee: this.userPayload.name,
           };
           this.createInvoice(obj);
         }
@@ -1005,7 +1005,7 @@ export class SalesComponent {
       if (result.isConfirmed) {
         const motivo = result.value;
         const obj: CancelInvoice = {
-          id_employee: this.userPayload.id,
+          employee: this.userPayload.name,
           id_invoice: invoice.id_invoice,
           motive: motivo,
         };
