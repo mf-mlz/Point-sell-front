@@ -26,6 +26,7 @@ import { ApiServiceRoles } from '../../../services/api.service.roles';
 import { IconsModule } from '../../../icons/icons.module';
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { SwalService } from 'src/app/services/swal.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-sales',
@@ -65,6 +66,7 @@ export class EmployeesComponent {
   classModal: string = '';
   error: string | null = null;
   permissions!: RoutePermissions;
+  temporaryString: string | null = environment.temporary_string;
   constructor(
     private apiServiceEmployees: ApiServiceEmployees,
     private apiServiceRoles: ApiServiceRoles,
@@ -294,7 +296,7 @@ export class EmployeesComponent {
     if (this.employeeForm.valid) {
       let formValue = this.employeeForm.value;
       const temporaryPassword = this.createTemporaryPassword(formValue);
-      formValue.password = temporaryPassword;
+      formValue.password = this.temporaryString + temporaryPassword;
       this.apiServiceEmployees.registerEmployee(formValue).subscribe({
         next: (response) => {
           Swal.fire({
@@ -302,8 +304,8 @@ export class EmployeesComponent {
             title:
               `<strong>${response.message}</strong>` ||
               '<strong> Empleado Agregado con Éxito </strong>',
-            html: `Por favor, proporcionale al Empleado su Contraseña Temporal: <br><br><b> ${temporaryPassword} </b><br><br>
-                  Para cambiar la contraseña es necesario ingresar al Sistema y dar clic en el apartado <br><br><strong> Cambiar Contraseña </strong>`,
+            html: `Por favor, proporcionale al Empleado su Contraseña Temporal: <br><br><b> ${formValue.password} </b><br><br>
+                  Ingresando por primera vez al Sistema, se le enviará un mensaje al correo: ${formValue.email} para realizar el cambio de contraseña.`,
           }).then((result) => {
             if (result.isConfirmed) {
               this.resetFileInput();
