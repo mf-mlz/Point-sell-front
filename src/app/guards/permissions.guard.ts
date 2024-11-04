@@ -34,7 +34,7 @@ export const PermissiosGuard: CanActivateFn = async (route, state) => {
         swalService.showToast(
           'error',
           '¡Acceso Denegado!',
-          `<b>No Cuentas con Permisos para Acceder al Módulo [ ${data.module} ]`
+          `No Cuentas con Permisos para Acceder al Módulo [ ${data.module} ]`
         );
         return false;
       }
