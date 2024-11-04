@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
-import { loginUserEncrypt } from '../models/interfaces';
-import { environment } from '../../environments/environment';
 import { ApiServiceLogout } from './api.service.logout';
 import Swal from 'sweetalert2';
+import { SwalService } from './swal.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private cookieService: CookieService, private apiServiceLogout:ApiServiceLogout) {}
-
+  constructor(
+    private cookieService: CookieService,
+    private apiServiceLogout: ApiServiceLogout,
+    private swalService: SwalService
+  ) {}
 
   /* Remove SessionStorage => Payload */
   /* Unsuscribe => Nav (Pendiente) */
@@ -21,30 +23,15 @@ export class AuthService {
     /* Clear Cookie => Backend */
     this.apiServiceLogout.logout().subscribe({
       next: (response) => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: 'success',
-          title: response.message,
-        });
+        this.swalService.showToast('success', response.message, '');
       },
       error: (error) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: error.error?.message || 'Ocurrió un Error',
-        });
+        this.swalService.showToast(
+          'error',
+          'Error',
+          error.error?.message || 'Ocurrió un Error'
+        );
       },
     });
-
   }
 }

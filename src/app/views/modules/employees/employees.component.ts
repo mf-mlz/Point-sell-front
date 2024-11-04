@@ -22,11 +22,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { ValidationsFormService } from 'src/app/utils/form-validations';
 import { ApiServiceEmployees } from '../../../services/api.service.employees';
-import { AuthService } from '../../../services/auth.service';
 import { ApiServiceRoles } from '../../../services/api.service.roles';
 import { IconsModule } from '../../../icons/icons.module';
 import { PermissionsService } from 'src/app/services/permissions.service';
-import { UserService } from 'src/app/services/user.service';
+import { SwalService } from 'src/app/services/swal.service';
 
 @Component({
   selector: 'app-sales',
@@ -69,11 +68,10 @@ export class EmployeesComponent {
   constructor(
     private apiServiceEmployees: ApiServiceEmployees,
     private apiServiceRoles: ApiServiceRoles,
-    private authService: AuthService,
     private fb: FormBuilder,
     public validationsFormService: ValidationsFormService,
     private permissionsService: PermissionsService,
-    private userService: UserService
+    private swalService: SwalService
   ) {
     /* Init Form and Add Validations */
     this.employeeForm = this.fb.group({
@@ -97,36 +95,20 @@ export class EmployeesComponent {
     this.getAllRoles();
   }
 
-
   /* Get Employee By Id */
   getEmployeeById(employee: EmployeeFilter): void {
     this.apiServiceEmployees.filter(employee).subscribe({
       next: (response) => {
         this.employees = response.employee;
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: true,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: 'success',
-          title: response.message,
-        });
+        this.swalService.showToast('success', response.message, '');
       },
       error: (error) => {
         this.employees = [];
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text:
-            error.error?.message || 'Ocurrió un Error al Obtener los Empleados',
-        });
+        this.swalService.showToast(
+          'error',
+          'Error',
+          error.error?.message || 'Ocurrió un Error al Obtener los Empleados'
+        );
       },
     });
   }
@@ -136,22 +118,11 @@ export class EmployeesComponent {
     this.apiServiceEmployees.allEmployees().subscribe({
       next: (response) => {
         this.employees = response;
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: true,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: 'success',
-          title:
-            response.message || `Se encontraron ${response.length} registros`,
-        });
+        this.swalService.showToast(
+          'success',
+          response.message || `Se encontraron ${response.length} registros`,
+          ''
+        );
       },
       error: (error) => {
         this.employees = [];
@@ -358,13 +329,13 @@ export class EmployeesComponent {
   }
 
   editEmployee(): void {
-    Object.keys(this.employeeForm.controls).forEach(key => {
+    Object.keys(this.employeeForm.controls).forEach((key) => {
       const controlErrors = this.employeeForm.get(key)?.errors;
       if (controlErrors) {
         console.log(`Errores en el control ${key}:`, controlErrors);
       }
     });
-    
+
     if (this.employeeForm.valid) {
       const formValue = this.employeeForm.value;
       this.apiServiceEmployees.editEmployee(formValue).subscribe({

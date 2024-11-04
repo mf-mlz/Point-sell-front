@@ -19,14 +19,13 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ValidationsFormService } from '../../../../../src/app/utils/form-validations';
-import { AuthService } from '../../../services/auth.service';
 import { ApiServiceRoles } from '../../../services/api.service.roles';
 import { IconsModule } from '../../../icons/icons.module';
 import { ApiServicePermissions } from '../../../services/api.service.permissions';
 import { NavService } from 'src/app/layout/default-layout/_nav';
 import { INavData } from '@coreui/angular';
 import { PermissionsService } from 'src/app/services/permissions.service';
-import { UserService } from 'src/app/services/user.service';
+import { SwalService } from 'src/app/services/swal.service';
 
 @Component({
   selector: 'app-sales',
@@ -70,12 +69,11 @@ export class ModulesComponent {
   constructor(
     private apiServiceRoles: ApiServiceRoles,
     private apiServicePermissions: ApiServicePermissions,
-    private authService: AuthService,
     private fb: FormBuilder,
     public validationsFormService: ValidationsFormService,
     private navService: NavService,
     private permissionsService: PermissionsService,
-    private userService: UserService
+    private swalService: SwalService
   ) {
     /* Init Form and Add Validations */
     this.permissionsForm = this.fb.group({
@@ -135,32 +133,20 @@ export class ModulesComponent {
     this.apiServicePermissions.filter(permission).subscribe({
       next: (response) => {
         this.permissions = response.permissions;
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: true,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: 'success',
-          title:
-            response.message ||
+        this.swalService.showToast(
+          'success',
+          response.message ||
             `Se encontraron  ${response.permissions.length} registros`,
-        });
+          ''
+        );
       },
       error: (error) => {
         this.permissions = [];
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text:
-            error.error?.message || 'Ocurrió un Error al Obtener los Permisos',
-        });
+        this.swalService.showToast(
+          'error',
+          'Error',
+          error.error?.message || 'Ocurrió un Error al Obtener los Permisos'
+        );
       },
     });
   }
@@ -171,23 +157,12 @@ export class ModulesComponent {
       next: (response) => {
         this.permissions = response.permissions;
 
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: true,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: 'success',
-          title:
-            response.message ||
+        this.swalService.showToast(
+          'success',
+          response.message ||
             `Se encontraron ${response.permissions.length} registros`,
-        });
+          ''
+        );
       },
       error: (error) => {
         this.permissions = [];
@@ -274,21 +249,11 @@ export class ModulesComponent {
     if (permissions.module !== 'Dashboard') {
       this.showModal('edit', 'Editar Permiso', permissions);
     } else {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: true,
-        timer: 2000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        },
-      });
-      Toast.fire({
-        icon: 'error',
-        title: 'No se pueden editar los permisos del Módulo Principal',
-      });
+      this.swalService.showToast(
+        'error',
+        'No se pueden editar los permisos del Módulo Principal',
+        ''
+      );
     }
   }
 
@@ -312,21 +277,11 @@ export class ModulesComponent {
         }
       });
     } else {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: true,
-        timer: 2000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        },
-      });
-      Toast.fire({
-        icon: 'error',
-        title: 'No se pueden eliminar los permisos del Módulo Principal',
-      });
+      this.swalService.showToast(
+        'error',
+        'No se pueden eliminar los permisos del Módulo Principal',
+        ''
+      );
     }
   }
 

@@ -37,6 +37,7 @@ import { encrypt, decrypt } from '../../../../utils/crypto';
 import { environment } from '../../../../../environments/environment';
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { UserService } from 'src/app/services/user.service';
+import { SwalService } from 'src/app/services/swal.service';
 
 @Component({
   selector: 'app-add-sales',
@@ -64,10 +65,10 @@ export class AddSalesComponent {
     private apiServiceSales: ApiServiceSales,
     private fb: FormBuilder,
     private openpayService: OpenpayService,
-    private authService: AuthService,
     public validationsFormService: ValidationsFormService,
     private permissionsService: PermissionsService,
-    private userService: UserService
+    private userService: UserService,
+    private swalService: SwalService
   ) {
     this.saleForm = this.fb.group({
       typePayment: ['', [Validators.required]],
@@ -220,21 +221,11 @@ export class AddSalesComponent {
       };
       this.searchProduct(data);
     } else {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: true,
-        timer: 2000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        },
-      });
-      Toast.fire({
-        icon: 'error',
-        title: 'Ingresa la Clave de un Producto para Ingresarlo a la Venta',
-      });
+      this.swalService.showToast(
+        'error',
+        'Ingresa la Clave de un Producto para Ingresarlo a la Venta',
+        ''
+      );
     }
   }
 
@@ -246,39 +237,19 @@ export class AddSalesComponent {
         } else if (response.product.length > 1) {
           this.openSwalMultipleProducts(response.product);
         } else {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: true,
-            timer: 2000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.onmouseenter = Swal.stopTimer;
-              toast.onmouseleave = Swal.resumeTimer;
-            },
-          });
-          Toast.fire({
-            icon: 'error',
-            title: `El Producto ${data.code} No Existe`,
-          });
+          this.swalService.showToast(
+            'error',
+            `El Producto ${data.code} No Existe`,
+            ''
+          );
         }
       },
       error: (error) => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: true,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: 'error',
-          title: 'Ocurrió un error al Obtener el Producto',
-        });
+        this.swalService.showToast(
+          'error',
+          'Ocurrió un error al Obtener el Producto',
+          ''
+        );
       },
     });
   }

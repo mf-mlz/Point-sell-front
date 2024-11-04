@@ -40,6 +40,7 @@ import { IconsModule } from '../../../../icons/icons.module';
 import { environment } from '../../../../../environments/environment';
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { UserService } from 'src/app/services/user.service';
+import { SwalService } from 'src/app/services/swal.service';
 
 @Component({
   selector: 'app-sales',
@@ -104,7 +105,7 @@ export class SalesComponent {
     private apiServiceClients: ApiServiceClients,
     private apiServiceSalesProducts: ApiServiceSalesProducts,
     private apiServiceInvoice: ApiServiceInvoice,
-    private authService: AuthService,
+    private swalService: SwalService,
     private fb: FormBuilder,
     private router: Router,
     public validationsFormService: ValidationsFormService,
@@ -172,30 +173,19 @@ export class SalesComponent {
     this.apiServiceSales.getAllSales().subscribe({
       next: (response) => {
         this.sales = response;
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: true,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: 'success',
-          title: 'Se encontraron ' + response.length + ' ventas',
-        });
+        this.swalService.showToast(
+          'success',
+          'Se encontraron ' + response.length + ' ventas',
+          ''
+        );
       },
       error: (error) => {
         this.sales = [];
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text:
-            error.error?.message || 'Ocurrió un Error al Obtener las Ventas',
-        });
+        this.swalService.showToast(
+          'error',
+          'Error',
+          error.error?.message || 'Ocurrió un Error al Obtener las Ventas'
+        );
       },
     });
   }
@@ -205,21 +195,11 @@ export class SalesComponent {
     this.apiServiceSales.getSaleById(idSale).subscribe({
       next: (response) => {
         this.sales = response;
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: true,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: 'success',
-          title: 'Se encontraron ' + response.length + ' ventas',
-        });
+        this.swalService.showToast(
+          'success',
+          'Se encontraron ' + response.length + ' ventas',
+          ''
+        );
       },
       error: (error) => {
         this.sales = [];
