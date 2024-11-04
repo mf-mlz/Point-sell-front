@@ -1,0 +1,156 @@
+<!-- Section Filters and Add -->
+<div class="d-flex flex-column flex-md-row p-4  ">
+    <div class="col-12 mb-3 mb-md-0 d-flex align-items-center justify-content-end">
+      <button
+        class="mx-3 btn btn-success fw-bold d-flex align-items-center justify-content-center btn-filter"
+        (click)="onAdd()"
+        *ngIf="permissions && permissions.add"
+      >
+        <app-icons icon="plus"></app-icons>
+        <span>Añadir Empleado</span>
+      </button>
+    </div>
+  </div>
+
+
+
+
+<!-- Datatable General Employee -->
+<app-datatable
+  [columns]="columns"
+  [data]="clients"
+  [buttons]="buttons"
+  [showButtonGroup]="showButtonGroupClient"
+></app-datatable>
+
+
+<!-- Modal Component -->
+<app-modal
+  [visible]="isModalVisible"
+  (visibleChange)="handleModalVisibilityChange($event)"
+  [title]="titleModal"
+  [class]="classModal"
+  (executeFunction)="handleClick()"
+>
+  <!-- Form View || Form Edit -->
+  <form [formGroup]="clientForm" class="product-form" [ngClass]="classModal">
+    <div class="form-group" *ngIf="classModal !== 'add'">
+      <label for="id">N° Cliente:</label>
+      <input
+        id="id"
+        formControlName="id"
+        class="form-control readonly-input"
+        type="text"
+        readonly
+        (keydown)="validationsFormService.preventInput($event)"
+        (input)="validationsFormService.preventInput($event)"
+      />
+      <div
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'id')"
+        class="error-message"
+      >
+        {{ validationsFormService.getErrorMessage(clientForm, "id") }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="name">Nombre:</label>
+      <input
+        id="name"
+        formControlName="name"
+        class="form-control"
+        type="text"
+      />
+      <div
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'name')"
+        class="error-message"
+      >
+        {{ validationsFormService.getErrorMessage(clientForm, "name") }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">E-mail:</label>
+      <input
+        id="email"
+        formControlName="email"
+        class="form-control"
+        type="email"
+      />
+      <div
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'email')"
+        class="error-message"
+      >
+        {{ validationsFormService.getErrorMessage(clientForm, "email") }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="phone">Télefono:</label>
+      <input
+        id="phone"
+        formControlName="phone"
+        class="form-control"
+        type="phone"
+      />
+      <div
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'phone')"
+        class="error-message"
+      >
+        {{ validationsFormService.getErrorMessage(clientForm, "phone") }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="address">Dirección:</label>
+      <input
+        id="address"
+        formControlName="address"
+        class="form-control"
+        type="text"
+      />
+      <div
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'address')"
+        class="error-message"
+      >
+        {{ validationsFormService.getErrorMessage(clientForm, "address") }}
+      </div>
+    </div>
+    <!-- tax_id	tax_system -->
+    <div class="form-group">
+        <label for="tax_id">tax id:</label>
+        <input
+          id="tax_id"
+          formControlName="tax_id"
+          class="form-control"
+          type="text"
+        />
+        <div
+          *ngIf="validationsFormService.isFieldInvalid(clientForm, 'tax_id')"
+          class="error-message"
+        >
+          {{ validationsFormService.getErrorMessage(clientForm, "tax_id") }}
+        </div>
+      </div>
+
+
+
+      <div class="form-group">
+          <label for="tax_system">tax system:</label>
+          <input
+            id="tax_system"
+            formControlName="tax_system"
+            class="form-control"
+            type="text"
+          />
+          <div
+            *ngIf="validationsFormService.isFieldInvalid(clientForm, 'tax_system')"
+            class="error-message"
+          >
+            {{ validationsFormService.getErrorMessage(clientForm, "tax_system") }}
+          </div>
+        </div>
+
+  </form>
+</app-modal>
+

@@ -63,6 +63,13 @@ export const routes: Routes = [
         data: {
           title: 'Permisos'
         }
+      },
+      {
+        path: 'clients',
+        loadComponent: () => import('./clients/clients.component').then(m => m.ClientsComponent),
+        data: {
+          title: 'Clientes'
+        }
       }
     ]
   }
