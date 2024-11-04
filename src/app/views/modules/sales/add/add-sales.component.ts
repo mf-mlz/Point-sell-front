@@ -26,7 +26,7 @@ import {
   OpenPayPayment,
   customerOpenPay,
   userPayload,
-  RoutePermissions
+  RoutePermissions,
 } from 'src/app/models/interfaces';
 import { ApiServicePaymentForms } from '../../../../services/api.service.paymentForms';
 import { ApiServiceSalesProducts } from 'src/app/services/api.service.salesProducts';
@@ -35,7 +35,8 @@ import { ValidationsFormService } from 'src/app/utils/form-validations';
 import { onKeydownScanner } from '../../../../utils/scanner';
 import { encrypt, decrypt } from '../../../../utils/crypto';
 import { environment } from '../../../../../environments/environment';
-import { PermissionsService } from 'src/app/services/permissionsService';
+import { PermissionsService } from 'src/app/services/permissions.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-add-sales',
@@ -65,7 +66,8 @@ export class AddSalesComponent {
     private openpayService: OpenpayService,
     private authService: AuthService,
     public validationsFormService: ValidationsFormService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private userService: UserService
   ) {
     this.saleForm = this.fb.group({
       typePayment: ['', [Validators.required]],
@@ -164,9 +166,9 @@ export class AddSalesComponent {
   ];
 
   /* Functions  */
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    this.userPayload = await this.userService.getUser();
     this.permissions = this.permissionsService.getPermissions();
-    this.userPayload = this.authService.getDecodedToken();
     this.products = [];
     this.getAllPaymentsForm();
     this.initForm();
@@ -545,9 +547,8 @@ export class AddSalesComponent {
         /* Sale Information Valid */
         const objData = {
           date: this.saleForm.value.date,
-          // customerId: this.userPayload.id,
           payment: this.saleForm.value.payment,
-          employeesId: this.userPayload.id,
+          employees: this.userPayload.name,
           total: this.saleForm.value.total,
           typePayment: this.saleForm.value.typePayment,
           products: this.products,
@@ -763,7 +764,7 @@ export class AddSalesComponent {
 
   /* Download Ticket */
   downloadPDF(idSale: number) {
-    const data = { salesId: idSale }; 
+    const data = { salesId: idSale };
 
     this.apiServiceSalesProducts.downloadTicket(data).subscribe({
       next: (response) => {

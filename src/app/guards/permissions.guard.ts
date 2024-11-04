@@ -2,38 +2,25 @@ import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import * as CryptoJS from 'crypto-js';
 import { ApiServicePermissions } from '../services/api.service.permissions';
-import { AuthService } from '../services/auth.service';
-import { environment } from 'src/environments/environment';
+import { UserService } from '../services/user.service';
 import { objPermissionsByRole } from '../models/interfaces';
-import { PermissionsService } from '../services/permissionsService';
+import { PermissionsService } from '../services/permissions.service';
 
 export const PermissiosGuard: CanActivateFn = async (route, state) => {
   const router = inject(Router);
   const apiServicePermissions = inject(ApiServicePermissions);
   const permissionsService = inject(PermissionsService);
-  const authService = inject(AuthService);
+  const userService = inject(UserService);
 
   try {
-    const dataSession = authService.getDecodedToken();
+    const dataSession = await userService.getUser();
     
     const data = {
       module: route.data['title'],
       role: dataSession.role_name,
     };
-    const jsonData = JSON.stringify(data);
-    const encryptedModule = CryptoJS.AES.encrypt(
-      jsonData,
-      environment.secret_key
-    ).toString();
-    const dataEncripted: objPermissionsByRole = {
-      data: encryptedModule,
-    };
-    const permissions = await getPermissionsByRole(
-      apiServicePermissions,
-      dataEncripted
-    );
+    const permissions = await getPermissionsByRole(apiServicePermissions, data);
 
     if (permissions.status) {
       /* Save Data Permissions Module */
@@ -59,7 +46,7 @@ export const PermissiosGuard: CanActivateFn = async (route, state) => {
           title: '¡Acceso Denegado!',
           html: `<b>No Cuentas con Permisos para Acceder al Módulo [ ${data.module} ]`,
         });
-        router.navigate(['/dashboard']);
+        // router.navigate(['/dashboard']);
         return false;
       }
       /* Permissions Empty */
@@ -80,7 +67,7 @@ export const PermissiosGuard: CanActivateFn = async (route, state) => {
         title: '¡Acceso Denegado!',
         html: `<b>La Ruta [ ${data.module} ] no cuenta con permisos para tu tipo de Rol.</b>`,
       });
-      router.navigate(['/dashboard']);
+      // router.navigate(['/dashboard']);
       return false;
     }
   } catch (error) {

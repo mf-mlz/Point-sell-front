@@ -45,9 +45,10 @@ export class ApiServiceModules {
   }
 
   getPermissionsByRole(data: objPermissionsByRole): Observable<any> {
+    console.log(data);
     const url = `${this.apiUrl}/permissions/getPermissionsByRole`;
     return this.http.get(url, {
-      headers: new HttpHeaders({ 'module-role': data.data }),
+      headers: new HttpHeaders({ 'module-role': JSON.stringify(data) }),
       withCredentials: true,
     });
   }

@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { INavData } from '@coreui/angular';
-import { AuthService } from 'src/app/services/auth.service';
-import { environment } from 'src/environments/environment';
-import { ApiServicePermissions } from 'src/app/services/api.service.permissions';
+import { UserService } from 'src/app/services/user.service';
+import { ModulesService } from 'src/app/services/modules.service';
 import { ModulesPermissions } from 'src/app/models/interfaces';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import * as CryptoJS from 'crypto-js';
+import { map, switchMap } from 'rxjs/operators';
 import { ApiServiceModules } from 'src/app/services/api.service.modules';
 import { lastValueFrom, from, Observable, of } from 'rxjs';
 
@@ -15,11 +13,11 @@ import { lastValueFrom, from, Observable, of } from 'rxjs';
 export class NavService {
   public navItems: INavData[] = [];
   public navItemsPermissions: INavData[] = [];
-  private secretKey = environment.secret_key;
-
+  
   constructor(
-    private apiServicePermissions: ApiServicePermissions,
-    private apiServiceModules: ApiServiceModules
+    private modulesService: ModulesService,
+    private apiServiceModules: ApiServiceModules,
+    private userService: UserService
   ) {
     this.navItems = [];
   }
@@ -37,55 +35,40 @@ export class NavService {
     return from(this.allItems()).pipe(
       switchMap((items) => {
         this.navItems = items;
-        return this.apiServicePermissions.getModuleAccessByRole().pipe(
-          map((response) => {
-            if (response.status) {
-              const decryptedData = CryptoJS.AES.decrypt(
-                response.data,
-                this.secretKey
-              );
-              const decryptedModules = JSON.parse(
-                decryptedData.toString(CryptoJS.enc.Utf8)
-              );
 
-              /* Modules => Permissions */
-              this.navItemsPermissions = this.navItems.filter((elementModule) =>
-                decryptedModules.some(
-                  (module: ModulesPermissions) =>
-                    module.module === elementModule.name
-                )
-              );
+        return from(this.modulesService.getModules()).pipe(
+          map((dataUserLogged) => {
+            
+            const modules = dataUserLogged;
 
-              /* SubModules */
-              this.navItemsPermissions.forEach((module) => {
-                if (module.children) {
-                  const permissionModules = decryptedModules.map(
-                    (permission: ModulesPermissions) => permission.module
-                  );
-
-                  module.children = module.children.filter((child) =>
-                    permissionModules.includes(child.name)
-                  );
-                }
-              });
-
-              /* Filter Unique Modules */
-              this.navItems = Array.from(
-                new Set(this.navItemsPermissions.map((item) => item.name))
+            this.navItemsPermissions = this.navItems.filter((elementModule) =>
+              modules.some(
+                (module: ModulesPermissions) =>
+                  module.module === elementModule.name
               )
-                .map((name) =>
-                  this.navItemsPermissions.find((item) => item.name === name)
-                )
-                .filter((item): item is INavData => item !== undefined);
+            );
 
-              return this.navItems;
-            } else {
-              return [];
-            }
-          }),
-          catchError((error) => {
-            console.error(error);
-            return of([]);
+            this.navItemsPermissions.forEach((module) => {
+              if (module.children) {
+                const permissionModules = modules.map(
+                  (permission: ModulesPermissions) => permission.module
+                );
+
+                module.children = module.children.filter((child) =>
+                  permissionModules.includes(child.name)
+                );
+              }
+            });
+
+            this.navItems = Array.from(
+              new Set(this.navItemsPermissions.map((item) => item.name))
+            )
+              .map((name) =>
+                this.navItemsPermissions.find((item) => item.name === name)
+              )
+              .filter((item): item is INavData => item !== undefined);
+
+            return this.navItems;
           })
         );
       })

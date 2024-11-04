@@ -91,7 +91,7 @@ export interface TransactionSale {
   date: string;
   customerId?: number;
   payment: number;
-  employeesId: number;
+  employees: string;
   status?: number;
   typePayment: string;
   dataPayment?: string;
@@ -206,7 +206,7 @@ export interface InvoiceSendEmail {
 export interface Invoice {
   customer: Number;
   id_sale: Number;
-  id_employee: Number;
+  employee: string;
 }
 
 export interface InvoiceDownload {
@@ -215,8 +215,9 @@ export interface InvoiceDownload {
 
 export interface CancelInvoice {
   id_invoice: string;
-  id_employee: number;
+  employee: string;
   motive: string;
+  
 }
 
 export interface InvoiceList {
@@ -344,7 +345,8 @@ export interface NavItem {
 }
 
 export interface objPermissionsByRole {
-  data: string;
+  module: string;
+  role: string;
 }
 
 export interface RoutePermissions {
@@ -364,4 +366,11 @@ export interface ModuleAndSubmodule {
   name: string;
   type: string;
   modulo?: string;
+}
+
+/* SMS */
+export interface VerifyCodeSms {
+  code: number;
+  codeResend: string;
+  data: string;
 }

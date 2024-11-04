@@ -49,7 +49,8 @@ import {
 import { IconsModule } from '../../../icons/icons.module';
 import { ValidationsFormService } from '../../../utils/form-validations';
 import { onKeydownScanner } from '../../../utils/scanner';
-import { PermissionsService } from 'src/app/services/permissionsService';
+import { PermissionsService } from 'src/app/services/permissions.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   templateUrl: 'products.component.html',
@@ -108,7 +109,6 @@ export class ProductsComponent implements OnInit {
   searchInput: string = '';
   permissions!: RoutePermissions;
   public apiUpload = environment.apiUpload;
-  public nameRole = environment.name_role;
   
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -116,7 +116,8 @@ export class ProductsComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     public validationsFormService: ValidationsFormService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private userService: UserService
 
   ) {
     /* Init Form and Validations */
@@ -136,8 +137,7 @@ export class ProductsComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.userPayload = this.authService.getDecodedToken();
+  async ngOnInit(): Promise<void> {
     this.permissions = this.permissionsService.getPermissions();
     this.getAllProducts();
     this.getAllCategories();

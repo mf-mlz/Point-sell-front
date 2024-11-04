@@ -4,11 +4,13 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { ApiServiceValidate } from '../services/api.service.validate';
 import { AuthService } from '../services/auth.service';
+import { SwalService } from '../services/swal.service';
 
 export const AuthGuard: CanActivateFn = async (route, state) => {
   const router = inject(Router);
   const apiServiceValidate = inject(ApiServiceValidate);
   const authService = inject(AuthService);
+  const swalService = inject(SwalService);
 
   try {
     const data = await isTokenValid(apiServiceValidate);
@@ -51,8 +53,7 @@ const isTokenValid = (apiServiceValidate: ApiServiceValidate): Promise<any> => {
       },
       error: () => {
         reject(false);
-      }
+      },
     });
   });
 };
-

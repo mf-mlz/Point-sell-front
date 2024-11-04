@@ -38,7 +38,8 @@ import { AuthService } from '../../../../services/auth.service';
 import { ApiServiceInvoice } from '../../../../services/api.service.invoice';
 import { IconsModule } from '../../../../icons/icons.module';
 import { environment } from '../../../../../environments/environment';
-import { PermissionsService } from 'src/app/services/permissionsService';
+import { PermissionsService } from 'src/app/services/permissions.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-sales',
@@ -108,7 +109,8 @@ export class SalesComponent {
     private router: Router,
     public validationsFormService: ValidationsFormService,
     private route: ActivatedRoute,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private userService: UserService
   ) {
     /* Init Form and Add Validations */
     this.saleForm = this.fb.group({
@@ -147,19 +149,18 @@ export class SalesComponent {
   buttonsGroup: ButtonConfig[] = [];
   buttonsInvoice: ButtonConfig[] = [];
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    this.userPayload = await this.userService.getUser();
     this.permissions = this.permissionsService.getPermissions();
     this.idSale = '';
     this.route.params.subscribe((params) => {
       this.idSale = params['idSale'] || null;
     });
-
     if (this.idSale) {
       this.getSaleById(this.idSale);
     } else {
       this.getAllSales();
     }
-    this.userPayload = this.authService.getDecodedToken();
     this.generateButtons();
     this.getAllPaymentsForm();
     this.getAllEmployees();
@@ -402,7 +403,7 @@ export class SalesComponent {
     const btns: ButtonConfig[] = ([] = []);
 
     /* Btns Add */
-    if (this.permissions.add) {
+    if (this.permissions && this.permissions.add) {
       btnsGroup.push({
         class: 'btn-success',
         icon: 'book',
@@ -412,14 +413,8 @@ export class SalesComponent {
     }
 
     /* Btns View */
-    if (this.permissions.view) {
+    if (this.permissions && this.permissions.view) {
       buttonsInvoice.push(
-        {
-          class: 'btn-view',
-          icon: 'view',
-          title: 'Ver',
-          action: (element: any) => this.onView(element),
-        },
         {
           class: 'btn-download',
           icon: 'download',
@@ -464,7 +459,7 @@ export class SalesComponent {
     }
 
     /* Btns Delete */
-    if (this.permissions.delete) {
+    if (this.permissions && this.permissions.delete) {
       btns.push({
         class: 'btn-delete',
         icon: 'trash',
@@ -481,7 +476,7 @@ export class SalesComponent {
     }
 
     /* Btns Edit */
-    if (this.permissions.edit) {
+    if (this.permissions && this.permissions.edit) {
       btns.push({
         class: 'btn-edit',
         icon: 'pencil',
@@ -557,7 +552,7 @@ export class SalesComponent {
           const obj: Invoice = {
             customer: sale.customerId,
             id_sale: sale.id,
-            id_employee: this.userPayload.id,
+            employee: this.userPayload.name,
           };
           this.createInvoice(obj);
         }
@@ -1010,7 +1005,7 @@ export class SalesComponent {
       if (result.isConfirmed) {
         const motivo = result.value;
         const obj: CancelInvoice = {
-          id_employee: this.userPayload.id,
+          employee: this.userPayload.name,
           id_invoice: invoice.id_invoice,
           motive: motivo,
         };

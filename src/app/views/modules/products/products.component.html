@@ -27,7 +27,7 @@
       class="btn btn-success fw-bold d-flex align-items-center justify-content-center"
       (click)="showModal(null, 'Ver Datos del Producto', 'add', '')"
       style="width: 100%; max-width: 200px; height: 40px; color: white"
-      *ngIf="permissions.add"
+      *ngIf="permissions && permissions.add"
     >
       <app-icons icon="plus"></app-icons>
       <span>Añadir Producto</span>
@@ -107,7 +107,7 @@
           title="Ver"
           class="btn btn-view me-2 fw-bold btn-product"
           (click)="showModal(product, 'Ver Datos del Producto', 'eye', product.photo)"
-          *ngIf="permissions.view"
+          *ngIf="permissions && permissions.view"
         >
           <app-icons icon="view"></app-icons>
         </button>
@@ -115,7 +115,7 @@
           title="Editar"
           class="btn btn-edit me-2 fw-bold btn-product"
           (click)="showModal(product, 'Editar Producto', 'edit', product.photo)"
-          *ngIf="permissions.edit"
+          *ngIf="permissions && permissions.edit"
         >
           <app-icons icon="pencil"></app-icons>
         </button>
@@ -123,7 +123,7 @@
           title="Eliminar"
           class="btn btn-delete fw-bold btn-product"
           (click)="showModaldeleteProduct(product.id)"
-          *ngIf="permissions.delete"
+          *ngIf="permissions && permissions.delete"
         >
           <app-icons icon="trash"></app-icons>
         </button>
