@@ -106,7 +106,7 @@ export class LoginComponent {
               const data = {
                 code: Number(result.value),
                 codeResend: response.code,
-                data: response.data
+                data: response.data,
               };
 
               this.validCode(data)
@@ -114,7 +114,9 @@ export class LoginComponent {
                   this.swalService.showToast(
                     'success',
                     'Bienvenido',
-                    res.message || 'Inicio de Sesión Éxitoso'
+                    res.message || 'Inicio de Sesión Éxitoso',
+                    'text',
+                    () => {}
                   );
                   /* Save Data */
                   this.saveDataSession(response.data);
@@ -124,14 +126,18 @@ export class LoginComponent {
                     'error',
                     'Autenticación Fallida',
                     error.error?.error ||
-                      'El Código de Autenticación ingresado es incorrecto, intentalo de nuevo'
+                      'El Código de Autenticación ingresado es incorrecto, intentalo de nuevo',
+                    'text',
+                    () => {}
                   );
                 });
             } else {
               this.swalService.showToast(
                 'error',
                 'Acción Cancelada',
-                'La autenticación por SMS es requerida, por favor, intentalo de nuevo.'
+                'La autenticación por SMS es requerida, por favor, intentalo de nuevo.',
+                'text',
+                () => {}
               );
             }
           });
@@ -140,7 +146,9 @@ export class LoginComponent {
           this.swalService.showToast(
             'error',
             'Error',
-            error.error?.message || 'Ocurrió un error al Iniciar Sesión.'
+            error.error?.message || 'Ocurrió un error al Iniciar Sesión.',
+            'text',
+            () => {}
           );
         },
       });
@@ -148,7 +156,9 @@ export class LoginComponent {
       this.swalService.showToast(
         'error',
         'Error',
-        'Por favor, ingrese correctamente la información'
+        'Por favor, ingrese correctamente la información',
+        'text',
+        () => {}
       );
     }
   }
@@ -169,5 +179,5 @@ export class LoginComponent {
   saveDataSession = (sessionEmployee: any): void => {
     sessionStorage.setItem('session-employee', JSON.stringify(sessionEmployee));
     this.router.navigate(['/dashboard']);
-  }
+  };
 }

@@ -34,7 +34,9 @@ export const PermissiosGuard: CanActivateFn = async (route, state) => {
         swalService.showToast(
           'error',
           '¡Acceso Denegado!',
-          `<b>No Cuentas con Permisos para Acceder al Módulo [ ${data.module} ]`
+          `<b>No Cuentas con Permisos para Acceder al Módulo [ ${data.module} ]`,
+          'html',
+          ()=>{}
         );
         return false;
       }
@@ -43,7 +45,9 @@ export const PermissiosGuard: CanActivateFn = async (route, state) => {
       swalService.showToast(
         'error',
         '¡Acceso Denegado!',
-        `<b>La Ruta [ ${data.module} ] no cuenta con permisos para tu tipo de Rol.</b>`
+        `<b>La Ruta [ ${data.module} ] no cuenta con permisos para tu tipo de Rol.</b>`,
+        'html',
+        ()=>{}
       );
       return false;
     }

@@ -176,7 +176,9 @@ export class SalesComponent {
         this.swalService.showToast(
           'success',
           'Se encontraron ' + response.length + ' ventas',
-          ''
+          '',
+          'text',
+          () => {}
         );
       },
       error: (error) => {
@@ -184,7 +186,9 @@ export class SalesComponent {
         this.swalService.showToast(
           'error',
           'Error',
-          error.error?.message || 'Ocurrió un Error al Obtener las Ventas'
+          error.error?.message || 'Ocurrió un Error al Obtener las Ventas',
+          'text',
+          () => {}
         );
       },
     });
@@ -198,17 +202,18 @@ export class SalesComponent {
         this.swalService.showToast(
           'success',
           'Se encontraron ' + response.length + ' ventas',
-          ''
+          '',
+          'text',
+          () => {}
         );
       },
       error: (error) => {
         this.sales = [];
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text:
-            error.error?.message || 'Ocurrió un Error al Obtener las Ventas',
-        });
+        this.swalService.showFire(
+          'error',
+          'Error',
+          error.error?.message || 'Ocurrió un Error al Obtener las Ventas'
+        );
       },
     });
   }
@@ -484,51 +489,45 @@ export class SalesComponent {
   }
 
   onDelete(sale: SaleInfoComplete): void {
-    Swal.fire({
-      title: '¿Estás seguro que deseas eliminar?',
-      text: '¡Esta acción no se puede deshacer!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-    }).then((result) => {
-      if (result.isConfirmed) {
+    this.swalService.showFireConfirm(
+      'warning',
+      'Sí, eliminar',
+      'Cancelar',
+      '¿Estás seguro que deseas eliminar?',
+      '¡Esta acción no se puede deshacer!',
+      'text',
+      () => {
         const obj: DeleteRequest = {
           id: sale.id,
         };
         this.deleteSale(obj);
       }
-    });
+    );
   }
 
   onInvoice(sale: SaleInfoComplete): void {
     /* If status => Rechazada */
     if (sale.payment_status === 'Rechazada') {
-      Swal.fire({
-        icon: 'error',
-        title: 'Venta Rechazada',
-        text: 'No puedes facturar una venta Rechazada',
-      });
+      this.swalService.showFire(
+        'error',
+        'Venta Rechazada',
+        'No puedes facturar una venta Rechazada'
+      );
     } else if (sale.id_invoice && sale.status_invoice == 'Active') {
-      Swal.fire({
-        icon: 'info',
-        title: 'Factura Existente',
-        text: 'La venta ya cuenta con una Factura Activa: ' + sale.folio,
-      });
+      this.swalService.showFire(
+        'info',
+        'Factura Existente',
+        'La venta ya cuenta con una Factura Activa: ' + sale.folio
+      );
     } else {
-      Swal.fire({
-        title: '¿Estás seguro que deseas generar la Factura?',
-        text: '¡Sólo puedes generar 1 Factura por Venta, verifica que los datos sean correctos!',
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, generar',
-        cancelButtonText: 'Cancelar',
-      }).then((result) => {
-        if (result.isConfirmed) {
+      this.swalService.showFireConfirm(
+        'info',
+        'Sí, generar',
+        'Cancelar',
+        '¿Estás seguro que deseas generar la Factura?',
+        '¡Sólo puedes generar 1 Factura por Venta, verifica que los datos sean correctos!',
+        'text',
+        () => {
           const obj: Invoice = {
             customer: sale.customerId,
             id_sale: sale.id,
@@ -536,34 +535,33 @@ export class SalesComponent {
           };
           this.createInvoice(obj);
         }
-      });
+      );
     }
   }
 
   onDownloadInvoice(invoice: SaleInvoice): void {
     if (invoice.id_invoice) {
-      Swal.fire({
-        title: 'Descargar Factura',
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Descargar',
-        cancelButtonText: 'Cancelar',
-      }).then((result) => {
-        if (result.isConfirmed) {
+      this.swalService.showFireConfirm(
+        'info',
+        'Descargar',
+        'Cancelar',
+        'Descargar Factura',
+        '',
+        'text',
+        () => {
           const obj: InvoiceDownload = {
             id_invoice: invoice.id_invoice,
           };
           this.downloadIncoice(obj);
         }
-      });
+      );
     } else {
-      Swal.fire({
-        icon: 'info',
-        title: 'Sin Factura Registrada',
-        text: 'La venta no cuenta con una Factura Registrada',
-      });
+      this.swalService.showFire(
+        'info',
+        'Sin Factura Registrada',
+        'La venta no cuenta con una Factura Registrada',
+        'text'
+      );
     }
   }
 
@@ -571,11 +569,12 @@ export class SalesComponent {
     if (invoice.id_invoice && invoice.status === 'Active') {
       this.swalCancel(invoice);
     } else {
-      Swal.fire({
-        icon: 'info',
-        title: 'Factura Inexistente o Cancelada',
-        text: 'La Factura Seleccionada no sé puede Cancelar',
-      });
+      this.swalService.showFire(
+        'info',
+        'Factura Inexistente o Cancelada',
+        'La Factura Seleccionada no se puede Cancelar',
+        'text'
+      );
     }
   }
 
@@ -583,11 +582,12 @@ export class SalesComponent {
     if (invoice.id_invoice && invoice.status === 'Active') {
       this.swalSend(invoice);
     } else {
-      Swal.fire({
-        icon: 'info',
-        title: 'Factura Inexistente o Cancelada',
-        text: 'La Factura Seleccionada no sé puede Enviar',
-      });
+      this.swalService.showFire(
+        'info',
+        'Factura Inexistente o Cancelada',
+        'La Factura Seleccionada no se puede Enviar',
+        'text'
+      );
     }
   }
 
@@ -595,11 +595,12 @@ export class SalesComponent {
     if (sale.payment_status === 'Aprobada') {
       this.showModal('eye', 'Ver Facturas de la Venta', sale, 'viewInvoices');
     } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Venta Rechazada',
-        text: 'Las Ventas Rechazadas no cuentan con Facturas',
-      });
+      this.swalService.showFire(
+        'error',
+        'Venta Rechazada',
+        'Las Ventas Rechazadas no cuentan con Facturas',
+        'text'
+      );
     }
   }
 
@@ -804,48 +805,57 @@ export class SalesComponent {
 
       this.apiServiceSales.editSale(data).subscribe({
         next: (response) => {
-          Swal.fire({
-            icon: 'success',
-            title: response.message || 'Venta Modificada con Éxito',
-          }).then((result) => {
-            if (result.isConfirmed) {
+          this.swalService.showFire(
+            'success',
+            'Venta Modificada con Éxito',
+            response.message || 'Venta Modificada con Éxito',
+            'text',
+            () => {
               this.resetFileInput();
               this.getAllSales();
             }
-          });
+          );
         },
         error: () => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Ocurrió un error al Modificar la Venta.',
-          });
+          this.swalService.showFire(
+            'error',
+            'Error',
+            'Ocurrió un error al Modificar la Venta.',
+            'text'
+          );
         },
       });
     } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error',
-        text: 'Por favor, ingresa correctamente la información.',
-      });
+      this.swalService.showFire(
+        'warning',
+        'Error',
+        'Por favor, ingresa correctamente la información.',
+        'text'
+      );
     }
   }
 
   deleteSale(credentials: DeleteRequest): void {
     this.apiServiceSales.deleteSale(credentials).subscribe({
       next: (response) => {
-        Swal.fire({
-          icon: 'success',
-          title: response.message || 'Venta Eliminada Correctamente',
-        });
-        this.getAllSales();
+        this.swalService.showFire(
+          'success',
+          'Venta Eliminada Correctamente',
+          response.message || 'Venta Eliminada Correctamente',
+          'text',
+          ()=>{
+            this.getAllSales();
+          }
+        );
+        
       },
       error: () => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Ocurrió un Error al Eliminar la Venta',
-        });
+        this.swalService.showFire(
+          'error',
+          'Error',
+          'Ocurrió un Error al Eliminar la Venta',
+          'text'
+        );
       },
     });
   }
@@ -853,24 +863,20 @@ export class SalesComponent {
   createInvoice(credentials: Invoice): void {
     this.apiServiceInvoice.createInvoice(credentials).subscribe({
       next: (response) => {
-        Swal.fire({
-          title: response.message || 'Factura Generada con Éxito',
-          icon: 'success',
-          showCancelButton: false,
-          confirmButtonColor: '#3085d6',
-          confirmButtonText: 'Ok',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.getAllSales();
-          }
-        });
+        this.swalService.showFire(
+          'success',
+          response.message || 'Factura Generada con Éxito',
+          '',
+          'text',
+          () => this.getAllSales()
+        );
       },
       error: () => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Ocurrió un Error al Generar la Factura',
-        });
+        this.swalService.showFire(
+          'error',
+          'Error',
+          'Ocurrió un Error al Generar la Factura'
+        );
       },
     });
   }
@@ -888,7 +894,11 @@ export class SalesComponent {
         window.URL.revokeObjectURL(url);
       },
       error: (error) => {
-        /* console.error('Error al descargar la factura:', error); */
+        this.swalService.showFire(
+          'error',
+          'Error',
+          'Ocurrió un Error al Descargar la Factura'
+        );
       },
     });
   }
@@ -913,24 +923,23 @@ export class SalesComponent {
   cancelInvoice(credentials: CancelInvoice): void {
     this.apiServiceInvoice.cancelInvoice(credentials).subscribe({
       next: (response) => {
-        Swal.fire({
-          title: response.message || 'Factura Cancelada con Éxito',
-          icon: 'success',
-          showCancelButton: false,
-          confirmButtonColor: '#3085d6',
-          confirmButtonText: 'Ok',
-        }).then((result) => {
-          if (result.isConfirmed) {
+        this.swalService.showFire(
+          'success',
+          response.message || 'Factura Cancelada con Éxito',
+          '',
+          'text',
+          () => {
             this.getAllSales();
           }
-        });
+        );
       },
       error: (error) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: error.error?.error || 'Ocurrió un Error al Cancelar la Factura',
-        });
+        this.swalService.showFire(
+          'error',
+          'Error',
+          error.error?.error || 'Ocurrió un Error al Cancelar la Factura',
+          'text'
+        );
       },
     });
   }
@@ -938,24 +947,23 @@ export class SalesComponent {
   sendInvoice(credentials: InvoiceSendEmail): void {
     this.apiServiceInvoice.sendEmail(credentials).subscribe({
       next: (response) => {
-        Swal.fire({
-          title: response.message || 'Factura Enviada con Éxito',
-          icon: 'success',
-          showCancelButton: false,
-          confirmButtonColor: '#3085d6',
-          confirmButtonText: 'Ok',
-        }).then((result) => {
-          if (result.isConfirmed) {
+        this.swalService.showFire(
+          'success',
+          response.message || 'Factura Enviada con Éxito',
+          '',
+          'text',
+          () => {
             this.getAllSales();
           }
-        });
+        );
       },
       error: (error) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: error.error?.error || 'Ocurrió un Error al Enviar la Factura',
-        });
+        this.swalService.showFire(
+          'error',
+          'Error',
+          error.error?.error || 'Ocurrió un Error al Enviar la Factura',
+          'text'
+        );
       },
     });
   }

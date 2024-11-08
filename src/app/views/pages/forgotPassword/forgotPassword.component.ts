@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { IconDirective } from '@coreui/icons-angular';
-import { Router } from '@angular/router';
+import { SwalService } from 'src/app/services/swal.service';
 
 import {
   ContainerComponent,
@@ -60,7 +60,8 @@ export class ForgotPasswordComponent {
 
   constructor(
     private fb: FormBuilder,
-    private apiServiceForgot: ApiServiceForgot
+    private apiServiceForgot: ApiServiceForgot,
+    private swalService: SwalService
   ) {
     this.forgotPasswordForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -75,30 +76,26 @@ export class ForgotPasswordComponent {
       
       this.apiServiceForgot.recoverPassword(formValue).subscribe({
         next: (response) => {
-          Swal.fire({
-            icon: 'success',
-            title: response.message || 'Correo Enviado, favor de revisar su bandeja de mensajes',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              console.log('Send Success');
-            }
-          });
+          this.swalService.showToast(
+            'success',
+            response.message || 'Correo Enviado, favor de revisar su bandeja de mensajes',
+            'text'
+          );          
         },
         error: (error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text:
-              error.error?.message || 'Ocurrió un error al enviar el correo.',
-          });
+          this.swalService.showToast(
+            'error',
+            error.error?.message || 'Ocurrió un error al enviar el correo.',
+            'text'
+          );          
         },
       });
     } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error',
-        text: 'Por favor, ingresa correctamente la información.',
-      });
+      this.swalService.showToast(
+        'warning',
+        'Por favor, ingresa correctamente la información.',
+        'text'
+      );      
     }
   }
 

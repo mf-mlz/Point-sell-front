@@ -108,7 +108,9 @@ export class DashboardComponent implements OnInit {
           'error',
           'Error',
           error.error?.message ||
-            'Ocurrió un Error al Obtener las Ventas Diarias'
+            'Ocurrió un Error al Obtener las Ventas Diarias',
+          'text',
+          () => {}
         );
       },
     });

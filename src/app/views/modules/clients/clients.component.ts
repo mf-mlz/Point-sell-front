@@ -72,7 +72,7 @@ export class ClientsComponent {
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       address: ['', [Validators.required]],
-      zip: [''],
+      zip: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       tax_id: ['', [Validators.required]],
       tax_system: ['', [Validators.required]],
     });
@@ -93,14 +93,22 @@ export class ClientsComponent {
     this.apiServiceClients.filterClients(filters).subscribe({
       next: (response) => {
         this.clients = response.client;
-        this.swalService.showToast('success', response.message, '');
+        this.swalService.showToast(
+          'success',
+          response.message,
+          '',
+          'text',
+          () => {}
+        );
       },
       error: (error) => {
         this.clients = [];
         this.swalService.showToast(
           'error',
           'Error',
-          error.error?.message || 'Ocurrió un Error al Obtener los Clientes'
+          error.error?.message || 'Ocurrió un Error al Obtener los Clientes',
+          'text',
+          () => {}
         );
       },
     });
@@ -114,7 +122,9 @@ export class ClientsComponent {
         this.swalService.showToast(
           'success',
           response.message || `Se encontraron ${response.length} registros`,
-          ''
+          '',
+          'text',
+          () => {}
         );
       },
       error: (error) => {
@@ -206,35 +216,32 @@ export class ClientsComponent {
 
   /* Functions Datatable Buttons -- Open Modals */
   onAdd(): void {
-    this.showModal('add', 'Añadir Empleado');
+    this.showModal('add', 'Añadir Cliente');
   }
 
   onView(client: Clients): void {
-    this.showModal('eye', 'Ver Información del Empleado', client);
+    this.showModal('eye', 'Ver Información del Cliente', client);
   }
 
   onEdit(client: Clients): void {
-    this.showModal('edit', 'Editar Venta', client);
+    this.showModal('edit', 'Editar Cliente', client);
   }
 
   onDelete(client: Clients): void {
-    Swal.fire({
-      title: '¿Estás seguro que deseas eliminar?',
-      text: '¡Esta acción no se puede deshacer!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-    }).then((result) => {
-      if (result.isConfirmed) {
+    this.swalService.showFireConfirm(
+      'warning',
+      'Sí, eliminar',
+      'Cancelar',
+      '¿Estás seguro que deseas eliminar?',
+      '¡Esta acción no se puede deshacer!',
+      'text',
+      () => {
         const obj: DeleteRequest = {
           id: client.id,
         };
         this.deleteClient(obj);
       }
-    });
+    );
   }
 
   /* Show Modal */
@@ -298,27 +305,27 @@ export class ClientsComponent {
   addClient(): void {
     if (this.clientForm.valid) {
       let formValue = this.clientForm.value;
-      // const temporaryPassword = this.createTemporaryPassword(formValue);
-      // formValue.password = temporaryPassword;
       this.apiServiceClients.registerClients(formValue).subscribe({
         next: (response) => {
-          Swal.fire({
-            icon: 'info',
-            title:
-              `<strong>${response.message}</strong>` ||
+          this.swalService.showFire(
+            'success',
+            `<strong>${response.message}</strong>` ||
               '<strong> Cliente Agregado con Éxito </strong>',
-          }).then((result) => {
-            if (result.isConfirmed) {
+            '',
+            'text',
+            () => {
               this.resetFileInput();
               this.getAllClients();
             }
-          });
+          );
         },
         error: (error) => {
           this.swalService.showToast(
             'error',
             'Error',
-            'Ocurrió un error al Agregar el Cliente, verifica que el Correo y el Télefono no estén registrados en otro Cliente Activo'
+            'Ocurrió un error al Agregar el Cliente, verifica que el Correo y el Télefono no estén registrados en otro Cliente Activo',
+            'text',
+            () => {}
           );
         },
       });
@@ -326,7 +333,9 @@ export class ClientsComponent {
       this.swalService.showToast(
         'warning',
         'Error',
-        'Por favor, ingresa correctamente la información.'
+        'Por favor, ingresa correctamente la información.',
+        'text',
+        () => {}
       );
     }
   }
@@ -336,21 +345,24 @@ export class ClientsComponent {
       const formValue = this.clientForm.value;
       this.apiServiceClients.editClients(formValue).subscribe({
         next: (response) => {
-          Swal.fire({
-            icon: 'success',
-            title: response.message || 'Cliente Modificado con Éxito',
-          }).then((result) => {
-            if (result.isConfirmed) {
+          this.swalService.showFire(
+            'success',
+            response.message || 'Cliente Modificado con Éxito',
+            '',
+            'text',
+            () => {
               this.resetFileInput();
               this.getAllClients();
             }
-          });
+          );
         },
         error: () => {
           this.swalService.showToast(
             'error',
             'Error',
-            'Ocurrió un error al Modificar el Cliente, verifica que el Correo y el Télefono no estén registrados en otro Cliente Activo'
+            'Ocurrió un error al Modificar el Cliente, verifica que el Correo y el Télefono no estén registrados en otro Cliente Activo',
+            'text',
+            () => {}
           );
         },
       });
@@ -358,7 +370,9 @@ export class ClientsComponent {
       this.swalService.showToast(
         'warning',
         'Error',
-        'Por favor, ingresa correctamente la información.'
+        'Por favor, ingresa correctamente la información.',
+        'text',
+        () => {}
       );
     }
   }
@@ -369,7 +383,9 @@ export class ClientsComponent {
         this.swalService.showToast(
           'success',
           response.message || 'Cliente Eliminado Correctamente',
-          ''
+          '',
+          'text',
+          () => {}
         );
         this.getAllClients();
       },
@@ -377,7 +393,9 @@ export class ClientsComponent {
         this.swalService.showToast(
           'error',
           'Error',
-          'Ocurrió un Error al Eliminar el Cliente'
+          'Ocurrió un Error al Eliminar el Cliente',
+          'text',
+          () => {}
         );
       },
     });

@@ -19,11 +19,47 @@ export class SwalService {
 
   constructor() {}
 
-  showToast(icon: SweetAlertIcon, title: string, text: string) {
+  showFire(icon: SweetAlertIcon, title: string, content: string, type: 'text' | 'html' = 'text', action?: () => void) {
+    Swal.fire({
+      icon,
+      title,
+      [type]: content
+    }).then(() => {
+      if (action) {
+        action();
+      }
+    });
+  }
+
+  showFireConfirm(icon: SweetAlertIcon, confirm: string, cancel: string, title: string, content: string, type: 'text' | 'html' = 'text', action?: () => void){
+    Swal.fire({
+      title: title,
+      [type]: content,
+      icon: icon,
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: confirm,
+      cancelButtonText: cancel,
+    }).then((result) => {
+      if (result.isConfirmed && action) {
+          action();
+      }
+    });
+  } 
+
+  showToast(icon: SweetAlertIcon, title: string, content: string, type: 'text' | 'html' = 'text', action?: () => void) {
     this.Toast.fire({
       icon,
       title,
-      text,
+      [type]: content
+    }).then(() => {
+      if (action) {
+        action();
+      }
     });
   }
+
+  
+
 }

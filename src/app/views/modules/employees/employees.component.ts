@@ -26,6 +26,7 @@ import { ApiServiceRoles } from '../../../services/api.service.roles';
 import { IconsModule } from '../../../icons/icons.module';
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { SwalService } from 'src/app/services/swal.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-sales',
@@ -100,14 +101,22 @@ export class EmployeesComponent {
     this.apiServiceEmployees.filter(employee).subscribe({
       next: (response) => {
         this.employees = response.employee;
-        this.swalService.showToast('success', response.message, '');
+        this.swalService.showToast(
+          'success',
+          response.message,
+          '',
+          'text',
+          () => {}
+        );
       },
       error: (error) => {
         this.employees = [];
         this.swalService.showToast(
           'error',
           'Error',
-          error.error?.message || 'Ocurrió un Error al Obtener los Empleados'
+          error.error?.message || 'Ocurrió un Error al Obtener los Empleados',
+          'text',
+          () => {}
         );
       },
     });
@@ -121,7 +130,9 @@ export class EmployeesComponent {
         this.swalService.showToast(
           'success',
           response.message || `Se encontraron ${response.length} registros`,
-          ''
+          '',
+          'text',
+          () => {}
         );
       },
       error: (error) => {
@@ -215,23 +226,20 @@ export class EmployeesComponent {
   }
 
   onDelete(employee: Employee): void {
-    Swal.fire({
-      title: '¿Estás seguro que deseas eliminar?',
-      text: '¡Esta acción no se puede deshacer!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-    }).then((result) => {
-      if (result.isConfirmed) {
+    this.swalService.showFireConfirm(
+      'warning',
+      'Sí, eliminar',
+      'Cancelar',
+      '¿Estás seguro que deseas eliminar?',
+      '¡Esta acción no se puede deshacer!',
+      'text',
+      () => {
         const obj: DeleteRequest = {
           id: employee.id,
         };
         this.deleteSale(obj);
       }
-    });
+    );
   }
 
   /* Show Modal */
@@ -297,34 +305,37 @@ export class EmployeesComponent {
       formValue.password = temporaryPassword;
       this.apiServiceEmployees.registerEmployee(formValue).subscribe({
         next: (response) => {
-          Swal.fire({
-            icon: 'info',
-            title:
-              `<strong>${response.message}</strong>` ||
+          this.swalService.showFire(
+            'info',
+            `<strong>${response.message}</strong>` ||
               '<strong> Empleado Agregado con Éxito </strong>',
-            html: `Por favor, proporcionale al Empleado su Contraseña Temporal: <br><br><b> ${temporaryPassword} </b><br><br>
+            `Por favor, proporcionale al Empleado su Contraseña Temporal: <br><br><b> ${temporaryPassword} </b><br><br>
                   Para cambiar la contraseña es necesario ingresar al Sistema y dar clic en el apartado <br><br><strong> Cambiar Contraseña </strong>`,
-          }).then((result) => {
-            if (result.isConfirmed) {
+            'html',
+            () => {
               this.resetFileInput();
               this.getAllEmployees();
             }
-          });
+          );
         },
-        error: (error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Ocurrió un error al Agregar el Empleado, verifica que el Correo y el Télefono no estén registrados en otro empleado Activo',
-          });
+        error: () => {
+          this.swalService.showToast(
+            'error',
+            'Error',
+            'Ocurrió un error al Agregar el Empleado, verifica que el Correo y el Télefono no estén registrados en otro empleado Activo',
+            'text',
+            () => {}
+          );
         },
       });
     } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error',
-        text: 'Por favor, ingresa correctamente la información.',
-      });
+      this.swalService.showToast(
+        'warning',
+        'Error',
+        'Por favor, ingresa correctamente la información.',
+        'text',
+        () => {}
+      );
     }
   }
 
@@ -340,48 +351,58 @@ export class EmployeesComponent {
       const formValue = this.employeeForm.value;
       this.apiServiceEmployees.editEmployee(formValue).subscribe({
         next: (response) => {
-          Swal.fire({
-            icon: 'success',
-            title: response.message || 'Empleado Modificado con Éxito',
-          }).then((result) => {
-            if (result.isConfirmed) {
+          this.swalService.showFire(
+            'success',
+            response.message || 'Empleado Modificado con Éxito',
+            '',
+            'text',
+            () => {
               this.resetFileInput();
               this.getAllEmployees();
             }
-          });
+          );
         },
         error: () => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Ocurrió un error al Modificar el Empleado, verifica que el Correo y el Télefono no estén registrados en otro empleado Activo',
-          });
+          this.swalService.showToast(
+            'error',
+            'Error',
+            'Ocurrió un error al Modificar el Empleado, verifica que el Correo y el Télefono no estén registrados en otro empleado Activo.',
+            'text',
+            () => {}
+          );
         },
       });
     } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error',
-        text: 'Por favor, ingresa correctamente la información.',
-      });
+      this.swalService.showToast(
+        'warning',
+        'Error',
+        'Por favor, ingresa correctamente la información.',
+        'text',
+        () => {}
+      );
     }
   }
 
   deleteSale(credentials: DeleteRequest): void {
     this.apiServiceEmployees.deleteEmployee(credentials).subscribe({
       next: (response) => {
-        Swal.fire({
-          icon: 'success',
-          title: response.message || 'Empleado Eliminado Correctamente',
-        });
+        this.swalService.showToast(
+          'success',
+          response.message || 'Empleado Eliminado Correctamente',
+          '',
+          'text',
+          () => {}
+        );
         this.getAllEmployees();
       },
       error: () => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Ocurrió un Error al Eliminar el Empleado',
-        });
+        this.swalService.showToast(
+          'error',
+          'Error',
+          'Ocurrió un Error al Eliminar el Empleado',
+          'text',
+          () => {}
+        );
       },
     });
   }
@@ -408,7 +429,7 @@ export class EmployeesComponent {
         }
       }
     }
-    const password = arrayPassword.join('');
+    const password = environment.temporary_string + arrayPassword.join('');
     return password;
   }
 

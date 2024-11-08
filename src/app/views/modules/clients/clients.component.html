@@ -1,19 +1,18 @@
 <!-- Section Filters and Add -->
-<div class="d-flex flex-column flex-md-row p-4  ">
-    <div class="col-12 mb-3 mb-md-0 d-flex align-items-center justify-content-end">
-      <button
-        class="mx-3 btn btn-success fw-bold d-flex align-items-center justify-content-center btn-filter"
-        (click)="onAdd()"
-        *ngIf="permissions && permissions.add"
-      >
-        <app-icons icon="plus"></app-icons>
-        <span>Añadir Empleado</span>
-      </button>
-    </div>
+<div class="d-flex flex-column flex-md-row p-4">
+  <div
+    class="col-12 mb-3 mb-md-0 d-flex align-items-center justify-content-end"
+  >
+    <button
+      class="mx-3 btn btn-success fw-bold d-flex align-items-center justify-content-center btn-filter"
+      (click)="onAdd()"
+      *ngIf="permissions && permissions.add"
+    >
+      <app-icons icon="plus"></app-icons>
+      <span>Añadir Cliente</span>
+    </button>
   </div>
-
-
-
+</div>
 
 <!-- Datatable General Employee -->
 <app-datatable
@@ -22,7 +21,6 @@
   [buttons]="buttons"
   [showButtonGroup]="showButtonGroupClient"
 ></app-datatable>
-
 
 <!-- Modal Component -->
 <app-modal
@@ -116,41 +114,52 @@
         {{ validationsFormService.getErrorMessage(clientForm, "address") }}
       </div>
     </div>
+    <div class="form-group">
+      <label for="zip">Código Postal:</label>
+      <input
+        id="zip"
+        formControlName="zip"
+        class="form-control"
+        type="number"
+      />
+      <div
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'zip')"
+        class="error-message"
+      >
+        {{ validationsFormService.getErrorMessage(clientForm, "zip") }}
+      </div>
+    </div>
     <!-- tax_id	tax_system -->
     <div class="form-group">
-        <label for="tax_id">tax id:</label>
-        <input
-          id="tax_id"
-          formControlName="tax_id"
-          class="form-control"
-          type="text"
-        />
-        <div
-          *ngIf="validationsFormService.isFieldInvalid(clientForm, 'tax_id')"
-          class="error-message"
-        >
-          {{ validationsFormService.getErrorMessage(clientForm, "tax_id") }}
-        </div>
+      <label for="tax_id">RFC:</label>
+      <input
+        id="tax_id"
+        formControlName="tax_id"
+        class="form-control"
+        type="text"
+      />
+      <div
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'tax_id')"
+        class="error-message"
+      >
+        {{ validationsFormService.getErrorMessage(clientForm, "tax_id") }}
       </div>
+    </div>
 
-
-
-      <div class="form-group">
-          <label for="tax_system">tax system:</label>
-          <input
-            id="tax_system"
-            formControlName="tax_system"
-            class="form-control"
-            type="text"
-          />
-          <div
-            *ngIf="validationsFormService.isFieldInvalid(clientForm, 'tax_system')"
-            class="error-message"
-          >
-            {{ validationsFormService.getErrorMessage(clientForm, "tax_system") }}
-          </div>
-        </div>
-
+    <div class="form-group">
+      <label for="tax_system">Régimen Físcal:</label>
+      <input
+        id="tax_system"
+        formControlName="tax_system"
+        class="form-control"
+        type="text"
+      />
+      <div
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'tax_system')"
+        class="error-message"
+      >
+        {{ validationsFormService.getErrorMessage(clientForm, "tax_system") }}
+      </div>
+    </div>
   </form>
 </app-modal>
-

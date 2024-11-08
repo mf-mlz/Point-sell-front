@@ -224,7 +224,9 @@ export class AddSalesComponent {
       this.swalService.showToast(
         'error',
         'Ingresa la Clave de un Producto para Ingresarlo a la Venta',
-        ''
+        '',
+        'text',
+        () => {}
       );
     }
   }
@@ -240,7 +242,9 @@ export class AddSalesComponent {
           this.swalService.showToast(
             'error',
             `El Producto ${data.code} No Existe`,
-            ''
+            '',
+            'text',
+            () => {}
           );
         }
       },
@@ -248,7 +252,9 @@ export class AddSalesComponent {
         this.swalService.showToast(
           'error',
           'Ocurrió un error al Obtener el Producto',
-          ''
+          '',
+          'text',
+          () => {}
         );
       },
     });
@@ -527,11 +533,11 @@ export class AddSalesComponent {
         this.confirmPaymentSale(objData);
       }
     } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Ingresa correctamente la información para generar la venta',
-      });
+      this.swalService.showFire(
+        'error',
+        'Error',
+        'Ingresa correctamente la información para generar la venta'
+      );
 
       /* Activate Validations Input Required (Type and Data Payment) */
       if (!this.saleForm.value.payment) {
@@ -580,11 +586,12 @@ export class AddSalesComponent {
           this.addSale(obj, changeAmount, receivedAmount, 'money');
         } else {
           /* The entered amount is less than the total */
-          Swal.fire({
-            icon: 'error',
-            html: `<strong>El Monto Ingresado es Menor al Monto total de la Venta ${obj.total}</strong>`,
-            confirmButtonText: 'Aceptar',
-          });
+          this.swalService.showFire(
+            'error',
+            'Error',
+            `<strong>El Monto Ingresado es Menor al Monto total de la Venta ${obj.total}</strong>`,
+            'html'
+          );
         }
       }
       /* If payment is Credit/Debit Card */
@@ -707,26 +714,19 @@ export class AddSalesComponent {
                     response.message
                   }</strong><br>Cambio: ${this.formatMoneyMx(changeAmount)}`
                 : `<strong>${response.message}</strong>`;
-            Swal.fire({
-              icon: 'success',
-              html: message,
-              confirmButtonText: 'Aceptar',
-              showConfirmButton: true,
-            }).then((result) => {
-              if (result.isConfirmed) {
-                this.downloadPDF(response.idSale);
-                this.loadData();
-              }
+            this.swalService.showFire('success', '', message, 'html', () => {
+              this.downloadPDF(response.idSale);
+              this.loadData();
             });
             resolve(response);
           }
         },
         error: (error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error.error.error || 'Ocurrió un Error al Registrar la Venta',
-          });
+          this.swalService.showFire(
+            'error',
+            'Error',
+            error.error?.error || 'Ocurrió un Error al Registrar la Venta'
+          );
           reject(error);
         },
       });
@@ -777,25 +777,23 @@ export class AddSalesComponent {
 
         this.openpayService.processPayment(paymentData).subscribe({
           next: (response) => {
-            Swal.fire({
-              icon: 'success',
-              title: 'Venta Procesada con Éxito',
-              text: response.message || 'Venta Pagada con Éxito',
-              showConfirmButton: true,
-              confirmButtonText: 'Aceptar',
-            }).then((result) => {
-              if (result.isConfirmed) {
+            this.swalService.showFire(
+              'success',
+              'Venta Procesada con Éxito',
+              response.message || 'Venta Pagada con Éxito',
+              'text',
+              () => {
                 this.downloadPDF(saleResponse.idSale);
                 this.loadData();
               }
-            });
+            );
           },
           error: (error) => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: error.error.error || 'Ocurrió un Error al Procesar el Pago',
-            });
+            this.swalService.showFire(
+              'error',
+              'Error',
+              error.error?.error || 'Ocurrió un Error al Procesar el Pago'
+            );
           },
         });
       }
@@ -806,10 +804,8 @@ export class AddSalesComponent {
       const errorMessage =
         openPayError?.data?.description ||
         'Ocurrió un Error al Procesar la Venta';
-      Swal.fire({
-        icon: 'error',
-        title: errorMessage,
-      });
+      this.swalService.showFire('error', 'Error', errorMessage);
+
       return false;
     }
   }

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { IconDirective } from '@coreui/icons-angular';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SwalService } from 'src/app/services/swal.service';
 
 import {
   ContainerComponent,
@@ -60,7 +61,8 @@ export class ResetPasswordComponent {
     private fb: FormBuilder,
     private apiServiceForgot: ApiServiceForgot,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private swalService: SwalService
   ) {
     this.changePasswordForm = this.fb.group(
       {
@@ -81,12 +83,12 @@ export class ResetPasswordComponent {
       if (token !== "") {
         this.tkn = decodeURIComponent(token);
       } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text:
-            'Falta el token',
-        });
+        this.swalService.showToast(
+          'error',
+          'Error',
+          'Falta el token',
+          'text'
+        );        
       }
     });
 
@@ -97,44 +99,45 @@ export class ResetPasswordComponent {
       const formValue = this.changePasswordForm.value;
       const { pass1, password } = formValue;
       if (pass1 !== password) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text:
-            'una de las contraseñas no coincide',
-        });
+        this.swalService.showToast(
+          'error',
+          'Error',
+          'Una de las contraseñas no coincide',
+          'text'
+        );        
       }
 
       this.apiServiceForgot.changePassword(formValue).subscribe({
         next: (response) => {
-          Swal.fire({
-            icon: 'success',
-            title: response.message || 'Contraseña modificada correctamente',
-          }).then((result) => {
-            if (result.isConfirmed) {
-
+          this.swalService.showFireConfirm(
+            'success',
+            'Aceptar',
+            'Cancelar',
+            'Confirmación',
+            response.message || 'Contraseña modificada correctamente',
+            'text',
+            () => {
               setTimeout(() => {
                 this.router.navigate(['/login']);
               }, 1000);
-              
             }
-          });
+          );
+          
         },
         error: (error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text:
-              error.error?.message || 'Ocurrió un error al cambiar la contraseña.',
-          });
+          this.swalService.showFire(
+            'error',
+            'Error',
+            error.error?.message || 'Ocurrió un error al cambiar la contraseña.'
+          );          
         }
       });
     } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error',
-        text: 'Por favor, ingresa correctamente la información.',
-      });
+      this.swalService.showFire(
+        'warning',
+        'Error',
+        'Por favor, ingresa correctamente la información.'
+      );      
     }
   }
 

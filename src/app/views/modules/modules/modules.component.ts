@@ -137,7 +137,9 @@ export class ModulesComponent {
           'success',
           response.message ||
             `Se encontraron  ${response.permissions.length} registros`,
-          ''
+          '',
+          'text',
+          () => {}
         );
       },
       error: (error) => {
@@ -145,7 +147,9 @@ export class ModulesComponent {
         this.swalService.showToast(
           'error',
           'Error',
-          error.error?.message || 'Ocurrió un Error al Obtener los Permisos'
+          error.error?.message || 'Ocurrió un Error al Obtener los Permisos',
+          'text',
+          () => {}
         );
       },
     });
@@ -161,7 +165,9 @@ export class ModulesComponent {
           'success',
           response.message ||
             `Se encontraron ${response.permissions.length} registros`,
-          ''
+          '',
+          'text',
+          () => {}
         );
       },
       error: (error) => {
@@ -252,35 +258,36 @@ export class ModulesComponent {
       this.swalService.showToast(
         'error',
         'No se pueden editar los permisos del Módulo Principal',
-        ''
+        '',
+        'text',
+        () => {}
       );
     }
   }
 
   onDelete(permissions: Permissions): void {
     if (permissions.module !== 'Dashboard') {
-      Swal.fire({
-        title: '¿Estás seguro que deseas eliminar?',
-        text: '¡Esta acción no se puede deshacer!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar',
-      }).then((result) => {
-        if (result.isConfirmed) {
+      this.swalService.showFireConfirm(
+        'warning',
+        'Sí, eliminar',
+        'Cancelar',
+        '¿Estás seguro que deseas eliminar?',
+        '¡Esta acción no se puede deshacer!',
+        'text',
+        () => {
           const obj: Permissions = {
             id: permissions.id,
           };
           this.deletePermissions(obj);
         }
-      });
+      );
     } else {
       this.swalService.showToast(
         'error',
         'No se pueden eliminar los permisos del Módulo Principal',
-        ''
+        '',
+        'text',
+        () => {}
       );
     }
   }
@@ -364,30 +371,35 @@ export class ModulesComponent {
       delete formValue.id;
       this.apiServicePermissions.register(formValue).subscribe({
         next: (response) => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Permiso Insertado con Éxito',
-          }).then((result) => {
-            if (result.isConfirmed) {
+          this.swalService.showFire(
+            'success',
+            'Permiso Insertado con Éxito',
+            '',
+            'text',
+            () => {
               this.resetFileInput();
               this.getAllPermissions();
             }
-          });
+          );
         },
         error: (error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Ocurrió un error al Agregar el Permiso',
-          });
+          this.swalService.showToast(
+            'error',
+            'Error',
+            'Ocurrió un error al Agregar el Permiso',
+            'text',
+            () => {}
+          );
         },
       });
     } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error',
-        text: 'Por favor, ingresa correctamente la información.',
-      });
+      this.swalService.showToast(
+        'warning',
+        'Error',
+        'Por favor, ingresa correctamente la información.',
+        'text',
+        () => {}
+      );
     }
   }
 
@@ -405,48 +417,58 @@ export class ModulesComponent {
       formValue.permissions = permissionsString;
       this.apiServicePermissions.edit(formValue).subscribe({
         next: (response) => {
-          Swal.fire({
-            icon: 'success',
-            title: response.message || 'Permiso Modificado con Éxito',
-          }).then((result) => {
-            if (result.isConfirmed) {
+          this.swalService.showToast(
+            'success',
+            response.message || 'Permiso Modificado con Éxito',
+            '',
+            'text',
+            () => {
               this.resetFileInput();
               this.getAllPermissions();
             }
-          });
+          );
         },
         error: () => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Ocurrió un error al Modificar el Permiso',
-          });
+          this.swalService.showToast(
+            'error',
+            'Error',
+            'Ocurrió un error al Modificar el Permiso',
+            'text',
+            () => {}
+          );
         },
       });
     } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error',
-        text: 'Por favor, ingresa correctamente la información.',
-      });
+      this.swalService.showToast(
+        'warning',
+        'Error',
+        'Por favor, ingresa correctamente la información.',
+        'text',
+        () => {}
+      );
     }
   }
 
   deletePermissions(credentials: Permissions): void {
     this.apiServicePermissions.delete(credentials).subscribe({
       next: (response) => {
-        Swal.fire({
-          icon: 'success',
-          title: response.message || 'Permiso Eliminado Correctamente',
-        });
+        this.swalService.showToast(
+          'success',
+          response.message || 'Permiso Eliminado Correctamente',
+          '',
+          'text',
+          () => {}
+        );
         this.getAllPermissions();
       },
       error: () => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Ocurrió un Error al Eliminar el Permiso',
-        });
+        this.swalService.showToast(
+          'error',
+          'Error',
+          'Ocurrió un Error al Eliminar el Permiso',
+          'text',
+          () => {}
+        );
       },
     });
   }

@@ -23,13 +23,21 @@ export class AuthService {
     /* Clear Cookie => Backend */
     this.apiServiceLogout.logout().subscribe({
       next: (response) => {
-        this.swalService.showToast('success', response.message, '');
+        this.swalService.showToast(
+          'success',
+          response.message,
+          '',
+          'text',
+          () => {}
+        );
       },
       error: (error) => {
         this.swalService.showToast(
           'error',
           'Error',
-          error.error?.message || 'Ocurrió un Error'
+          error.error?.message || 'Ocurrió un Error',
+          'text',
+          () => {}
         );
       },
     });

@@ -149,7 +149,9 @@ export class ProductsComponent implements OnInit {
         this.swalService.showToast(
           'success',
           'Se encontraron ' + response.length + ' registros',
-          ''
+          '',
+          'text',
+          () => {}
         );
       },
       error: (error) => {
@@ -157,7 +159,9 @@ export class ProductsComponent implements OnInit {
         this.swalService.showToast(
           'error',
           'Error',
-          error.error?.message || 'Ocurrió un Error al Obtener los Productos'
+          error.error?.message || 'Ocurrió un Error al Obtener los Productos',
+          'text',
+          () => {}
         );
       },
     });
@@ -201,7 +205,9 @@ export class ProductsComponent implements OnInit {
         this.swalService.showToast(
           'error',
           'Ocurrió un Error al Obtener los Productos',
-          ''
+          '',
+          'text',
+          () => {}
         );
       },
     });
@@ -215,13 +221,11 @@ export class ProductsComponent implements OnInit {
       },
       error: (error) => {
         this.categories = [];
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text:
-            error.error?.message ||
-            'Ocurrió un Error al Obtener las Categorías',
-        });
+        this.swalService.showFire(
+          'error',
+          'Error',
+          error.error?.message || 'Ocurrió un Error al Obtener las Categorías'
+        );
       },
     });
   }
@@ -234,13 +238,12 @@ export class ProductsComponent implements OnInit {
       },
       error: (error) => {
         this.keySat = [];
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text:
-            error.error?.message ||
-            'Ocurrió un Error al Obtener las Claves de Producto',
-        });
+        this.swalService.showFire(
+          'error',
+          'Error',
+          error.error?.message ||
+            'Ocurrió un Error al Obtener las Claves de Producto'
+        );
       },
     });
   }
@@ -259,42 +262,39 @@ export class ProductsComponent implements OnInit {
 
   /* Delete Product -- Modal */
   showModaldeleteProduct(idProduct: number): void {
-    Swal.fire({
-      title: '¿Estás seguro que deseas eliminar?',
-      text: '¡Esta acción no se puede deshacer!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-    }).then((result) => {
-      if (result.isConfirmed) {
+    this.swalService.showFireConfirm(
+      'warning',
+      'Sí, eliminar',
+      'Cancelar',
+      '¿Estás seguro que deseas eliminar?',
+      '¡Esta acción no se puede deshacer!',
+      'text',
+      () => {
         const obj: DeleteRequest = {
           id: idProduct,
         };
         this.deleteProduct(obj);
       }
-    });
+    );
   }
 
   /* Delete Product -- Function */
   deleteProduct(credentials: DeleteRequest): void {
     this.apiServiceProducts.deleteProduct(credentials).subscribe({
       next: (response) => {
-        Swal.fire({
-          icon: 'success',
-          title: response.message || 'Producto Eliminado Correctamente',
-        });
+        this.swalService.showFire(
+          'success',
+          response.message || 'Producto Eliminado Correctamente',
+          ''
+        );
         this.getAllProducts();
       },
       error: (error) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text:
-            error.error?.message || 'Ocurrió un Error al Eliminar el Producto',
-        });
+        this.swalService.showFire(
+          'error',
+          'Error',
+          error.error?.message || 'Ocurrió un Error al Eliminar el Producto'
+        );
       },
     });
   }
@@ -370,32 +370,32 @@ export class ProductsComponent implements OnInit {
             formData.append('photo', this.selectedFile);
             this.uploadProduct(formData);
           } else {
-            Swal.fire({
-              icon: 'success',
-              title: response.message || 'Producto Añadido con Éxito',
-            }).then((result) => {
-              if (result.isConfirmed) {
+            this.swalService.showFire(
+              'success',
+              response.message || 'Producto Añadido con Éxito',
+              '',
+              'text',
+              () => {
                 this.resetFileInput();
                 this.getAllProducts();
               }
-            });
+            );
           }
         },
         error: (error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text:
-              error.error?.message || 'Ocurrió un error al Añadir el Producto.',
-          });
+          this.swalService.showFire(
+            'error',
+            'Error',
+            error.error?.message || 'Ocurrió un error al Añadir el Producto.'
+          );
         },
       });
     } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error',
-        text: 'Por favor, ingresa correctamente la información.',
-      });
+      this.swalService.showFire(
+        'warning',
+        'Error',
+        'Por favor, ingresa correctamente la información.'
+      );
     }
   }
 
@@ -413,32 +413,32 @@ export class ProductsComponent implements OnInit {
             formData.append('photo', this.selectedFile);
             this.uploadProduct(formData);
           } else {
-            Swal.fire({
-              icon: 'success',
-              title: response.message || 'Producto Modificado con Éxito',
-            }).then((result) => {
-              if (result.isConfirmed) {
+            this.swalService.showFire(
+              'success',
+              response.message || 'Producto Modificado con Éxito',
+              '',
+              'text',
+              () => {
                 this.resetFileInput();
                 this.getAllProducts();
               }
-            });
+            );
           }
         },
         error: (error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text:
-              error.error?.message || 'Ocurrió un error al Editar el Producto.',
-          });
+          this.swalService.showFire(
+            'error',
+            'Error',
+            error.error?.message || 'Ocurrió un error al Editar el Producto.'
+          );
         },
       });
     } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Error',
-        text: 'Por favor, ingresa correctamente la información.',
-      });
+      this.swalService.showFire(
+        'warning',
+        'Error',
+        'Por favor, ingresa correctamente la información.'
+      );
     }
   }
 
@@ -446,24 +446,21 @@ export class ProductsComponent implements OnInit {
   uploadProduct(formData: FormData): void {
     this.apiServiceProducts.uploadFile(formData).subscribe({
       next: (response) => {
-        Swal.fire({
-          icon: 'success',
-          title: response.message || 'Producto Modificado con Éxito',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.resetFileInput();
-            this.getAllProducts();
-          }
-        });
+        this.swalService.showFire(
+          'success',
+          response.message || 'Producto Modificado con Éxito',
+          ''
+        );
+        this.resetFileInput();
+        this.getAllProducts();
       },
       error: (error) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text:
-            error.error?.error ||
-            'Ocurrió un error al Subir la Imágen del Producto.',
-        });
+        this.swalService.showFire(
+          'error',
+          'Error',
+          error.error?.error ||
+            'Ocurrió un error al Subir la Imágen del Producto.'
+        );
       },
     });
   }
@@ -474,11 +471,11 @@ export class ProductsComponent implements OnInit {
     if (file) {
       const validationError = this.fileTypeValidator(file);
       if (validationError) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Error',
-          text: 'Solo se permiten imágenes (JPG, PNG, GIF, JPEG)',
-        });
+        this.swalService.showFire(
+          'warning',
+          'Error',
+          'Solo se permiten imágenes (JPG, PNG, GIF, JPEG)'
+        );
         return;
       }
 
