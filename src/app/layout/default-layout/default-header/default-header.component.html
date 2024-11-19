@@ -39,11 +39,11 @@
 <!--</c-header>-->
 
 <ng-template #userDropdown>
-  <span class="my-2 fw-bold text-danger">{{ userPayload.role_name }} </span>
+  <span class="my-2 fw-bold text-danger" *ngIf="userPayload">{{ userPayload.role_name }} </span>
   <div class="nav-item py-1">
     <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
   </div>
-  <span class="my-2 fw-bold">{{ userPayload.name }} </span>
+  <span class="my-2 fw-bold" *ngIf="userPayload">{{ userPayload.name }} </span>
   <c-dropdown
     [popperOptions]="{ placement: 'bottom-start' }"
     variant="nav-item"

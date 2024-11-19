@@ -1,27 +1,15 @@
 <!-- Section Filters and Add -->
 <div class="d-flex flex-column flex-md-row p-4">
-  <div class="col-12 mb-3 mb-md-0 d-flex align-items-center">
-    <input
-      type="text"
-      class="form-control me-2"
-      placeholder="Ingresa el Id/Nombre del Empleado"
-      [(ngModel)]="idEmployeeSearch"
-      (keyup.enter)="searchEmployee()"
-    />
-    <button
-      class="btn btn-success fw-bold d-flex align-items-center justify-content-center btn-search"
-      (click)="searchEmployee()"
-    >
-      <app-icons icon="search"></app-icons>
-      <span>Buscar</span>
-    </button>
+  <div
+    class="col-12 mb-3 mb-md-0 d-flex align-items-center justify-content-end"
+  >
     <button
       class="mx-3 btn btn-success fw-bold d-flex align-items-center justify-content-center btn-filter"
       (click)="onAdd()"
       *ngIf="permissions && permissions.add"
     >
       <app-icons icon="plus"></app-icons>
-      <span>Añadir Empleado</span>
+      <span>Añadir Cliente</span>
     </button>
   </div>
 </div>
@@ -29,9 +17,9 @@
 <!-- Datatable General Employee -->
 <app-datatable
   [columns]="columns"
-  [data]="employees"
+  [data]="clients"
   [buttons]="buttons"
-  [showButtonGroup]="showButtonGroupEmployee"
+  [showButtonGroup]="showButtonGroupClient"
 ></app-datatable>
 
 <!-- Modal Component -->
@@ -43,9 +31,9 @@
   (executeFunction)="handleClick()"
 >
   <!-- Form View || Form Edit -->
-  <form [formGroup]="employeeForm" class="product-form" [ngClass]="classModal">
+  <form [formGroup]="clientForm" class="product-form" [ngClass]="classModal">
     <div class="form-group" *ngIf="classModal !== 'add'">
-      <label for="id">N° Empleado:</label>
+      <label for="id">N° Cliente:</label>
       <input
         id="id"
         formControlName="id"
@@ -56,10 +44,10 @@
         (input)="validationsFormService.preventInput($event)"
       />
       <div
-        *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'id')"
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'id')"
         class="error-message"
       >
-        {{ validationsFormService.getErrorMessage(employeeForm, "id") }}
+        {{ validationsFormService.getErrorMessage(clientForm, "id") }}
       </div>
     </div>
 
@@ -72,10 +60,10 @@
         type="text"
       />
       <div
-        *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'name')"
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'name')"
         class="error-message"
       >
-        {{ validationsFormService.getErrorMessage(employeeForm, "name") }}
+        {{ validationsFormService.getErrorMessage(clientForm, "name") }}
       </div>
     </div>
 
@@ -88,10 +76,10 @@
         type="email"
       />
       <div
-        *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'email')"
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'email')"
         class="error-message"
       >
-        {{ validationsFormService.getErrorMessage(employeeForm, "email") }}
+        {{ validationsFormService.getErrorMessage(clientForm, "email") }}
       </div>
     </div>
 
@@ -104,10 +92,10 @@
         type="phone"
       />
       <div
-        *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'phone')"
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'phone')"
         class="error-message"
       >
-        {{ validationsFormService.getErrorMessage(employeeForm, "phone") }}
+        {{ validationsFormService.getErrorMessage(clientForm, "phone") }}
       </div>
     </div>
 
@@ -120,26 +108,57 @@
         type="text"
       />
       <div
-        *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'address')"
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'address')"
         class="error-message"
       >
-        {{ validationsFormService.getErrorMessage(employeeForm, "address") }}
+        {{ validationsFormService.getErrorMessage(clientForm, "address") }}
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="zip">Código Postal:</label>
+      <input
+        id="zip"
+        formControlName="zip"
+        class="form-control"
+        type="number"
+      />
+      <div
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'zip')"
+        class="error-message"
+      >
+        {{ validationsFormService.getErrorMessage(clientForm, "zip") }}
+      </div>
+    </div>
+    <!-- tax_id	tax_system -->
+    <div class="form-group">
+      <label for="tax_id">RFC:</label>
+      <input
+        id="tax_id"
+        formControlName="tax_id"
+        class="form-control"
+        type="text"
+      />
+      <div
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'tax_id')"
+        class="error-message"
+      >
+        {{ validationsFormService.getErrorMessage(clientForm, "tax_id") }}
       </div>
     </div>
 
     <div class="form-group">
-      <label for="role_id">Rol:</label>
-      <select id="role_id" formControlName="role_id" class="form-control">
-        <option value="">Selecciona una Categoría</option>
-        <option *ngFor="let rol of roles" [value]="rol.id">
-          {{ rol.name }}
-        </option>
-      </select>
+      <label for="tax_system">Régimen Físcal:</label>
+      <input
+        id="tax_system"
+        formControlName="tax_system"
+        class="form-control"
+        type="text"
+      />
       <div
-        *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'role_id')"
+        *ngIf="validationsFormService.isFieldInvalid(clientForm, 'tax_system')"
         class="error-message"
       >
-        {{ validationsFormService.getErrorMessage(employeeForm, "role_id") }}
+        {{ validationsFormService.getErrorMessage(clientForm, "tax_system") }}
       </div>
     </div>
   </form>

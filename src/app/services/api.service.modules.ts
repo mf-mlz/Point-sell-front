@@ -8,7 +8,7 @@ import { Permissions, objPermissionsByRole } from '../models/interfaces';
 @Injectable({
   providedIn: 'root',
 })
-export class ApiServicePermissions {
+export class ApiServiceModules {
   private apiUrl = environment.apiUrl;
 
   constructor(
@@ -29,7 +29,15 @@ export class ApiServicePermissions {
 
   /* Get */
   all(): Observable<any> {
-    const url = `${this.apiUrl}/permissions`;
+    const url = `${this.apiUrl}/modules`;
+    return this.http.get(url, {
+      headers: this.authHeaderService.getHeaders(),
+      withCredentials: true,
+    });
+  }
+
+  allModulesAndSubmodules(): Observable<any> {
+    const url = `${this.apiUrl}/modules/getModulesAndSubmodules`;
     return this.http.get(url, {
       headers: this.authHeaderService.getHeaders(),
       withCredentials: true,
@@ -37,6 +45,7 @@ export class ApiServicePermissions {
   }
 
   getPermissionsByRole(data: objPermissionsByRole): Observable<any> {
+    console.log(data);
     const url = `${this.apiUrl}/permissions/getPermissionsByRole`;
     return this.http.get(url, {
       headers: new HttpHeaders({ 'module-role': JSON.stringify(data) }),

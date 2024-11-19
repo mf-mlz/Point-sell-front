@@ -68,11 +68,11 @@
     </div>
 
     <div class="form-group">
-      <label for="module">Módulo / Submódulo:</label>
+      <label for="module">Módulo:</label>
       <select id="module" formControlName="module" class="form-control">
-        <option value="">Selecciona una Opción</option>
+        <option value="">Selecciona una Módulo</option>
         <option *ngFor="let item of navItems" [value]="item.name">
-          {{ item.name }} [   {{item.type}}   {{item.modulo}}  ]  
+          {{ item.name }}
         </option>
       </select>
       <div
@@ -84,6 +84,7 @@
     </div>
 
     <div class="form-group">
+      <label class="my-2"> Selecciona los Permisos: </label>
       <div class="form-group d-flex justify-content-evenly">
         <label class="checkbox-container">
           <input type="checkbox" name="permissions" formControlName="add" />
@@ -120,6 +121,26 @@
         {{
           validationsFormService.getErrorMessage(permissionsForm, "permissions")
         }}
+      </div>
+    </div>
+
+    <!-- Select Father o Children -->
+    <div class="form-group">
+      <label class="my-2"> Selecciona su tipo: </label>
+      <div class="form-group d-flex justify-content-initial">
+        <label class="checkbox-container mx-3">
+          <input type="radio" name="type" formControlName="type" value="isModule"/>
+          <span class="checkmark"></span>
+          Módulo </label
+        ><br />
+        <label class="checkbox-container">
+          <input type="radio" name="type" formControlName="type" value="isSubmodule"/>
+          <span class="checkmark"></span>
+          Sub Módulo </label
+        ><br />
+      </div>
+      <div *ngIf="validationsFormService.isFieldInvalid(permissionsForm, 'type')" class="error-message">
+        {{ validationsFormService.getErrorMessage(permissionsForm, "type") }}
       </div>
     </div>
 

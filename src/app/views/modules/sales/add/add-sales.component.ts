@@ -26,7 +26,7 @@ import {
   OpenPayPayment,
   customerOpenPay,
   userPayload,
-  RoutePermissions
+  RoutePermissions,
 } from 'src/app/models/interfaces';
 import { ApiServicePaymentForms } from '../../../../services/api.service.paymentForms';
 import { ApiServiceSalesProducts } from 'src/app/services/api.service.salesProducts';
@@ -35,7 +35,9 @@ import { ValidationsFormService } from 'src/app/utils/form-validations';
 import { onKeydownScanner } from '../../../../utils/scanner';
 import { encrypt, decrypt } from '../../../../utils/crypto';
 import { environment } from '../../../../../environments/environment';
-import { PermissionsService } from 'src/app/services/permissionsService';
+import { PermissionsService } from 'src/app/services/permissions.service';
+import { UserService } from 'src/app/services/user.service';
+import { SwalService } from 'src/app/services/swal.service';
 
 @Component({
   selector: 'app-add-sales',
@@ -63,9 +65,10 @@ export class AddSalesComponent {
     private apiServiceSales: ApiServiceSales,
     private fb: FormBuilder,
     private openpayService: OpenpayService,
-    private authService: AuthService,
     public validationsFormService: ValidationsFormService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private userService: UserService,
+    private swalService: SwalService
   ) {
     this.saleForm = this.fb.group({
       typePayment: ['', [Validators.required]],
@@ -164,9 +167,9 @@ export class AddSalesComponent {
   ];
 
   /* Functions  */
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    this.userPayload = await this.userService.getUser();
     this.permissions = this.permissionsService.getPermissions();
-    this.userPayload = this.authService.getDecodedToken();
     this.products = [];
     this.getAllPaymentsForm();
     this.initForm();
@@ -218,21 +221,13 @@ export class AddSalesComponent {
       };
       this.searchProduct(data);
     } else {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: true,
-        timer: 2000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        },
-      });
-      Toast.fire({
-        icon: 'error',
-        title: 'Ingresa la Clave de un Producto para Ingresarlo a la Venta',
-      });
+      this.swalService.showToast(
+        'error',
+        'Ingresa la Clave de un Producto para Ingresarlo a la Venta',
+        '',
+        'text',
+        () => {}
+      );
     }
   }
 
@@ -244,39 +239,23 @@ export class AddSalesComponent {
         } else if (response.product.length > 1) {
           this.openSwalMultipleProducts(response.product);
         } else {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: true,
-            timer: 2000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.onmouseenter = Swal.stopTimer;
-              toast.onmouseleave = Swal.resumeTimer;
-            },
-          });
-          Toast.fire({
-            icon: 'error',
-            title: `El Producto ${data.code} No Existe`,
-          });
+          this.swalService.showToast(
+            'error',
+            `El Producto ${data.code} No Existe`,
+            '',
+            'text',
+            () => {}
+          );
         }
       },
       error: (error) => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: true,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: 'error',
-          title: 'Ocurrió un error al Obtener el Producto',
-        });
+        this.swalService.showToast(
+          'error',
+          'Ocurrió un error al Obtener el Producto',
+          '',
+          'text',
+          () => {}
+        );
       },
     });
   }
@@ -545,9 +524,8 @@ export class AddSalesComponent {
         /* Sale Information Valid */
         const objData = {
           date: this.saleForm.value.date,
-          // customerId: this.userPayload.id,
           payment: this.saleForm.value.payment,
-          employeesId: this.userPayload.id,
+          employees: this.userPayload.name,
           total: this.saleForm.value.total,
           typePayment: this.saleForm.value.typePayment,
           products: this.products,
@@ -555,11 +533,11 @@ export class AddSalesComponent {
         this.confirmPaymentSale(objData);
       }
     } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Ingresa correctamente la información para generar la venta',
-      });
+      this.swalService.showFire(
+        'error',
+        'Error',
+        'Ingresa correctamente la información para generar la venta'
+      );
 
       /* Activate Validations Input Required (Type and Data Payment) */
       if (!this.saleForm.value.payment) {
@@ -608,11 +586,12 @@ export class AddSalesComponent {
           this.addSale(obj, changeAmount, receivedAmount, 'money');
         } else {
           /* The entered amount is less than the total */
-          Swal.fire({
-            icon: 'error',
-            html: `<strong>El Monto Ingresado es Menor al Monto total de la Venta ${obj.total}</strong>`,
-            confirmButtonText: 'Aceptar',
-          });
+          this.swalService.showFire(
+            'error',
+            'Error',
+            `<strong>El Monto Ingresado es Menor al Monto total de la Venta ${obj.total}</strong>`,
+            'html'
+          );
         }
       }
       /* If payment is Credit/Debit Card */
@@ -735,26 +714,19 @@ export class AddSalesComponent {
                     response.message
                   }</strong><br>Cambio: ${this.formatMoneyMx(changeAmount)}`
                 : `<strong>${response.message}</strong>`;
-            Swal.fire({
-              icon: 'success',
-              html: message,
-              confirmButtonText: 'Aceptar',
-              showConfirmButton: true,
-            }).then((result) => {
-              if (result.isConfirmed) {
-                this.downloadPDF(response.idSale);
-                this.loadData();
-              }
+            this.swalService.showFire('success', '', message, 'html', () => {
+              this.downloadPDF(response.idSale);
+              this.loadData();
             });
             resolve(response);
           }
         },
         error: (error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error.error.error || 'Ocurrió un Error al Registrar la Venta',
-          });
+          this.swalService.showFire(
+            'error',
+            'Error',
+            error.error?.error || 'Ocurrió un Error al Registrar la Venta'
+          );
           reject(error);
         },
       });
@@ -763,7 +735,7 @@ export class AddSalesComponent {
 
   /* Download Ticket */
   downloadPDF(idSale: number) {
-    const data = { salesId: idSale }; 
+    const data = { salesId: idSale };
 
     this.apiServiceSalesProducts.downloadTicket(data).subscribe({
       next: (response) => {
@@ -805,25 +777,23 @@ export class AddSalesComponent {
 
         this.openpayService.processPayment(paymentData).subscribe({
           next: (response) => {
-            Swal.fire({
-              icon: 'success',
-              title: 'Venta Procesada con Éxito',
-              text: response.message || 'Venta Pagada con Éxito',
-              showConfirmButton: true,
-              confirmButtonText: 'Aceptar',
-            }).then((result) => {
-              if (result.isConfirmed) {
+            this.swalService.showFire(
+              'success',
+              'Venta Procesada con Éxito',
+              response.message || 'Venta Pagada con Éxito',
+              'text',
+              () => {
                 this.downloadPDF(saleResponse.idSale);
                 this.loadData();
               }
-            });
+            );
           },
           error: (error) => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: error.error.error || 'Ocurrió un Error al Procesar el Pago',
-            });
+            this.swalService.showFire(
+              'error',
+              'Error',
+              error.error?.error || 'Ocurrió un Error al Procesar el Pago'
+            );
           },
         });
       }
@@ -834,10 +804,8 @@ export class AddSalesComponent {
       const errorMessage =
         openPayError?.data?.description ||
         'Ocurrió un Error al Procesar la Venta';
-      Swal.fire({
-        icon: 'error',
-        title: errorMessage,
-      });
+      this.swalService.showFire('error', 'Error', errorMessage);
+
       return false;
     }
   }

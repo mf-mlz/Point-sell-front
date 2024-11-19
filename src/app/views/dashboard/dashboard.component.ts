@@ -26,14 +26,12 @@ import {
   WidgetStatAComponent,
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
-import { cilArrowTop, cilOptions } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
-import { getStyle } from '@coreui/utils';
 import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.component';
 import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
 import { ApiServiceSales } from '../../services/api.service.sales';
 import { SaleDate, Sale } from '../../models/interfaces';
-import Swal from 'sweetalert2';
+import { SwalService } from 'src/app/services/swal.service';
 import { GridModule } from '@coreui/angular';
 
 @Component({
@@ -80,7 +78,10 @@ export class DashboardComponent implements OnInit {
 
   public options: any = {};
 
-  constructor(private apiServiceSales: ApiServiceSales) {}
+  constructor(
+    private apiServiceSales: ApiServiceSales,
+    private swalService: SwalService
+  ) {}
 
   ngOnInit(): void {
     this.getSaleDate();
@@ -103,13 +104,14 @@ export class DashboardComponent implements OnInit {
       },
       error: (error) => {
         this.sales = [];
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text:
-            error.error?.message ||
+        this.swalService.showToast(
+          'error',
+          'Error',
+          error.error?.message ||
             'Ocurrió un Error al Obtener las Ventas Diarias',
-        });
+          'text',
+          () => {}
+        );
       },
     });
   }

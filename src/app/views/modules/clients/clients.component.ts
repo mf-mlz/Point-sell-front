@@ -2,16 +2,15 @@ import { Component } from '@angular/core';
 import { DatatableComponent } from '../../../datatable/datatable.component';
 import { RouterModule } from '@angular/router';
 import {
-  Employee,
+  Clients,
   DeleteRequest,
   ButtonConfig,
-  userPayload,
-  EmployeeFilter,
   Roles,
   RoutePermissions,
 } from 'src/app/models/interfaces';
 import { ModalComponentHtml } from '../../../modalHtml/modalhtml.component';
 import Swal from 'sweetalert2';
+import { SwalService } from 'src/app/services/swal.service';
 import {
   FormBuilder,
   FormGroup,
@@ -21,15 +20,15 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ValidationsFormService } from 'src/app/utils/form-validations';
-import { ApiServiceEmployees } from '../../../services/api.service.employees';
+import { ApiServiceClients } from '../../../services/api.service.clients';
+import { AuthService } from '../../../services/auth.service';
 import { ApiServiceRoles } from '../../../services/api.service.roles';
 import { IconsModule } from '../../../icons/icons.module';
+import { environment } from '../../../../environments/environment';
 import { PermissionsService } from 'src/app/services/permissions.service';
-import { SwalService } from 'src/app/services/swal.service';
-import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-sales',
+  selector: 'app-client',
   standalone: true,
   imports: [
     DatatableComponent,
@@ -40,34 +39,26 @@ import { environment } from 'src/environments/environment';
     RouterModule,
     FormsModule,
   ],
-  templateUrl: './employees.component.html',
+  templateUrl: './clients.component.html',
   styleUrls: ['../../../../scss/forms.scss', '../../../../scss/buttons.scss'],
 })
-export class EmployeesComponent {
-  idEmployeeSearch: string = '';
-  showButtonGroupEmployee: boolean = false;
-  userPayload: userPayload = {
-    id: 0,
-    name: '',
-    email: '',
-    phone: '',
-    role_id: 0,
-    role_name: '',
-    iat: 0,
-    exp: 0,
-  };
+export class ClientsComponent {
+  idClientSearch: string = '';
+  showButtonGroupClient: boolean = false;
 
-  employees: Employee[] = [];
+  clients: Clients[] = [];
   roles: Roles[] = [];
-  selectedEmployee: Employee | null = null;
-  employeeForm: FormGroup;
+  selectedClient: Clients | null = null;
+  clientForm: FormGroup;
+
   isModalVisible = false;
   titleModal: string = '';
   classModal: string = '';
   error: string | null = null;
   permissions!: RoutePermissions;
+
   constructor(
-    private apiServiceEmployees: ApiServiceEmployees,
+    private apiServiceClients: ApiServiceClients,
     private apiServiceRoles: ApiServiceRoles,
     private fb: FormBuilder,
     public validationsFormService: ValidationsFormService,
@@ -75,14 +66,15 @@ export class EmployeesComponent {
     private swalService: SwalService
   ) {
     /* Init Form and Add Validations */
-    this.employeeForm = this.fb.group({
+    this.clientForm = this.fb.group({
       id: [''],
       name: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       address: ['', [Validators.required]],
-      role: [''],
-      role_id: ['', [Validators.required]],
+      zip: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      tax_id: ['', [Validators.required]],
+      tax_system: ['', [Validators.required]],
     });
   }
 
@@ -92,15 +84,15 @@ export class EmployeesComponent {
   async ngOnInit(): Promise<void> {
     this.permissions = this.permissionsService.getPermissions();
     this.generateButtons();
-    this.getAllEmployees();
+    this.getAllClients();
     this.getAllRoles();
   }
 
-  /* Get Employee By Id */
-  getEmployeeById(employee: EmployeeFilter): void {
-    this.apiServiceEmployees.filter(employee).subscribe({
+  /* Get CLient By Id */
+  getClientById(filters: { search?: string }): void {
+    this.apiServiceClients.filterClients(filters).subscribe({
       next: (response) => {
-        this.employees = response.employee;
+        this.clients = response.client;
         this.swalService.showToast(
           'success',
           response.message,
@@ -110,11 +102,11 @@ export class EmployeesComponent {
         );
       },
       error: (error) => {
-        this.employees = [];
+        this.clients = [];
         this.swalService.showToast(
           'error',
           'Error',
-          error.error?.message || 'Ocurrió un Error al Obtener los Empleados',
+          error.error?.message || 'Ocurrió un Error al Obtener los Clientes',
           'text',
           () => {}
         );
@@ -122,11 +114,11 @@ export class EmployeesComponent {
     });
   }
 
-  /* Get All Employees */
-  getAllEmployees(): void {
-    this.apiServiceEmployees.allEmployees().subscribe({
+  /* Get All Clients */
+  getAllClients(): void {
+    this.apiServiceClients.getAllClients().subscribe({
       next: (response) => {
-        this.employees = response;
+        this.clients = response;
         this.swalService.showToast(
           'success',
           response.message || `Se encontraron ${response.length} registros`,
@@ -136,7 +128,7 @@ export class EmployeesComponent {
         );
       },
       error: (error) => {
-        this.employees = [];
+        this.clients = [];
       },
     });
   }
@@ -162,19 +154,29 @@ export class EmployeesComponent {
       cell: (element: any) => element.name,
     },
     {
-      columnDef: 'phone',
-      header: 'Télefono',
-      cell: (element: any) => element.phone,
-    },
-    {
       columnDef: 'email',
       header: 'E-mail',
       cell: (element: any) => element.email,
     },
     {
-      columnDef: 'role',
-      header: 'Rol',
-      cell: (element: any) => element.role,
+      columnDef: 'phone',
+      header: 'Télefono',
+      cell: (element: any) => element.phone,
+    },
+    {
+      columnDef: 'address',
+      header: 'Direccion',
+      cell: (element: any) => element.address,
+    },
+    {
+      columnDef: 'tax_id',
+      header: 'RFC',
+      cell: (element: any) => element.tax_id,
+    },
+    {
+      columnDef: 'tax_system',
+      header: 'Régimen fiscal',
+      cell: (element: any) => element.tax_system,
     },
   ];
 
@@ -214,18 +216,18 @@ export class EmployeesComponent {
 
   /* Functions Datatable Buttons -- Open Modals */
   onAdd(): void {
-    this.showModal('add', 'Añadir Empleado');
+    this.showModal('add', 'Añadir Cliente');
   }
 
-  onView(employee: Employee): void {
-    this.showModal('eye', 'Ver Información del Empleado', employee);
+  onView(client: Clients): void {
+    this.showModal('eye', 'Ver Información del Cliente', client);
   }
 
-  onEdit(employee: Employee): void {
-    this.showModal('edit', 'Editar Empleado', employee);
+  onEdit(client: Clients): void {
+    this.showModal('edit', 'Editar Cliente', client);
   }
 
-  onDelete(employee: Employee): void {
+  onDelete(client: Clients): void {
     this.swalService.showFireConfirm(
       'warning',
       'Sí, eliminar',
@@ -235,41 +237,43 @@ export class EmployeesComponent {
       'text',
       () => {
         const obj: DeleteRequest = {
-          id: employee.id,
+          id: client.id,
         };
-        this.deleteSale(obj);
+        this.deleteClient(obj);
       }
     );
   }
 
   /* Show Modal */
-  showModal(classModal: string, title: string, employee?: Employee): void {
+  showModal(classModal: string, title: string, client?: Clients): void {
     /* Select Element or Default */
-    const defaultSale = {
+    const defaulClient = {
       id: 0,
       name: '',
       email: '',
-      phone: 0,
+      phone: '',
       address: '',
-      status: '',
-      role: '',
-      role_id: 0,
-      created_at: '',
-      updated_at: '',
+      zip: 0,
+      tax_id: '',
+      tax_system: 0,
+      created_at: new Date(),
+      updated_at: new Date(),
     };
 
-    this.selectedEmployee = employee ? employee : defaultSale;
+    this.selectedClient = client ? client : defaulClient;
 
     /* Inti Form => Show Modal */
-    this.employeeForm.patchValue({
-      id: this.selectedEmployee?.id || 0,
-      name: this.selectedEmployee?.name || '',
-      email: this.selectedEmployee?.email || '',
-      phone: this.selectedEmployee?.phone || '',
-      address: this.selectedEmployee?.address || '',
-      status: this.selectedEmployee?.status || '',
-      role_id: this.selectedEmployee?.role_id || 0,
-      role: this.selectedEmployee?.role || '',
+    this.clientForm.patchValue({
+      id: this.selectedClient?.id || 0,
+      name: this.selectedClient?.name || '',
+      email: this.selectedClient?.email || '',
+      phone: this.selectedClient?.phone || '',
+      address: this.selectedClient?.address || '',
+      zip: this.selectedClient?.zip || '',
+      tax_id: this.selectedClient?.tax_id || '',
+      tax_system: this.selectedClient?.tax_system || '',
+      created_at: this.selectedClient?.created_at || '',
+      updated_at: this.selectedClient?.updated_at || '',
     });
 
     /* Pass => Data Modal (Class, Visible and Title) */
@@ -287,10 +291,10 @@ export class EmployeesComponent {
   handleClick(): void {
     switch (this.classModal) {
       case 'edit':
-        this.editEmployee();
+        this.editClient();
         break;
       case 'add':
-        this.addEmployee();
+        this.addClient();
         break;
       default:
         break;
@@ -298,75 +302,28 @@ export class EmployeesComponent {
   }
 
   /* Functions */
-  addEmployee(): void {
-    if (this.employeeForm.valid) {
-      let formValue = this.employeeForm.value;
-      const temporaryPassword = this.createTemporaryPassword(formValue);
-      formValue.password = temporaryPassword;
-      this.apiServiceEmployees.registerEmployee(formValue).subscribe({
-        next: (response) => {
-          this.swalService.showFire(
-            'info',
-            `<strong>${response.message}</strong>` ||
-              '<strong> Empleado Agregado con Éxito </strong>',
-            `Por favor, proporcionale al Empleado su Contraseña Temporal: <br><br><b> ${temporaryPassword} </b><br><br>
-                  Para cambiar la contraseña es necesario ingresar al Sistema y dar clic en el apartado <br><br><strong> Cambiar Contraseña </strong>`,
-            'html',
-            () => {
-              this.resetFileInput();
-              this.getAllEmployees();
-            }
-          );
-        },
-        error: () => {
-          this.swalService.showToast(
-            'error',
-            'Error',
-            'Ocurrió un error al Agregar el Empleado, verifica que el Correo y el Télefono no estén registrados en otro empleado Activo',
-            'text',
-            () => {}
-          );
-        },
-      });
-    } else {
-      this.swalService.showToast(
-        'warning',
-        'Error',
-        'Por favor, ingresa correctamente la información.',
-        'text',
-        () => {}
-      );
-    }
-  }
-
-  editEmployee(): void {
-    Object.keys(this.employeeForm.controls).forEach((key) => {
-      const controlErrors = this.employeeForm.get(key)?.errors;
-      if (controlErrors) {
-        console.log(`Errores en el control ${key}:`, controlErrors);
-      }
-    });
-
-    if (this.employeeForm.valid) {
-      const formValue = this.employeeForm.value;
-      this.apiServiceEmployees.editEmployee(formValue).subscribe({
+  addClient(): void {
+    if (this.clientForm.valid) {
+      let formValue = this.clientForm.value;
+      this.apiServiceClients.registerClients(formValue).subscribe({
         next: (response) => {
           this.swalService.showFire(
             'success',
-            response.message || 'Empleado Modificado con Éxito',
+            `<strong>${response.message}</strong>` ||
+              '<strong> Cliente Agregado con Éxito </strong>',
             '',
             'text',
             () => {
               this.resetFileInput();
-              this.getAllEmployees();
+              this.getAllClients();
             }
           );
         },
-        error: () => {
+        error: (error) => {
           this.swalService.showToast(
             'error',
             'Error',
-            'Ocurrió un error al Modificar el Empleado, verifica que el Correo y el Télefono no estén registrados en otro empleado Activo.',
+            'Ocurrió un error al Agregar el Cliente, verifica que el Correo y el Télefono no estén registrados en otro Cliente Activo',
             'text',
             () => {}
           );
@@ -383,23 +340,60 @@ export class EmployeesComponent {
     }
   }
 
-  deleteSale(credentials: DeleteRequest): void {
-    this.apiServiceEmployees.deleteEmployee(credentials).subscribe({
+  editClient(): void {
+    if (this.clientForm.valid) {
+      const formValue = this.clientForm.value;
+      this.apiServiceClients.editClients(formValue).subscribe({
+        next: (response) => {
+          this.swalService.showFire(
+            'success',
+            response.message || 'Cliente Modificado con Éxito',
+            '',
+            'text',
+            () => {
+              this.resetFileInput();
+              this.getAllClients();
+            }
+          );
+        },
+        error: () => {
+          this.swalService.showToast(
+            'error',
+            'Error',
+            'Ocurrió un error al Modificar el Cliente, verifica que el Correo y el Télefono no estén registrados en otro Cliente Activo',
+            'text',
+            () => {}
+          );
+        },
+      });
+    } else {
+      this.swalService.showToast(
+        'warning',
+        'Error',
+        'Por favor, ingresa correctamente la información.',
+        'text',
+        () => {}
+      );
+    }
+  }
+
+  deleteClient(credentials: DeleteRequest): void {
+    this.apiServiceClients.deleteClients(credentials).subscribe({
       next: (response) => {
         this.swalService.showToast(
           'success',
-          response.message || 'Empleado Eliminado Correctamente',
+          response.message || 'Cliente Eliminado Correctamente',
           '',
           'text',
           () => {}
         );
-        this.getAllEmployees();
+        this.getAllClients();
       },
       error: () => {
         this.swalService.showToast(
           'error',
           'Error',
-          'Ocurrió un Error al Eliminar el Empleado',
+          'Ocurrió un Error al Eliminar el Cliente',
           'text',
           () => {}
         );
@@ -407,57 +401,30 @@ export class EmployeesComponent {
     });
   }
 
-  /* Create Temporary Password */
-  createTemporaryPassword(employee: Employee): string {
-    const arrayPassword: string[] = [];
-
-    for (const key in employee) {
-      if (employee.hasOwnProperty(key)) {
-        const value = employee[key as keyof Employee];
-
-        if (typeof value === 'string' && value.length > 0) {
-          const valueArr = value.replace(/\s+/g, '').split('');
-          const lengthArr = valueArr.length;
-
-          for (let index = 0; index < 2; index++) {
-            const randomIndex = Math.floor(Math.random() * lengthArr);
-            const randomChar = valueArr[randomIndex];
-            if (randomChar !== '') {
-              arrayPassword.push(randomChar);
-            }
-          }
-        }
-      }
-    }
-    const password = environment.temporary_string + arrayPassword.join('');
-    return password;
-  }
-
   /* Search Employee */
-  searchEmployee(): void {
-    if (this.idEmployeeSearch) {
+  searchClient(): void {
+    if (this.idClientSearch) {
       const isNumber = (value: string | number) => /^\d+$/.test(String(value));
-      const isValid = isNumber(this.idEmployeeSearch);
+      const isValid = isNumber(this.idClientSearch);
       let data = null;
 
       if (isValid) {
         data = {
-          id: Number(this.idEmployeeSearch),
+          search: this.idClientSearch,
         };
       } else {
         data = {
-          name: this.idEmployeeSearch.toString(),
+          search: this.idClientSearch.toString(),
         };
       }
-
-      this.getEmployeeById(data);
+      this.getClientById(data);
     } else {
-      this.getAllEmployees();
+      this.getAllClients();
     }
   }
 
   /* Reset Input File */
   resetFileInput(): void {
-    this.employeeForm.reset();
+    this.clientForm.reset();
   }
 }

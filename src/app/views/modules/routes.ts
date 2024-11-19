@@ -51,10 +51,24 @@ export const routes: Routes = [
         }
       },
       {
+        path: 'modules',
+        loadComponent: () => import('./modules/modules.component').then(m => m.ModulesComponent),
+        data: {
+          title: 'Modulos'
+        }
+      },
+      {
         path: 'permissions',
         loadComponent: () => import('./permissions/permissions.component').then(m => m.PermissionsComponent),
         data: {
           title: 'Permisos'
+        }
+      },
+      {
+        path: 'clients',
+        loadComponent: () => import('./clients/clients.component').then(m => m.ClientsComponent),
+        data: {
+          title: 'Clientes'
         }
       }
     ]
