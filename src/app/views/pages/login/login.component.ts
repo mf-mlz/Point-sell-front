@@ -71,7 +71,7 @@ export class LoginComponent {
     });
   }
 
-  onInit(): void {}
+  onInit(): void { }
 
   onSubmit(): void {
     if (this.loginForm.valid) {
@@ -117,14 +117,14 @@ export class LoginComponent {
                     res.message || 'Inicio de Sesión Éxitoso'
                   );
                   /* Save Data */
-                  this.saveDataSession(response.data);
+                  this.saveDataSession(response.data, response.vali);
                 })
                 .catch((error) => {
                   this.swalService.showToast(
                     'error',
                     'Autenticación Fallida',
                     error.error?.error ||
-                      'El Código de Autenticación ingresado es incorrecto, intentalo de nuevo'
+                    'El Código de Autenticación ingresado es incorrecto, intentalo de nuevo'
                   );
                 });
             } else {
@@ -166,8 +166,14 @@ export class LoginComponent {
     });
   };
 
-  saveDataSession = (sessionEmployee: any): void => {
-    sessionStorage.setItem('session-employee', JSON.stringify(sessionEmployee));
-    this.router.navigate(['/dashboard']);
+  saveDataSession = (sessionEmployee: any, vali: boolean): void => {
+    if (!vali) {
+      console.log("Validations false>>", vali);
+      sessionStorage.setItem('session-employee', JSON.stringify(sessionEmployee));
+      this.router.navigate(['/dashboard']);
+    }else{
+      console.log("Validations true>>", vali);
+      this.router.navigate(['/forgotPassword']);
+    }
   }
 }
