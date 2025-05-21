@@ -3,7 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthHeaderService } from './auth-header.service';
-import { Employee, EmployeeFilter, VerifyCodeSms } from '../models/interfaces';
+import {
+  Employee,
+  EmployeeFilter,
+  VerifyCodeSms,
+  Photo,
+} from '../models/interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -34,7 +39,7 @@ export class ApiServiceEmployees {
       withCredentials: true,
     });
   }
-  
+
   filter(filters: EmployeeFilter): Observable<any> {
     const url = `${this.apiUrl}/employees/filter`;
     return this.http.post(url, filters, {
@@ -84,6 +89,14 @@ export class ApiServiceEmployees {
   getModulesSession(): Observable<any> {
     const url = `${this.apiUrl}/employees/getModulesSession`;
     return this.http.get(url, {
+      headers: this.authHeaderService.getHeaders(),
+      withCredentials: true,
+    });
+  }
+
+  editPhotoEmployee(formData: FormData): Observable<any> {
+    const url = `${this.apiUrl}/employees/uploadPhoto`;
+    return this.http.post(url, formData, {
       headers: this.authHeaderService.getHeaders(),
       withCredentials: true,
     });

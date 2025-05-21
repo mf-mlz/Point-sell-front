@@ -72,6 +72,7 @@ export class SalesComponent {
     name: '',
     email: '',
     phone: '',
+    photo: '',
     role_id: 0,
     role_name: '',
     iat: 0,

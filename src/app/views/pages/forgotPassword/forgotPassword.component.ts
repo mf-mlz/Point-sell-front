@@ -51,11 +51,7 @@ import Swal from 'sweetalert2';
     CommonModule,
   ],
 })
-
-
 export class ForgotPasswordComponent {
-
-
   forgotPasswordForm: FormGroup;
 
   constructor(
@@ -69,25 +65,23 @@ export class ForgotPasswordComponent {
   }
 
   onSubmit(): void {
-
     if (this.forgotPasswordForm.valid) {
       const formValue = this.forgotPasswordForm.value;
-      console.log(formValue);
-      
       this.apiServiceForgot.recoverPassword(formValue).subscribe({
         next: (response) => {
           this.swalService.showToast(
             'success',
-            response.message || 'Correo Enviado, favor de revisar su bandeja de mensajes',
+            response.message ||
+              'Correo Enviado, favor de revisar su bandeja de mensajes',
             'text'
-          );          
+          );
         },
         error: (error) => {
           this.swalService.showToast(
             'error',
             error.error?.message || 'Ocurrió un error al enviar el correo.',
             'text'
-          );          
+          );
         },
       });
     } else {
@@ -95,8 +89,7 @@ export class ForgotPasswordComponent {
         'warning',
         'Por favor, ingresa correctamente la información.',
         'text'
-      );      
+      );
     }
   }
-
 }

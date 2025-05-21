@@ -16,6 +16,7 @@ export interface userPayload {
   email: string;
   phone: string;
   role_id: number;
+  photo: string;
   role_name: string;
   iat: number;
   exp: number;
@@ -159,6 +160,7 @@ export interface Employee {
   name: string;
   email: string;
   password?: string;
+  photo?: string;
   phone: number;
   address: string;
   status: string;
@@ -171,6 +173,11 @@ export interface Employee {
 export interface EmployeeFilter {
   id?: number;
   name?: string;
+}
+
+export interface Photo{
+  id: number,
+  photo: string
 }
 
 /* Clients */

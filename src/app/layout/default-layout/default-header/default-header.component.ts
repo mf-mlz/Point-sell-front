@@ -5,6 +5,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { ApiServiceEmployees } from 'src/app/services/api.service.employees';
 import { UserService } from 'src/app/services/user.service';
 import { Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 
 import {
   AvatarComponent,
@@ -69,6 +70,7 @@ import { OnInit } from '@angular/core';
 })
 export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   public userPayload: any;
+  public apiUpload = environment.apiUpload;
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
 
@@ -96,7 +98,7 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.userPayload = await this.userService.getUser();
+    this.userPayload = await this.userService.getUser(); 
   }
 
   onLogout() {

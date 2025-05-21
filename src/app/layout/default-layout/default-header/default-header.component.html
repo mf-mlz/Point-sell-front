@@ -14,7 +14,7 @@
 
     <!-- Notifications Products Expired Date -->
     <c-header-nav class="d-none d-md-flex ms-auto">
-      <app-icons icon="notification" style="color: yellow;"></app-icons>
+      <app-icons icon="notification" style="color: yellow"></app-icons>
     </c-header-nav>
 
     <!-- Change Theme -->
@@ -39,7 +39,9 @@
 <!--</c-header>-->
 
 <ng-template #userDropdown>
-  <span class="my-2 fw-bold text-danger" *ngIf="userPayload">{{ userPayload.role_name }} </span>
+  <span class="my-2 fw-bold text-danger" *ngIf="userPayload"
+    >{{ userPayload.role_name }}
+  </span>
   <div class="nav-item py-1">
     <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
   </div>
@@ -57,7 +59,7 @@
       <c-avatar
         shape="rounded-1"
         [size]="'md'"
-        src="./assets/images/avatars/8.jpg"
+        [src]="apiUpload + (userPayload?.photo_name || 'noImage.png')"
         status="success"
         textColor="primary"
         alt="User avatar"

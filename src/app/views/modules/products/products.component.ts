@@ -84,6 +84,7 @@ export class ProductsComponent implements OnInit {
     name: '',
     email: '',
     phone: '',
+    photo: '',
     role_id: 0,
     role_name: '',
     iat: 0,

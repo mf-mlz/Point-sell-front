@@ -44,6 +44,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['../../../../scss/forms.scss', '../../../../scss/buttons.scss'],
 })
 export class EmployeesComponent {
+  public apiUpload = environment.apiUpload;
   idEmployeeSearch: string = '';
   showButtonGroupEmployee: boolean = false;
   userPayload: userPayload = {
@@ -51,12 +52,15 @@ export class EmployeesComponent {
     name: '',
     email: '',
     phone: '',
+    photo: '',
     role_id: 0,
     role_name: '',
     iat: 0,
     exp: 0,
   };
 
+  nameFile: string = '';
+  selectedFile: File | null = null;
   employees: Employee[] = [];
   roles: Roles[] = [];
   selectedEmployee: Employee | null = null;
@@ -82,6 +86,7 @@ export class EmployeesComponent {
       phone: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       address: ['', [Validators.required]],
       role: [''],
+      photo: [''],
       role_id: ['', [Validators.required]],
     });
   }
@@ -198,6 +203,12 @@ export class EmployeesComponent {
         title: 'Editar',
         action: (element: any) => this.onEdit(element),
       });
+      btns.push({
+        class: 'btn-success',
+        icon: 'image',
+        title: 'Editar Foto',
+        action: (element: any) => this.onEditPhoto(element),
+      });
     }
 
     if (this.permissions && this.permissions.delete) {
@@ -225,6 +236,10 @@ export class EmployeesComponent {
     this.showModal('edit', 'Editar Empleado', employee);
   }
 
+  onEditPhoto(employee: Employee): void {
+    this.showModal('editPhoto', 'Editar Fotografía Empleado', employee);
+  }
+
   onDelete(employee: Employee): void {
     this.swalService.showFireConfirm(
       'warning',
@@ -237,13 +252,14 @@ export class EmployeesComponent {
         const obj: DeleteRequest = {
           id: employee.id,
         };
-        this.deleteSale(obj);
+        this.deleteEmployee(obj);
       }
     );
   }
 
   /* Show Modal */
   showModal(classModal: string, title: string, employee?: Employee): void {
+    
     /* Select Element or Default */
     const defaultSale = {
       id: 0,
@@ -253,13 +269,14 @@ export class EmployeesComponent {
       address: '',
       status: '',
       role: '',
+      photo: '',
       role_id: 0,
       created_at: '',
       updated_at: '',
     };
 
     this.selectedEmployee = employee ? employee : defaultSale;
-
+    
     /* Inti Form => Show Modal */
     this.employeeForm.patchValue({
       id: this.selectedEmployee?.id || 0,
@@ -268,11 +285,16 @@ export class EmployeesComponent {
       phone: this.selectedEmployee?.phone || '',
       address: this.selectedEmployee?.address || '',
       status: this.selectedEmployee?.status || '',
+      photo: this.selectedEmployee?.photo || '',
       role_id: this.selectedEmployee?.role_id || 0,
       role: this.selectedEmployee?.role || '',
     });
 
+    
+    
+
     /* Pass => Data Modal (Class, Visible and Title) */
+    this.nameFile = this.selectedEmployee?.photo || '';
     this.isModalVisible = true;
     this.titleModal = title;
     this.classModal = classModal;
@@ -286,11 +308,14 @@ export class EmployeesComponent {
   /* Execute Function Add-Edit-Delete-Create Invoice */
   handleClick(): void {
     switch (this.classModal) {
+      case 'add':
+        this.addEmployee();
+        break;
       case 'edit':
         this.editEmployee();
         break;
-      case 'add':
-        this.addEmployee();
+      case 'editPhoto':
+        this.editPhotoEmployee();
         break;
       default:
         break;
@@ -340,13 +365,6 @@ export class EmployeesComponent {
   }
 
   editEmployee(): void {
-    Object.keys(this.employeeForm.controls).forEach((key) => {
-      const controlErrors = this.employeeForm.get(key)?.errors;
-      if (controlErrors) {
-        console.log(`Errores en el control ${key}:`, controlErrors);
-      }
-    });
-
     if (this.employeeForm.valid) {
       const formValue = this.employeeForm.value;
       this.apiServiceEmployees.editEmployee(formValue).subscribe({
@@ -383,7 +401,90 @@ export class EmployeesComponent {
     }
   }
 
-  deleteSale(credentials: DeleteRequest): void {
+  editPhotoEmployee(): void {
+    if (this.employeeForm.valid) {
+      const formValue = this.employeeForm.value;
+      if (this.selectedFile) {
+        const formData = new FormData();
+        formData.append('id', formValue.id);
+        formData.append('photo', this.selectedFile);
+        this.uploadPhoto(formData);
+      } else {
+        this.swalService.showFire(
+          'error',
+          'Por favor, ingresa un archivo válido',
+          '',
+          'text',
+          () => {}
+        );
+      }
+    } else {
+      this.swalService.showFire(
+        'warning',
+        'Error',
+        'Por favor, ingresa correctamente la información.'
+      );
+    }
+  }
+
+  /* Upload Photo -- Function */
+  uploadPhoto(formData: FormData): void {
+    this.apiServiceEmployees.editPhotoEmployee(formData).subscribe({
+      next: (response) => {
+        this.swalService.showFire(
+          'success',
+          response.message || 'Fotografía Subida con Éxito',
+          '',
+          'text',
+          () => {
+            this.resetFileInput();
+            this.getAllEmployees();
+          }
+        );
+      },
+      error: (error) => {
+        this.swalService.showFire(
+          'error',
+          'Error',
+          error.error?.error ||
+            'Ocurrió un error al Subir la Imágen del Empleado.'
+        );
+      },
+    });
+  }
+
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      const validationError = this.fileTypeValidator(file);
+      if (validationError) {
+        this.swalService.showFire(
+          'warning',
+          'Error',
+          'Solo se permiten imágenes (JPG, PNG, GIF, JPEG)'
+        );
+        return;
+      }
+
+      this.selectedFile = file;
+    }
+  }
+
+  /* Validate Upload => Image */
+  fileTypeValidator(file: File): { [key: string]: any } | null {
+    const validImageTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/jpg',
+    ];
+    if (!validImageTypes.includes(file.type)) {
+      return { invalidFileType: true };
+    }
+    return null;
+  }
+
+  deleteEmployee(credentials: DeleteRequest): void {
     this.apiServiceEmployees.deleteEmployee(credentials).subscribe({
       next: (response) => {
         this.swalService.showToast(

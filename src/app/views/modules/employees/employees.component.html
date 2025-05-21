@@ -43,8 +43,18 @@
   (executeFunction)="handleClick()"
 >
   <!-- Form View || Form Edit -->
+  <div
+    class="form-group d-flex justify-content-center"
+    *ngIf="classModal === 'editPhoto'"
+  >
+    <img
+      class="theme-color w-80 rounded mb-3 bg-primary"
+      style="height: 250px"
+      [src]="apiUpload + nameFile"
+    />
+  </div>
   <form [formGroup]="employeeForm" class="product-form" [ngClass]="classModal">
-    <div class="form-group" *ngIf="classModal !== 'add'">
+    <div class="form-group" *ngIf="classModal === 'editPhoto'">
       <label for="id">N° Empleado:</label>
       <input
         id="id"
@@ -55,92 +65,116 @@
         (keydown)="validationsFormService.preventInput($event)"
         (input)="validationsFormService.preventInput($event)"
       />
-      <div
-        *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'id')"
-        class="error-message"
-      >
-        {{ validationsFormService.getErrorMessage(employeeForm, "id") }}
-      </div>
     </div>
-
-    <div class="form-group">
-      <label for="name">Nombre:</label>
+    <div class="form-group" *ngIf="classModal === 'editPhoto'">
+      <label for="photo">Foto:</label>
       <input
-        id="name"
-        formControlName="name"
+        id="photo"
+        (change)="onFileSelected($event)"
         class="form-control"
-        type="text"
+        type="file"
       />
-      <div
-        *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'name')"
-        class="error-message"
-      >
-        {{ validationsFormService.getErrorMessage(employeeForm, "name") }}
-      </div>
     </div>
 
-    <div class="form-group">
-      <label for="email">E-mail:</label>
-      <input
-        id="email"
-        formControlName="email"
-        class="form-control"
-        type="email"
-      />
-      <div
-        *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'email')"
-        class="error-message"
-      >
-        {{ validationsFormService.getErrorMessage(employeeForm, "email") }}
+    <ng-container *ngIf="classModal !== 'editPhoto'">
+      <div class="form-group" *ngIf="classModal !== 'add'">
+        <label for="id">N° Empleado:</label>
+        <input
+          id="id"
+          formControlName="id"
+          class="form-control readonly-input"
+          type="text"
+          readonly
+          (keydown)="validationsFormService.preventInput($event)"
+          (input)="validationsFormService.preventInput($event)"
+        />
+        <div
+          *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'id')"
+          class="error-message"
+        >
+          {{ validationsFormService.getErrorMessage(employeeForm, "id") }}
+        </div>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label for="phone">Télefono:</label>
-      <input
-        id="phone"
-        formControlName="phone"
-        class="form-control"
-        type="phone"
-      />
-      <div
-        *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'phone')"
-        class="error-message"
-      >
-        {{ validationsFormService.getErrorMessage(employeeForm, "phone") }}
+      <div class="form-group">
+        <label for="name">Nombre:</label>
+        <input
+          id="name"
+          formControlName="name"
+          class="form-control"
+          type="text"
+        />
+        <div
+          *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'name')"
+          class="error-message"
+        >
+          {{ validationsFormService.getErrorMessage(employeeForm, "name") }}
+        </div>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label for="address">Dirección:</label>
-      <input
-        id="address"
-        formControlName="address"
-        class="form-control"
-        type="text"
-      />
-      <div
-        *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'address')"
-        class="error-message"
-      >
-        {{ validationsFormService.getErrorMessage(employeeForm, "address") }}
+      <div class="form-group">
+        <label for="email">E-mail:</label>
+        <input
+          id="email"
+          formControlName="email"
+          class="form-control"
+          type="email"
+        />
+        <div
+          *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'email')"
+          class="error-message"
+        >
+          {{ validationsFormService.getErrorMessage(employeeForm, "email") }}
+        </div>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label for="role_id">Rol:</label>
-      <select id="role_id" formControlName="role_id" class="form-control">
-        <option value="">Selecciona una Categoría</option>
-        <option *ngFor="let rol of roles" [value]="rol.id">
-          {{ rol.name }}
-        </option>
-      </select>
-      <div
-        *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'role_id')"
-        class="error-message"
-      >
-        {{ validationsFormService.getErrorMessage(employeeForm, "role_id") }}
+      <div class="form-group">
+        <label for="phone">Télefono:</label>
+        <input
+          id="phone"
+          formControlName="phone"
+          class="form-control"
+          type="phone"
+        />
+        <div
+          *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'phone')"
+          class="error-message"
+        >
+          {{ validationsFormService.getErrorMessage(employeeForm, "phone") }}
+        </div>
       </div>
-    </div>
+
+      <div class="form-group">
+        <label for="address">Dirección:</label>
+        <input
+          id="address"
+          formControlName="address"
+          class="form-control"
+          type="text"
+        />
+        <div
+          *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'address')"
+          class="error-message"
+        >
+          {{ validationsFormService.getErrorMessage(employeeForm, "address") }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="role_id">Rol:</label>
+        <select id="role_id" formControlName="role_id" class="form-control">
+          <option value="">Selecciona una Categoría</option>
+          <option *ngFor="let rol of roles" [value]="rol.id">
+            {{ rol.name }}
+          </option>
+        </select>
+        <div
+          *ngIf="validationsFormService.isFieldInvalid(employeeForm, 'role_id')"
+          class="error-message"
+        >
+          {{ validationsFormService.getErrorMessage(employeeForm, "role_id") }}
+        </div>
+      </div>
+    </ng-container>
   </form>
 </app-modal>
