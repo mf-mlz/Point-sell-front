@@ -294,7 +294,7 @@ export class EmployeesComponent {
     
 
     /* Pass => Data Modal (Class, Visible and Title) */
-    this.nameFile = this.selectedEmployee?.photo || '';
+    this.nameFile = this.selectedEmployee?.photo || 'noImage.png';
     this.isModalVisible = true;
     this.titleModal = title;
     this.classModal = classModal;

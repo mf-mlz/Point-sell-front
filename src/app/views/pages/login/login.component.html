@@ -57,7 +57,12 @@
 
                 <c-row style="margin-top: 20px">
                   <c-col xs="6">
-                    <button cButton class="px-4 btn-login" color="primary" type="submit">
+                    <button
+                      cButton
+                      class="px-4 btn-login"
+                      color="primary"
+                      type="submit"
+                    >
                       Login
                     </button>
                   </c-col>
@@ -77,11 +82,11 @@
                   El control total de tu tienda en un solo lugar.
                 </p>
                 <button
+                  (click)="goForgot()"
                   [active]="true"
                   cButton
                   class="mt-3 btn-forget-password"
                   color="primary"
-                  routerLink="/register"
                 >
                   ¿Olvidaste tu contraseña?
                 </button>

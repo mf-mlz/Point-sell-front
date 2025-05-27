@@ -31,7 +31,7 @@
             "inlineStyleLanguage": "scss",
             "preserveSymlinks": true,
             "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["src/scss/styles.scss"],
+            "styles": ["src/scss/styles.scss",  "node_modules/ngx-spinner/animations/ball-scale-multiple.css"],
             "scripts": [],
             "allowedCommonJsDependencies": []
           },
@@ -86,7 +86,7 @@
             "karmaConfig": "karma.conf.js",
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["src/scss/styles.scss"],
+            "styles": ["src/scss/styles.scss",  "node_modules/ngx-spinner/animations/ball-scale-multiple.css"],
             "scripts": []
           }
         }

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { DefaultLayoutComponent } from './layout';
+import { ResetGuard } from './guards/reset.guard';
 
 export const routes: Routes = [
   {
@@ -94,6 +95,7 @@ export const routes: Routes = [
   {
     path: 'resetPassword/:token',
     loadComponent: () => import('./views/pages/resetPassword/resetPassword.component').then(m => m.ResetPasswordComponent),
+    canActivate: [ResetGuard],
     data: {
       title: 'Reset Password'
     }

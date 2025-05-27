@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { ApiServiceLogout } from './api.service.logout';
-import Swal from 'sweetalert2';
 import { SwalService } from './swal.service';
+import { SocketService } from './socket.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +11,8 @@ export class AuthService {
   constructor(
     private cookieService: CookieService,
     private apiServiceLogout: ApiServiceLogout,
-    private swalService: SwalService
+    private swalService: SwalService,
+    private socketService: SocketService
   ) {}
 
   /* Remove SessionStorage => Payload */
@@ -41,5 +42,7 @@ export class AuthService {
         );
       },
     });
+
+     this.socketService.disconnect();
   }
 }

@@ -28,8 +28,8 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
-import { AuthService } from 'src/app/services/auth.service';
-import { VerifyCodeSms } from 'src/app/models/interfaces';
+import { SocketService } from '../../../services/socket.service';
+import { VerifyCodeSms } from '../../../models/interfaces';
 
 @Component({
   selector: 'app-login',
@@ -63,7 +63,8 @@ export class LoginComponent {
     private fb: FormBuilder,
     private router: Router,
     private swalService: SwalService,
-    private userService: UserService
+    private userService: UserService,
+    private socketService: SocketService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -107,19 +108,30 @@ export class LoginComponent {
                 code: Number(result.value),
                 codeResend: response.code,
                 data: response.data,
+                temp: response.temp,
               };
 
               this.validCode(data)
                 .then((res) => {
-                  this.swalService.showToast(
-                    'success',
-                    'Bienvenido',
-                    res.message || 'Inicio de Sesión Éxitoso',
-                    'text',
-                    () => {}
-                  );
-                  /* Save Data */
-                  this.saveDataSession(response.data);
+                  /* Temporary Session */
+                  if (res.temp) {
+                    console.log(res.temp);
+                    console.log('SESION TEMPORAL');
+                    const email = credentials.email;
+                    this.router.navigate(['/forgotPassword'], {
+                      state: { email },
+                    });
+                  } else {
+                    this.swalService.showToast(
+                      'success',
+                      'Bienvenido',
+                      res.message || 'Inicio de Sesión Éxitoso',
+                      'text',
+                      () => {}
+                    );
+                    /* Save Data */
+                    this.saveDataSession(response.data);
+                  }
                 })
                 .catch((error) => {
                   this.swalService.showToast(
@@ -179,5 +191,10 @@ export class LoginComponent {
   saveDataSession = (sessionEmployee: any): void => {
     sessionStorage.setItem('session-employee', JSON.stringify(sessionEmployee));
     this.router.navigate(['/dashboard']);
+    this.socketService.connect();
   };
+
+  goForgot() {
+    this.router.navigate(['/forgotPassword']);
+  }
 }

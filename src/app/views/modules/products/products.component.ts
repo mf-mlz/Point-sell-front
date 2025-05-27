@@ -25,7 +25,6 @@ import {
 } from '@coreui/angular';
 
 import { ApiServiceProducts } from '../../../services/api.service.products';
-import Swal from 'sweetalert2';
 import { ModalComponentHtml } from '../../../modalHtml/modalhtml.component';
 import {
   FormBuilder,
@@ -50,6 +49,7 @@ import { ValidationsFormService } from '../../../utils/form-validations';
 import { onKeydownScanner } from '../../../utils/scanner';
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { SwalService } from 'src/app/services/swal.service';
+import { SocketService } from 'src/app/services/socket.service';
 
 @Component({
   templateUrl: 'products.component.html',

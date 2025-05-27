@@ -380,4 +380,10 @@ export interface VerifyCodeSms {
   code: number;
   codeResend: string;
   data: string;
+  temp: boolean;
+}
+
+/* Reset */
+export interface ResetVerify {
+  token: string;
 }
