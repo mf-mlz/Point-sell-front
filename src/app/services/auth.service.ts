@@ -18,31 +18,42 @@ export class AuthService {
   /* Remove SessionStorage => Payload */
   /* Unsuscribe => Nav (Pendiente) */
   public clearPayloadFromSession() {
-    sessionStorage.clear();
-    this.cookieService.delete('token');
-
     /* Clear Cookie => Backend */
-    this.apiServiceLogout.logout().subscribe({
-      next: (response) => {
-        this.swalService.showToast(
-          'success',
-          response.message,
-          '',
-          'text',
-          () => {}
-        );
-      },
-      error: (error) => {
-        this.swalService.showToast(
-          'error',
-          'Error',
-          error.error?.message || 'Ocurrió un Error',
-          'text',
-          () => {}
-        );
-      },
-    });
+    const sessionData = sessionStorage.getItem('session-employee') || null;
+    if (sessionData) {
+      this.apiServiceLogout.logout({ sessionData }).subscribe({
+        next: (response) => {
+          sessionStorage.clear();
+          this.cookieService.delete('token');
 
-     this.socketService.disconnect();
+          this.swalService.showToast(
+            'success',
+            response.message,
+            '',
+            'text',
+            () => {}
+          );
+        },
+        error: (error) => {
+          this.swalService.showToast(
+            'error',
+            'Error',
+            error.error?.message || 'Ocurrió un Error',
+            'text',
+            () => {}
+          );
+        },
+      });
+
+      this.socketService.disconnect();
+    } else {
+      this.swalService.showToast(
+        'error',
+        'Error',
+        'Ocurrió un Error al Cerrar la Sesión',
+        'text',
+        () => {}
+      );
+    }
   }
 }

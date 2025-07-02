@@ -115,8 +115,6 @@ export class LoginComponent {
                 .then((res) => {
                   /* Temporary Session */
                   if (res.temp) {
-                    console.log(res.temp);
-                    console.log('SESION TEMPORAL');
                     const email = credentials.email;
                     this.router.navigate(['/forgotPassword'], {
                       state: { email },

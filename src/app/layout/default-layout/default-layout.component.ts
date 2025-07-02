@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { NgScrollbar } from 'ngx-scrollbar';
 import { IconDirective } from '@coreui/icons-angular';
-import { ModulesPermissions } from 'src/app/models/interfaces';
+import { ModulesPermissions } from '../../../../src/app/models/interfaces';
 import {
   ContainerComponent,
   ShadowOnScrollDirective,
@@ -17,7 +17,8 @@ import {
 import { DefaultFooterComponent, DefaultHeaderComponent } from './';
 import { NavService } from './_nav';
 import { INavData } from '@coreui/angular';
-import { ApiServicePermissions } from 'src/app/services/api.service.permissions';
+import { ApiServicePermissions } from '../../services/api.service.permissions';
+import { NotifierComponent } from '../notifier/notifier.component';
 
 function isOverflown(element: HTMLElement) {
   return (
@@ -47,6 +48,7 @@ function isOverflown(element: HTMLElement) {
     ContainerComponent,
     RouterOutlet,
     DefaultFooterComponent,
+    NotifierComponent
   ],
 })
 export class DefaultLayoutComponent implements OnInit {

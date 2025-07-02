@@ -27,9 +27,9 @@ export class ApiServiceEmployees {
     return this.http.post(url, credentials, { withCredentials: true });
   }
 
-  logout(): Observable<any> {
+  logout(credentials: {sessionData: string}): Observable<any> {
     const url = `${this.apiUrl}/employees/logout`;
-    return this.http.post(url, {});
+    return this.http.post(url, credentials, {withCredentials: true});
   }
 
   filterEmployeesAll(filters: { search?: string }): Observable<any> {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import Swal, { SweetAlertIcon } from 'sweetalert2';
+import Swal, { SweetAlertIcon, SweetAlertPosition  } from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root',
@@ -48,10 +48,13 @@ export class SwalService {
     });
   } 
 
-  showToast(icon: SweetAlertIcon, title: string, content: string, type: 'text' | 'html' = 'text', action?: () => void) {
+  showToast(icon: SweetAlertIcon, title: string, content: string, type: 'text' | 'html' = 'text', action?: () => void, position: SweetAlertPosition  = 'top-end') {
     this.Toast.fire({
+      showConfirmButton: false,
+      timer: 3000,
       icon,
       title,
+      position: position,
       [type]: content
     }).then(() => {
       if (action) {
@@ -60,6 +63,5 @@ export class SwalService {
     });
   }
 
-  
 
 }
