@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { DefaultLayoutComponent } from './layout';
+import { ResetGuard } from './guards/reset.guard';
 
 export const routes: Routes = [
   {
@@ -82,6 +83,21 @@ export const routes: Routes = [
     loadComponent: () => import('./views/pages/register/register.component').then(m => m.RegisterComponent),
     data: {
       title: 'Register Page'
+    }
+  },
+  {
+    path: 'forgotPassword',
+    loadComponent: () => import('./views/pages/forgotPassword/forgotPassword.component').then(m => m.ForgotPasswordComponent),
+    data: {
+      title: 'forgot Password'
+    }
+  },
+  {
+    path: 'resetPassword/:token',
+    loadComponent: () => import('./views/pages/resetPassword/resetPassword.component').then(m => m.ResetPasswordComponent),
+    canActivate: [ResetGuard],
+    data: {
+      title: 'Reset Password'
     }
   },
   { path: '**', redirectTo: 'dashboard' }

@@ -1,0 +1,84 @@
+.form-group {
+  margin-bottom: 5px;
+  padding: 5px;
+}
+
+.form-group label {
+  margin-bottom: 10px;
+}
+
+.error-message {
+  color: red;
+  padding: 3px;
+}
+
+.span-color {
+  padding: 1px;
+  color: white;
+  width: 50%;
+  border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto;
+  height: 30px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.Electronics {
+  background-color: gray;
+}
+
+.Furniture {
+  background-color: rgb(93, 0, 124);
+}
+
+.Fashion {
+  background-color: rgb(251, 4, 82);
+}
+
+.Accessories {
+  background-color: green;
+}
+
+.Home {
+  background-color: yellow;
+  color: black;
+}
+
+.desconocidaa {
+  background-color: black;
+  color: white;
+}
+
+.desconocida{
+  background-color: black;
+  color: white;
+}
+
+.btn-product {
+  font-size: 15px;
+}
+
+.eye {
+  z-index: 1 !important;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.add input,
+select {
+ display: inline !important;
+}
+
+.btn-category{
+  font-size: 15px;
+  font-weight: bolder;
+  border: 1px solid transparent;
+  border-radius: 10px !important;
+  height: 50px !important;
+  width: 100%;
+}

@@ -1,9 +1,11 @@
-import { NgStyle, NgTemplateOutlet } from '@angular/common';
+import { NgStyle, NgTemplateOutlet, CommonModule } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ApiServiceEmployees } from 'src/app/services/api.service.employees';
+import { UserService } from 'src/app/services/user.service';
 import { Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 
 import {
   AvatarComponent,
@@ -63,10 +65,12 @@ import { OnInit } from '@angular/core';
     ProgressBarDirective,
     ProgressComponent,
     NgStyle,
+    CommonModule
   ],
 })
 export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   public userPayload: any;
+  public apiUpload = environment.apiUpload;
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
 
@@ -87,13 +91,14 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private apiServiceEmployees: ApiServiceEmployees
+    private apiServiceEmployees: ApiServiceEmployees,
+    private userService: UserService
   ) {
     super();
   }
 
-  ngOnInit(): void {
-    this.userPayload = this.authService.getDecodedToken();
+  async ngOnInit(): Promise<void> {
+    this.userPayload = await this.userService.getUser(); 
   }
 
   onLogout() {

@@ -12,8 +12,8 @@ export class ApiServiceLogout {
   constructor(private http: HttpClient) { }
 
   /* Post */
-  logout(): Observable<any> {
+  logout(credentials: {sessionData: string}): Observable<any> {
     const url = `${this.apiUrl}/employees/logout`;
-    return this.http.post(url, {});
+    return this.http.post(url, credentials, {withCredentials: true});
   }
 }

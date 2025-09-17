@@ -3,7 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthHeaderService } from './auth-header.service';
-import { Employee, EmployeeFilter } from '../models/interfaces';
+import {
+  Employee,
+  EmployeeFilter,
+  VerifyCodeSms,
+  Photo,
+} from '../models/interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -22,9 +27,9 @@ export class ApiServiceEmployees {
     return this.http.post(url, credentials, { withCredentials: true });
   }
 
-  logout(): Observable<any> {
+  logout(credentials: {sessionData: string}): Observable<any> {
     const url = `${this.apiUrl}/employees/logout`;
-    return this.http.post(url, {});
+    return this.http.post(url, credentials, {withCredentials: true});
   }
 
   filterEmployeesAll(filters: { search?: string }): Observable<any> {
@@ -34,7 +39,7 @@ export class ApiServiceEmployees {
       withCredentials: true,
     });
   }
-  
+
   filter(filters: EmployeeFilter): Observable<any> {
     const url = `${this.apiUrl}/employees/filter`;
     return this.http.post(url, filters, {
@@ -51,6 +56,11 @@ export class ApiServiceEmployees {
     });
   }
 
+  verifyCode(credentials: VerifyCodeSms): Observable<any> {
+    const url = `${this.apiUrl}/employees/verifyCode`;
+    return this.http.post(url, credentials, { withCredentials: true });
+  }
+
   /* Get */
   allEmployees(): Observable<any> {
     const url = `${this.apiUrl}/employees`;
@@ -63,6 +73,30 @@ export class ApiServiceEmployees {
   getRoles(): Observable<any> {
     const url = `${this.apiUrl}/roles/get`;
     return this.http.get(url, {
+      headers: this.authHeaderService.getHeaders(),
+      withCredentials: true,
+    });
+  }
+
+  getDataSession(): Observable<any> {
+    const url = `${this.apiUrl}/employees/getDataSession`;
+    return this.http.get(url, {
+      headers: this.authHeaderService.getHeaders(),
+      withCredentials: true,
+    });
+  }
+
+  getModulesSession(): Observable<any> {
+    const url = `${this.apiUrl}/employees/getModulesSession`;
+    return this.http.get(url, {
+      headers: this.authHeaderService.getHeaders(),
+      withCredentials: true,
+    });
+  }
+
+  editPhotoEmployee(formData: FormData): Observable<any> {
+    const url = `${this.apiUrl}/employees/uploadPhoto`;
+    return this.http.post(url, formData, {
       headers: this.authHeaderService.getHeaders(),
       withCredentials: true,
     });

@@ -8,12 +8,13 @@ import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
 import { ApiServiceEmployees } from './services/api.service.employees';
 import { UserService } from './services/user.service'; 
+import { NgxSpinnerModule } from "ngx-spinner";
 
 @Component({
   selector: 'app-root',
   template: '<router-outlet />',
   standalone: true,
-  imports: [RouterOutlet]
+  imports: [RouterOutlet, NgxSpinnerModule]
 })
 export class AppComponent implements OnInit {
   title = 'CoreUI Angular Admin Template';

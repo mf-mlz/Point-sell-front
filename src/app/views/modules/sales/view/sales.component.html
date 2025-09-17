@@ -1,22 +1,10 @@
 <div class="d-flex flex-column flex-md-row p-4">
-  <div class="col-12 mb-3 mb-md-0 d-flex align-items-center">
-    <input
-      type="text"
-      class="form-control me-2"
-      placeholder="Ingresa el Id de la Venta"
-      [(ngModel)]="idSaleSearch"
-      (keyup.enter)="searchSale()"
-    />
-    <button
-      class="btn btn-success fw-bold d-flex align-items-center justify-content-center btn-search"
-    >
-      <app-icons icon="search"></app-icons>
-      <span>Buscar</span>
-    </button>
+  <div class="col-12 mb-3 mb-md-0 d-flex align-items-center justify-content-end">
     <button
       class="mx-3 btn btn-success fw-bold d-flex align-items-center justify-content-center btn-filter"
       (click)="addSale()"
-      *ngIf="permissions.add">
+      *ngIf="permissions && permissions.add"
+    >
       <app-icons icon="plus"></app-icons>
       <span>Añadir Venta</span>
     </button>

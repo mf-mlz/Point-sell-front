@@ -71,7 +71,7 @@ export class ApiServiceSales {
 
   /* Delete */
   deleteSale(credentials: { id: number }): Observable<any> {
-    const url = `${this.apiUrl}/sales/delete${credentials.id}`;
+    const url = `${this.apiUrl}/sales/delete/${credentials.id}`;
     return this.http.delete(url, {
       headers: this.authHeaderService.getHeaders(),
       withCredentials: true,
