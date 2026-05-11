@@ -18,6 +18,18 @@ Cuenta con las siguientes funcionalidades clave:
 
 Este sistema proporciona una solución completa y escalable para cualquier tipo de negocio que requiera un punto de venta robusto y con capacidades avanzadas.
 
+# Configuración del BackEnd
+
+> Antes de ejecutar este proyecto, es necesario tener correctamente instalado, configurado e iniciado el API del sistema.
+
+- [Link del BackEnd](https://github.com/mf-mlz/Point-sell-api)
+
+## Importante
+- El API debe estar funcionando correctamente para que el sistema pueda consumir los servicios.
+- Configura las variables de entorno tanto del FrontEnd como del BackEnd.
+- Verifica que la conexión a la base de datos esté activa.
+- Asegúrate de ejecutar primero el servidor del BackEnd antes de iniciar el FrontEnd.
+
 # Instalación
 Para instalar y ejecutar este sistema de punto de venta, sigue estos pasos:
 
